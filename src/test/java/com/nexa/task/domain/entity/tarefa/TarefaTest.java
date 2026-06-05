@@ -71,4 +71,24 @@ class TarefaTest {
 
         assertEquals("Dificuldade da tarefa é obrigatório.", exception.getMessage());
     }
+
+    @Test
+    void deveAlterarStatusParaAtivoQuandoAtivarTarefa() {
+
+        Tarefa tarefa = new TarefaBuilder().comAtivo(false).build();
+
+        tarefa.ativar();
+
+        assertTrue(tarefa.getAtivo());
+    }
+
+    @Test
+    void deveAlterarStatusParaInativoQuandoDesativarTarefa() {
+
+        Tarefa tarefa = new TarefaBuilder().comAtivo(true).build();
+
+        tarefa.desativar();
+
+        assertFalse(tarefa.getAtivo());
+    }
 }

@@ -43,4 +43,24 @@ class WorkspaceTest {
 
         assertEquals("Descrição do workspace é obrigatória.", exception.getMessage());
     }
+
+    @Test
+    void deveAlterarStatusParaAtivoQuandoAtivarWorkspace() {
+
+        Workspace workspace = new WorkspaceBuilder().comAtivo(false).build();
+
+        workspace.ativar();
+
+        assertTrue(workspace.getAtivo());
+    }
+
+    @Test
+    void deveAlterarStatusParaInativoQuandoDesativarWorkspace() {
+
+        Workspace workspace = new WorkspaceBuilder().comAtivo(true).build();
+
+        workspace.desativar();
+
+        assertFalse(workspace.getAtivo());
+    }
 }
