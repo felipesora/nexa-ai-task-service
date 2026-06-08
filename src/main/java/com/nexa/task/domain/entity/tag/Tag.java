@@ -8,8 +8,9 @@ public class Tag {
     private Long idUsuario;
     private String nome;
     private Boolean ativo;
+    private CorTag corTag;
 
-    public Tag(Long id, Long idUsuario, String nome, Boolean ativo) {
+    public Tag(Long id, Long idUsuario, String nome, Boolean ativo, CorTag corTag) {
         validarIdUsuario(idUsuario);
         validarNome(nome);
 
@@ -17,6 +18,7 @@ public class Tag {
         this.idUsuario = idUsuario;
         this.nome = nome;
         this.ativo = ativo;
+        this.corTag = corTag;
     }
 
     public void ativar() {
@@ -69,5 +71,13 @@ public class Tag {
 
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public CorTag getCorTag() {
+        return corTag;
+    }
+
+    public void setCorTag(CorTag corTag) {
+        this.corTag = corTag;
     }
 }

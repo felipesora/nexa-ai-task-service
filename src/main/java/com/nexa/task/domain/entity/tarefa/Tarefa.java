@@ -1,9 +1,11 @@
 package com.nexa.task.domain.entity.tarefa;
 
+import com.nexa.task.domain.entity.tag.Tag;
 import com.nexa.task.domain.entity.workspace.Workspace;
 import com.nexa.task.domain.exception.DomainException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class Tarefa {
 
@@ -20,11 +22,12 @@ public class Tarefa {
     private LocalDateTime atualizadoEm;
     private Boolean ativo;
     private Workspace workspace;
+    private List<Tag> tags;
 
     public Tarefa(Long id, Long idUsuario, String titulo, String descricao,
                   PrioridadeTarefa prioridade, StatusTarefa status, DificuldadeTarefa dificuldade,
                   LocalDateTime dataLimite, LocalDateTime dataConclusao, LocalDateTime criadoEm,
-                  LocalDateTime atualizadoEm, Boolean ativo, Workspace workspace) {
+                  LocalDateTime atualizadoEm, Boolean ativo, Workspace workspace, List<Tag> tags) {
         validarIdUsuario(idUsuario);
         validarTitulo(titulo);
         validarDescricao(descricao);
@@ -46,6 +49,7 @@ public class Tarefa {
         this.atualizadoEm = atualizadoEm;
         this.ativo = ativo;
         this.workspace = workspace;
+        this.tags = tags;
     }
 
     public void ativar() {
@@ -54,6 +58,18 @@ public class Tarefa {
 
     public void desativar() {
         this.ativo = false;
+    }
+
+    public void adicionarTag(Tag tag) {
+        if (tag == null) {
+            throw new DomainException("Tag é obrigatória.");
+        }
+
+        this.tags.add(tag);
+    }
+
+    public void removerTagPeloId(Long idTag) {
+        this.tags.removeIf(tag -> tag.getId().equals(idTag));
     }
 
     private void validarIdUsuario(Long idUsuario) {
@@ -200,5 +216,13 @@ public class Tarefa {
 
     public void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 }

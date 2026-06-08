@@ -1,5 +1,6 @@
 package com.nexa.task.domain.builder.tag;
 
+import com.nexa.task.domain.entity.tag.CorTag;
 import com.nexa.task.domain.entity.tag.Tag;
 
 public class TagBuilder {
@@ -8,6 +9,7 @@ public class TagBuilder {
     private Long idUsuario = 1L;
     private String nome = "Tag Padrão";
     private Boolean ativo = true;
+    private CorTag corTag = new CorTagBuilder().build();
 
     public TagBuilder comId(Long id) {
         this.id = id;
@@ -29,12 +31,18 @@ public class TagBuilder {
         return this;
     }
 
+    public TagBuilder comCor(CorTag corTag) {
+        this.corTag = corTag;
+        return this;
+    }
+
     public Tag build() {
         return new Tag(
                 id,
                 idUsuario,
                 nome,
-                ativo
+                ativo,
+                corTag
         );
     }
 }
