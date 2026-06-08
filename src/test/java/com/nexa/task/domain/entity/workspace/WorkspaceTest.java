@@ -18,6 +18,8 @@ class WorkspaceTest {
         assertEquals("Nome do workspace", workspace.getNome());
         assertEquals("Descrição do workspace", workspace.getDescricao());
         assertTrue(workspace.getAtivo());
+        assertEquals(1L, workspace.getIconeWorkspace().getId());
+        assertEquals(1L, workspace.getCorWorkspace().getId());
     }
 
     @Test

@@ -12,8 +12,12 @@ public class Workspace {
     private String descricao;
     private LocalDateTime criadoEm;
     private Boolean ativo;
+    private CorWorkspace corWorkspace;
+    private IconeWorkspace iconeWorkspace;
 
-    public Workspace(Long id, Long idUsuario, String nome, String descricao, LocalDateTime criadoEm, Boolean ativo) {
+    public Workspace(Long id, Long idUsuario, String nome, String descricao,
+                     LocalDateTime criadoEm, Boolean ativo,
+                     CorWorkspace corWorkspace, IconeWorkspace iconeWorkspace) {
         validarIdUsuario(idUsuario);
         validarNome(nome);
         validarDescricao(descricao);
@@ -24,6 +28,8 @@ public class Workspace {
         this.descricao = descricao;
         this.criadoEm = criadoEm;
         this.ativo = ativo;
+        this.corWorkspace = corWorkspace;
+        this.iconeWorkspace = iconeWorkspace;
     }
 
     public void ativar() {
@@ -98,5 +104,21 @@ public class Workspace {
 
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public CorWorkspace getCorWorkspace() {
+        return corWorkspace;
+    }
+
+    public void setCorWorkspace(CorWorkspace corWorkspace) {
+        this.corWorkspace = corWorkspace;
+    }
+
+    public IconeWorkspace getIconeWorkspace() {
+        return iconeWorkspace;
+    }
+
+    public void setIconeWorkspace(IconeWorkspace iconeWorkspace) {
+        this.iconeWorkspace = iconeWorkspace;
     }
 }

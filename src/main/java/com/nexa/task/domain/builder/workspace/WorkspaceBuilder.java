@@ -1,5 +1,7 @@
 package com.nexa.task.domain.builder.workspace;
 
+import com.nexa.task.domain.entity.workspace.CorWorkspace;
+import com.nexa.task.domain.entity.workspace.IconeWorkspace;
 import com.nexa.task.domain.entity.workspace.Workspace;
 
 import java.time.LocalDateTime;
@@ -12,6 +14,8 @@ public class WorkspaceBuilder {
     private String descricao = "Descrição do workspace";
     private LocalDateTime criadoEm = LocalDateTime.now();
     private Boolean ativo = true;
+    private CorWorkspace corWorkspace = new CorWorkspaceBuilder().build();
+    private IconeWorkspace iconeWorkspace = new IconeWorkspaceBuilder().build();
 
     public WorkspaceBuilder comId(Long id) {
         this.id = id;
@@ -38,6 +42,16 @@ public class WorkspaceBuilder {
         return this;
     }
 
+    public WorkspaceBuilder comCor(CorWorkspace corWorkspace) {
+        this.corWorkspace = corWorkspace;
+        return this;
+    }
+
+    public WorkspaceBuilder comIcone(IconeWorkspace iconeWorkspace) {
+        this.iconeWorkspace = iconeWorkspace;
+        return this;
+    }
+
     public WorkspaceBuilder comAtivo(Boolean ativo) {
         this.ativo = ativo;
         return this;
@@ -50,7 +64,9 @@ public class WorkspaceBuilder {
                 nome,
                 descricao,
                 criadoEm,
-                ativo
+                ativo,
+                corWorkspace,
+                iconeWorkspace
         );
     }
 }
