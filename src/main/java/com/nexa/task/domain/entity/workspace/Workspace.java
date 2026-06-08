@@ -15,9 +15,8 @@ public class Workspace {
     private CorWorkspace corWorkspace;
     private IconeWorkspace iconeWorkspace;
 
-    public Workspace(Long id, Long idUsuario, String nome, String descricao,
-                     LocalDateTime criadoEm, Boolean ativo,
-                     CorWorkspace corWorkspace, IconeWorkspace iconeWorkspace) {
+    public Workspace(Long id, Long idUsuario, String nome, String descricao, LocalDateTime criadoEm,
+                     Boolean ativo, CorWorkspace corWorkspace, IconeWorkspace iconeWorkspace) {
         validarIdUsuario(idUsuario);
         validarNome(nome);
         validarDescricao(descricao);

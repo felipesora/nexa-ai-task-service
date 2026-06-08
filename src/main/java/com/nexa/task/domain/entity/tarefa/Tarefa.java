@@ -1,5 +1,6 @@
 package com.nexa.task.domain.entity.tarefa;
 
+import com.nexa.task.domain.entity.workspace.Workspace;
 import com.nexa.task.domain.exception.DomainException;
 
 import java.time.LocalDateTime;
@@ -18,18 +19,19 @@ public class Tarefa {
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
     private Boolean ativo;
+    private Workspace workspace;
 
     public Tarefa(Long id, Long idUsuario, String titulo, String descricao,
                   PrioridadeTarefa prioridade, StatusTarefa status, DificuldadeTarefa dificuldade,
                   LocalDateTime dataLimite, LocalDateTime dataConclusao, LocalDateTime criadoEm,
-                  LocalDateTime atualizadoEm, Boolean ativo) {
-
+                  LocalDateTime atualizadoEm, Boolean ativo, Workspace workspace) {
         validarIdUsuario(idUsuario);
         validarTitulo(titulo);
         validarDescricao(descricao);
         validarPrioridade(prioridade);
         validarStatus(status);
         validarDificuldade(dificuldade);
+        validarWorkspace(workspace);
 
         this.id = id;
         this.idUsuario = idUsuario;
@@ -43,6 +45,7 @@ public class Tarefa {
         this.criadoEm = criadoEm;
         this.atualizadoEm = atualizadoEm;
         this.ativo = ativo;
+        this.workspace = workspace;
     }
 
     public void ativar() {
@@ -89,6 +92,11 @@ public class Tarefa {
         }
     }
 
+    private void validarWorkspace(Workspace workspace) {
+        if (workspace == null) {
+            throw new DomainException("Workspace da tarefa é obrigatório.");
+        }
+    }
 
     public Long getId() {
         return id;
@@ -184,5 +192,13 @@ public class Tarefa {
 
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public Workspace getWorkspace() {
+        return workspace;
+    }
+
+    public void setWorkspace(Workspace workspace) {
+        this.workspace = workspace;
     }
 }

@@ -22,6 +22,7 @@ class TarefaTest {
         assertEquals(StatusTarefa.EM_ANDAMENTO, tarefa.getStatus());
         assertEquals(DificuldadeTarefa.BAIXA, tarefa.getDificuldade());
         assertTrue(tarefa.getAtivo());
+        assertEquals(1L, tarefa.getWorkspace().getId());
     }
 
     @Test
@@ -70,6 +71,14 @@ class TarefaTest {
                 () -> new TarefaBuilder().comDificuldade(null).build());
 
         assertEquals("Dificuldade da tarefa é obrigatório.", exception.getMessage());
+    }
+
+    @Test
+    void deveLancarDomainExceptionCasoWorkspaceEstejaVazio() {
+        DomainException exception = assertThrows(DomainException.class,
+                () -> new TarefaBuilder().comWorkspace(null).build());
+
+        assertEquals("Workspace da tarefa é obrigatório.", exception.getMessage());
     }
 
     @Test

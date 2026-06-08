@@ -1,9 +1,11 @@
 package com.nexa.task.domain.builder.tarefa;
 
+import com.nexa.task.domain.builder.workspace.WorkspaceBuilder;
 import com.nexa.task.domain.entity.tarefa.DificuldadeTarefa;
 import com.nexa.task.domain.entity.tarefa.PrioridadeTarefa;
 import com.nexa.task.domain.entity.tarefa.StatusTarefa;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
+import com.nexa.task.domain.entity.workspace.Workspace;
 
 import java.time.LocalDateTime;
 
@@ -21,6 +23,7 @@ public class TarefaBuilder {
     private LocalDateTime criadoEm = LocalDateTime.now();
     private LocalDateTime atualizadoEm = LocalDateTime.now();
     private Boolean ativo = true;
+    private Workspace workspace = new WorkspaceBuilder().build();
 
     public TarefaBuilder comId(Long id) {
         this.id = id;
@@ -82,6 +85,11 @@ public class TarefaBuilder {
         return this;
     }
 
+    public TarefaBuilder comWorkspace(Workspace workspace) {
+        this.workspace = workspace;
+        return this;
+    }
+
     public Tarefa build() {
         return new Tarefa(
                 id,
@@ -95,7 +103,8 @@ public class TarefaBuilder {
                 dataConclusao,
                 criadoEm,
                 atualizadoEm,
-                ativo
+                ativo,
+                workspace
         );
     }
 }

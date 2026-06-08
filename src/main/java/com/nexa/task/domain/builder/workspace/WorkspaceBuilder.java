@@ -1,10 +1,14 @@
 package com.nexa.task.domain.builder.workspace;
 
+import com.nexa.task.domain.builder.tarefa.TarefaBuilder;
+import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.entity.workspace.CorWorkspace;
 import com.nexa.task.domain.entity.workspace.IconeWorkspace;
 import com.nexa.task.domain.entity.workspace.Workspace;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WorkspaceBuilder {
 
