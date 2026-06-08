@@ -1,6 +1,8 @@
 package com.nexa.task.domain.builder.subtarefa;
 
+import com.nexa.task.domain.builder.tarefa.TarefaBuilder;
 import com.nexa.task.domain.entity.subtarefa.Subtarefa;
+import com.nexa.task.domain.entity.tarefa.Tarefa;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +14,7 @@ public class SubtarefaBuilder {
     private LocalDateTime criadoEm = LocalDateTime.now();
     private LocalDateTime atualizadoEm = LocalDateTime.now();
     private Boolean ativo = true;
+    private Tarefa tarefa = new TarefaBuilder().build();
 
     public SubtarefaBuilder comId(Long id) {
         this.id = id;
@@ -43,6 +46,11 @@ public class SubtarefaBuilder {
         return this;
     }
 
+    public SubtarefaBuilder comTarefa(Tarefa tarefa) {
+        this.tarefa = tarefa;
+        return this;
+    }
+
     public Subtarefa build() {
         return new Subtarefa(
                 id,
@@ -50,7 +58,8 @@ public class SubtarefaBuilder {
                 concluida,
                 criadoEm,
                 atualizadoEm,
-                ativo
+                ativo,
+                tarefa
         );
     }
 }

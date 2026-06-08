@@ -1,6 +1,7 @@
 package com.nexa.task.domain.entity.subtarefa;
 
 
+import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.exception.DomainException;
 
 import java.time.LocalDateTime;
@@ -13,9 +14,12 @@ public class Subtarefa {
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
     private Boolean ativo;
+    private Tarefa tarefa;
 
-    public Subtarefa(Long id, String titulo, Boolean concluida, LocalDateTime criadoEm, LocalDateTime atualizadoEm, Boolean ativo) {
+    public Subtarefa(Long id, String titulo, Boolean concluida, LocalDateTime criadoEm,
+                     LocalDateTime atualizadoEm, Boolean ativo, Tarefa tarefa) {
         validarTitulo(titulo);
+        validarTarefa(tarefa);
 
         this.id = id;
         this.titulo = titulo;
@@ -23,6 +27,7 @@ public class Subtarefa {
         this.criadoEm = criadoEm;
         this.atualizadoEm = atualizadoEm;
         this.ativo = ativo;
+        this.tarefa = tarefa;
     }
 
     public void marcarConcluida() {
@@ -44,6 +49,12 @@ public class Subtarefa {
     private void validarTitulo(String titulo) {
         if (titulo == null || titulo.isBlank()) {
             throw new DomainException("Título da subtarefa é obrigatório.");
+        }
+    }
+
+    private void validarTarefa(Tarefa tarefa) {
+        if (tarefa == null) {
+            throw new DomainException("Tarefa da subtarefa é obrigatório.");
         }
     }
 
@@ -93,5 +104,13 @@ public class Subtarefa {
 
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public Tarefa getTarefa() {
+        return tarefa;
+    }
+
+    public void setTarefa(Tarefa tarefa) {
+        this.tarefa = tarefa;
     }
 }

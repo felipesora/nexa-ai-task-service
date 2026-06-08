@@ -1,8 +1,6 @@
 package com.nexa.task.domain.entity.subtarefa;
 
 import com.nexa.task.domain.builder.subtarefa.SubtarefaBuilder;
-import com.nexa.task.domain.builder.tarefa.TarefaBuilder;
-import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.exception.DomainException;
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +17,7 @@ class SubtarefaTest {
         assertEquals("Título da subtarefa", subtarefa.getTitulo());
         assertFalse(subtarefa.getConcluida());
         assertTrue(subtarefa.getAtivo());
+        assertEquals(1L, subtarefa.getTarefa().getId());
     }
 
     @Test
@@ -27,6 +26,14 @@ class SubtarefaTest {
                 () -> new SubtarefaBuilder().comTitulo(null).build());
 
         assertEquals("Título da subtarefa é obrigatório.", exception.getMessage());
+    }
+
+    @Test
+    void deveLancarDomainExceptionCasoWorkspaceEstejaVazio() {
+        DomainException exception = assertThrows(DomainException.class,
+                () -> new SubtarefaBuilder().comTarefa(null).build());
+
+        assertEquals("Tarefa da subtarefa é obrigatório.", exception.getMessage());
     }
 
     @Test
