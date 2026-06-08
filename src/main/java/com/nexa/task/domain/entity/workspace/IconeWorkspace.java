@@ -1,4 +1,4 @@
-package com.nexa.task.domain.entity.iconeWorkspace;
+package com.nexa.task.domain.entity.workspace;
 
 import com.nexa.task.domain.exception.DomainException;
 

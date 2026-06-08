@@ -1,8 +1,6 @@
-package com.nexa.task.domain.entity.iconeWorkspace;
+package com.nexa.task.domain.entity.workspace;
 
-import com.nexa.task.domain.builder.corWorkspace.CorWorkspaceBuilder;
-import com.nexa.task.domain.builder.iconeWorkspace.IconeWorkspaceBuilder;
-import com.nexa.task.domain.entity.corWorkspace.CorWorkspace;
+import com.nexa.task.domain.builder.workspace.IconeWorkspaceBuilder;
 import com.nexa.task.domain.exception.DomainException;
 import org.junit.jupiter.api.Test;
 

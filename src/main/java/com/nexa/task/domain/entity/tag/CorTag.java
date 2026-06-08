@@ -1,14 +1,14 @@
-package com.nexa.task.domain.entity.corWorkspace;
+package com.nexa.task.domain.entity.tag;
 
 import com.nexa.task.domain.exception.DomainException;
 
-public class CorWorkspace {
+public class CorTag {
 
     private Long id;
     private String cor;
     private Boolean ativo;
 
-    public CorWorkspace(Long id, String cor, Boolean ativo) {
+    public CorTag(Long id, String cor, Boolean ativo) {
         validarCor(cor);
 
         this.id = id;
@@ -26,7 +26,7 @@ public class CorWorkspace {
 
     private void validarCor(String cor) {
         if (cor == null || cor.isBlank()) {
-            throw new DomainException("O valor da cor é obrigatório.");
+            throw new DomainException("Cor da tag é obrigatório.");
         }
     }
 

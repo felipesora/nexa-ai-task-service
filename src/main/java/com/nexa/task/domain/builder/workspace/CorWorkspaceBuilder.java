@@ -1,6 +1,6 @@
-package com.nexa.task.domain.builder.corWorkspace;
+package com.nexa.task.domain.builder.workspace;
 
-import com.nexa.task.domain.entity.corWorkspace.CorWorkspace;
+import com.nexa.task.domain.entity.workspace.CorWorkspace;
 
 public class CorWorkspaceBuilder {
 

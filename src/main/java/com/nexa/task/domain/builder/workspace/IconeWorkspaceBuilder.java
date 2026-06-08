@@ -1,6 +1,6 @@
-package com.nexa.task.domain.builder.iconeWorkspace;
+package com.nexa.task.domain.builder.workspace;
 
-import com.nexa.task.domain.entity.iconeWorkspace.IconeWorkspace;
+import com.nexa.task.domain.entity.workspace.IconeWorkspace;
 
 public class IconeWorkspaceBuilder {
 
