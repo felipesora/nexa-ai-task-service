@@ -10,7 +10,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "Cores_Workspace")
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class CorWorkspaceEntity {
@@ -28,4 +27,10 @@ public class CorWorkspaceEntity {
 
     @OneToMany(mappedBy = "corWorkspace", fetch = FetchType.LAZY)
     private Set<WorkspaceEntity> workspaces = new HashSet<>();
+
+    public CorWorkspaceEntity(Long id, String cor, Boolean ativo) {
+        this.id = id;
+        this.cor = cor;
+        this.ativo = ativo;
+    }
 }

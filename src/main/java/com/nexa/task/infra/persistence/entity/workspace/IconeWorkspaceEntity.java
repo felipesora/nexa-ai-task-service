@@ -11,7 +11,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "Icones_Workspace")
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class IconeWorkspaceEntity {
@@ -32,4 +31,11 @@ public class IconeWorkspaceEntity {
 
     @OneToMany(mappedBy = "iconeWorkspace", fetch = FetchType.LAZY)
     private Set<WorkspaceEntity> workspaces = new HashSet<>();
+
+    public IconeWorkspaceEntity(Long id, String nome, String caminho, Boolean ativo) {
+        this.id = id;
+        this.nome = nome;
+        this.caminho = caminho;
+        this.ativo = ativo;
+    }
 }
