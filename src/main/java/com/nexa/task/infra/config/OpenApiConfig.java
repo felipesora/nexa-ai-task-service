@@ -20,11 +20,17 @@ public class OpenApiConfig {
                         .title("Nexa AI - Task Service")
                         .version("1.0.0")
                         .description("""
-                                Serviço responsável por autenticação, autorização,
-                                gerenciamento de usuários e perfis do ecossistema Nexa AI.
+                                Serviço responsável pelo gerenciamento de produtividade
+                                do ecossistema Nexa AI.
+                                
+                                Este serviço centraliza funcionalidades relacionadas a:
+                                - Workspaces
+                                - Tarefas
+                                - Subtarefas
+                                - Organização e acompanhamento de atividades
                                 
                                 Repositório GitHub:
-                                https://github.com/felipesora/nexa-ai-auth-service
+                                https://github.com/felipesora/nexa-ai-task-service
                                 """)
                         .contact(new Contact()
                                 .name("Linkedin - Felipe Sora")
