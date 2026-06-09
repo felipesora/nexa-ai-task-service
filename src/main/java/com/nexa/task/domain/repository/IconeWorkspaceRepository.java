@@ -13,4 +13,8 @@ public interface IconeWorkspaceRepository {
     Page<IconeWorkspace> findAll(Pageable pageable);
 
     Optional<IconeWorkspace> findById(Long id);
+
+    Optional<IconeWorkspace> findByNome(String nome);
+
+    Optional<IconeWorkspace> findByCaminho(String caminho);
 }
