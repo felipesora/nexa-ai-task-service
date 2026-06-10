@@ -2,9 +2,7 @@ package com.nexa.task.presentation.controller;
 
 import com.nexa.task.application.dto.iconeWorkspace.IconeWorkspaceRequestDTO;
 import com.nexa.task.application.dto.iconeWorkspace.IconeWorkspaceResponseDTO;
-import com.nexa.task.application.usecase.iconeWorkspace.BuscarIconeWorkspacePorIdUserCase;
-import com.nexa.task.application.usecase.iconeWorkspace.CadastrarIconeWorkspaceUseCase;
-import com.nexa.task.application.usecase.iconeWorkspace.ListarTodosIconesWorkspaceUseCase;
+import com.nexa.task.application.usecase.iconeWorkspace.*;
 import com.nexa.task.presentation.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -30,11 +28,15 @@ public class IconeWorkspaceController {
     private final CadastrarIconeWorkspaceUseCase cadastrarIconeWorkspaceUseCase;
     private final ListarTodosIconesWorkspaceUseCase listarTodosIconesWorkspaceUseCase;
     private final BuscarIconeWorkspacePorIdUserCase buscarIconeWorkspacePorIdUserCase;
+    private final DesativarIconeWorkspaceUseCase desativarIconeWorkspaceUseCase;
+    private final AtivarIconeWorkspaceUseCase ativarIconeWorkspaceUseCase;
 
-    public IconeWorkspaceController(CadastrarIconeWorkspaceUseCase cadastrarIconeWorkspaceUseCase, ListarTodosIconesWorkspaceUseCase listarTodosIconesWorkspaceUseCase, BuscarIconeWorkspacePorIdUserCase buscarIconeWorkspacePorIdUserCase) {
+    public IconeWorkspaceController(CadastrarIconeWorkspaceUseCase cadastrarIconeWorkspaceUseCase, ListarTodosIconesWorkspaceUseCase listarTodosIconesWorkspaceUseCase, BuscarIconeWorkspacePorIdUserCase buscarIconeWorkspacePorIdUserCase, DesativarIconeWorkspaceUseCase desativarIconeWorkspaceUseCase, AtivarIconeWorkspaceUseCase ativarIconeWorkspaceUseCase) {
         this.cadastrarIconeWorkspaceUseCase = cadastrarIconeWorkspaceUseCase;
         this.listarTodosIconesWorkspaceUseCase = listarTodosIconesWorkspaceUseCase;
         this.buscarIconeWorkspacePorIdUserCase = buscarIconeWorkspacePorIdUserCase;
+        this.desativarIconeWorkspaceUseCase = desativarIconeWorkspaceUseCase;
+        this.ativarIconeWorkspaceUseCase = ativarIconeWorkspaceUseCase;
     }
 
     @Operation(summary = "Cadastrar ícone de workspace",
@@ -108,5 +110,51 @@ public class IconeWorkspaceController {
     public ResponseEntity<IconeWorkspaceResponseDTO> buscarIconePorId(@PathVariable Long id) {
         IconeWorkspaceResponseDTO icone = buscarIconeWorkspacePorIdUserCase.execute(id);
         return ResponseEntity.ok(icone);
+    }
+
+    @Operation(summary = "Desativar ícone de workspace",
+            description = """
+                Realiza a desativação lógica de um ícone.
+
+                Requer autenticação JWT.
+                Apenas usuários com ROLE_ADMIN podem acessar.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Ícone desativado com sucesso", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Ícone não encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> desativarIcone(@PathVariable Long id) {
+        desativarIconeWorkspaceUseCase.execute(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Ativar ícone de workspace",
+            description = """
+                Reativa um ícone previamente desativado.
+
+                Requer autenticação JWT.
+                Apenas usuários com ROLE_ADMIN podem acessar.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Ícone ativado com sucesso", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Ícone não encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PatchMapping("/ativar/{id}")
+    public ResponseEntity<Void> ativarIcone(@PathVariable Long id) {
+        ativarIconeWorkspaceUseCase.execute(id);
+        return ResponseEntity.noContent().build();
     }
 }

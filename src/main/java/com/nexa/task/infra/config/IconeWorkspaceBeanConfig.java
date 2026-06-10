@@ -1,9 +1,7 @@
 package com.nexa.task.infra.config;
 
 import com.nexa.task.application.mapper.IconeWorkspaceControllerMapper;
-import com.nexa.task.application.usecase.iconeWorkspace.BuscarIconeWorkspacePorIdUserCase;
-import com.nexa.task.application.usecase.iconeWorkspace.CadastrarIconeWorkspaceUseCase;
-import com.nexa.task.application.usecase.iconeWorkspace.ListarTodosIconesWorkspaceUseCase;
+import com.nexa.task.application.usecase.iconeWorkspace.*;
 import com.nexa.task.domain.repository.IconeWorkspaceRepository;
 import com.nexa.task.infra.persistence.adapter.JpaIconeWorkspaceRepository;
 import com.nexa.task.infra.persistence.mapper.IconeWorkspacePersistenceMapper;
@@ -27,6 +25,16 @@ public class IconeWorkspaceBeanConfig {
     @Bean
     BuscarIconeWorkspacePorIdUserCase buscarIconeWorkspacePorIdUserCase(IconeWorkspaceRepository repository, IconeWorkspaceControllerMapper mapper) {
         return new BuscarIconeWorkspacePorIdUserCase(repository, mapper);
+    }
+
+    @Bean
+    DesativarIconeWorkspaceUseCase DesativarIconeWorkspaceUseCase(IconeWorkspaceRepository repository) {
+        return new DesativarIconeWorkspaceUseCase(repository);
+    }
+
+    @Bean
+    AtivarIconeWorkspaceUseCase ativarIconeWorkspaceUseCase(IconeWorkspaceRepository repository) {
+        return new AtivarIconeWorkspaceUseCase(repository);
     }
 
     @Bean

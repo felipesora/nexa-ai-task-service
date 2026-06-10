@@ -5,9 +5,7 @@ import com.nexa.task.application.dto.iconeWorkspace.IconeWorkspaceRequestDTO;
 import com.nexa.task.application.dto.iconeWorkspace.IconeWorkspaceResponseDTO;
 import com.nexa.task.application.exception.BadRequestException;
 import com.nexa.task.application.exception.EntityNotFoundException;
-import com.nexa.task.application.usecase.iconeWorkspace.BuscarIconeWorkspacePorIdUserCase;
-import com.nexa.task.application.usecase.iconeWorkspace.CadastrarIconeWorkspaceUseCase;
-import com.nexa.task.application.usecase.iconeWorkspace.ListarTodosIconesWorkspaceUseCase;
+import com.nexa.task.application.usecase.iconeWorkspace.*;
 import com.nexa.task.domain.builder.workspace.IconeWorkspaceBuilder;
 import com.nexa.task.domain.entity.workspace.IconeWorkspace;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,10 +22,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(IconeWorkspaceController.class)
@@ -44,6 +41,12 @@ class IconeWorkspaceControllerTest {
 
     @MockitoBean
     private BuscarIconeWorkspacePorIdUserCase buscarIconeWorkspacePorIdUserCase;
+
+    @MockitoBean
+    private DesativarIconeWorkspaceUseCase desativarIconeWorkspaceUseCase;
+
+    @MockitoBean
+    private AtivarIconeWorkspaceUseCase ativarIconeWorkspaceUseCase;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -173,6 +176,56 @@ class IconeWorkspaceControllerTest {
                 .thenThrow(new EntityNotFoundException("Ícone com id: 999 não encontrado."));
 
         mockMvc.perform(get("/v1/icones-workspace/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Ícone com id: 999 não encontrado."));
+    }
+
+    @Test
+    void deveDesativarIconeComSucesso() throws Exception {
+
+        doNothing().when(desativarIconeWorkspaceUseCase)
+                .execute(1L);
+
+        mockMvc.perform(delete("/v1/icones-workspace/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404AoDesativarIconeNaoEncontrado() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Ícone com id: 999 não encontrado."))
+                .when(desativarIconeWorkspaceUseCase)
+                .execute(999L);
+
+        mockMvc.perform(delete("/v1/icones-workspace/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Ícone com id: 999 não encontrado."));
+    }
+
+    @Test
+    void deveAtivarIconeComSucesso() throws Exception {
+
+        doNothing().when(ativarIconeWorkspaceUseCase)
+                .execute(1L);
+
+        mockMvc.perform(patch("/v1/icones-workspace/ativar/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404AoAtivarIconeNaoEncontrado() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Ícone com id: 999 não encontrado."))
+                .when(ativarIconeWorkspaceUseCase)
+                .execute(999L);
+
+        mockMvc.perform(patch("/v1/icones-workspace/ativar/999"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.message")
