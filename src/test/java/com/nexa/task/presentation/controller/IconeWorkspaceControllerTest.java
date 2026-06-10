@@ -4,19 +4,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nexa.task.application.dto.iconeWorkspace.IconeWorkspaceRequestDTO;
 import com.nexa.task.application.dto.iconeWorkspace.IconeWorkspaceResponseDTO;
 import com.nexa.task.application.exception.BadRequestException;
+import com.nexa.task.application.exception.EntityNotFoundException;
+import com.nexa.task.application.usecase.iconeWorkspace.BuscarIconeWorkspacePorIdUserCase;
 import com.nexa.task.application.usecase.iconeWorkspace.CadastrarIconeWorkspaceUseCase;
+import com.nexa.task.application.usecase.iconeWorkspace.ListarTodosIconesWorkspaceUseCase;
 import com.nexa.task.domain.builder.workspace.IconeWorkspaceBuilder;
 import com.nexa.task.domain.entity.workspace.IconeWorkspace;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -28,6 +38,12 @@ class IconeWorkspaceControllerTest {
 
     @MockitoBean
     private CadastrarIconeWorkspaceUseCase cadastrarIconeWorkspaceUseCase;
+
+    @MockitoBean
+    private ListarTodosIconesWorkspaceUseCase listarTodosIconesWorkspaceUseCase;
+
+    @MockitoBean
+    private BuscarIconeWorkspacePorIdUserCase buscarIconeWorkspacePorIdUserCase;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -118,5 +134,48 @@ class IconeWorkspaceControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.message").value("Erro de validação"));
+    }
+
+    @Test
+    void deveListarTodosOsIcones() throws Exception {
+
+        Page<IconeWorkspaceResponseDTO> page = new PageImpl<>(List.of(response));
+
+        when(listarTodosIconesWorkspaceUseCase.execute(any(Pageable.class))).thenReturn(page);
+
+        mockMvc.perform(get("/v1/icones-workspace"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id_icone").value(1))
+                .andExpect(jsonPath("$.content[0].nome").value("ícone padrão"))
+                .andExpect(jsonPath("$.content[0].caminho").value("icon-padrao.png"))
+                .andExpect(jsonPath("$.content[0].ativo").value(true))
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void deveBuscarIconePorIdComSucesso() throws Exception {
+
+        when(buscarIconeWorkspacePorIdUserCase.execute(1L))
+                .thenReturn(response);
+
+        mockMvc.perform(get("/v1/icones-workspace/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id_icone").value(1))
+                .andExpect(jsonPath("$.nome").value("ícone padrão"))
+                .andExpect(jsonPath("$.caminho").value("icon-padrao.png"))
+                .andExpect(jsonPath("$.ativo").value(true));
+    }
+
+    @Test
+    void deveRetornar404QuandoIconeNaoForEncontrado() throws Exception {
+
+        when(buscarIconeWorkspacePorIdUserCase.execute(999L))
+                .thenThrow(new EntityNotFoundException("Ícone com id: 999 não encontrado."));
+
+        mockMvc.perform(get("/v1/icones-workspace/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Ícone com id: 999 não encontrado."));
     }
 }
