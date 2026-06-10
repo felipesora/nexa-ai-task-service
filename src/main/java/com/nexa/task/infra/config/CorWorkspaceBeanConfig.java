@@ -43,7 +43,7 @@ public class CorWorkspaceBeanConfig {
     }
 
     @Bean
-    CorWorkspaceRepository corWorkspaceRepository(SpringDataCorWorkspaceRepository repository, CorWorkspacePersistenceMapper mapper) {
+    JpaCorWorkspaceRepository jpaCorWorkspaceRepository(SpringDataCorWorkspaceRepository repository, CorWorkspacePersistenceMapper mapper) {
         return new JpaCorWorkspaceRepository(repository, mapper);
     }
 

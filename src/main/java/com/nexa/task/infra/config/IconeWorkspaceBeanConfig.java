@@ -43,7 +43,7 @@ public class IconeWorkspaceBeanConfig {
     }
 
     @Bean
-    IconeWorkspaceRepository iconeWorkspaceRepository(SpringDataIconeWorkspaceRepository iconeWorkspaceRepository, IconeWorkspacePersistenceMapper mapper) {
+    JpaIconeWorkspaceRepository jpaIconeWorkspaceRepository(SpringDataIconeWorkspaceRepository iconeWorkspaceRepository, IconeWorkspacePersistenceMapper mapper) {
         return new JpaIconeWorkspaceRepository(iconeWorkspaceRepository, mapper);
     }
 

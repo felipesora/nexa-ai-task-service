@@ -10,7 +10,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "Cores_Tag")
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class CorTagEntity {
@@ -28,4 +27,10 @@ public class CorTagEntity {
 
     @OneToMany(mappedBy = "corTag", fetch = FetchType.LAZY)
     private Set<TagEntity> tags = new HashSet<>();
+
+    public CorTagEntity(Long id, String cor, Boolean ativo) {
+        this.id = id;
+        this.cor = cor;
+        this.ativo = ativo;
+    }
 }
