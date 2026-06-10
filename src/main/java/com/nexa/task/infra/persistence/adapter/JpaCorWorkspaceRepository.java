@@ -38,4 +38,10 @@ public class JpaCorWorkspaceRepository implements CorWorkspaceRepository {
         return corWorkspaceRepository.findById(id)
                 .map(mapper::toDomain);
     }
+
+    @Override
+    public Optional<CorWorkspace> findByCor(String cor) {
+        return corWorkspaceRepository.findByCor(cor)
+                .map(mapper::toDomain);
+    }
 }

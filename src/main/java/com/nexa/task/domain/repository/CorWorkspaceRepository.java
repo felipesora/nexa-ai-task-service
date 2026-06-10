@@ -13,4 +13,6 @@ public interface CorWorkspaceRepository {
     Page<CorWorkspace> findAll(Pageable pageable);
 
     Optional<CorWorkspace> findById(Long id);
+
+    Optional<CorWorkspace> findByCor(String cor);
 }
