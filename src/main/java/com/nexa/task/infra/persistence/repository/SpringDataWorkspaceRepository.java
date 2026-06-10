@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SpringDataWorkspaceRepository extends JpaRepository<WorkspaceEntity, Long> {
+
+    boolean existsByNomeAndIdUsuario(String nome, Long idUsuario);
 }

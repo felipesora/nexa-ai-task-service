@@ -11,12 +11,13 @@ public class Workspace {
     private String nome;
     private String descricao;
     private LocalDateTime criadoEm;
+    private LocalDateTime atualizadoEm;
     private Boolean ativo;
     private CorWorkspace corWorkspace;
     private IconeWorkspace iconeWorkspace;
 
     public Workspace(Long id, Long idUsuario, String nome, String descricao, LocalDateTime criadoEm,
-                     Boolean ativo, CorWorkspace corWorkspace, IconeWorkspace iconeWorkspace) {
+                     LocalDateTime atualizadoEm, Boolean ativo, CorWorkspace corWorkspace, IconeWorkspace iconeWorkspace) {
         validarIdUsuario(idUsuario);
         validarNome(nome);
         validarDescricao(descricao);
@@ -26,6 +27,7 @@ public class Workspace {
         this.nome = nome;
         this.descricao = descricao;
         this.criadoEm = criadoEm;
+        this.atualizadoEm = atualizadoEm;
         this.ativo = ativo;
         this.corWorkspace = corWorkspace;
         this.iconeWorkspace = iconeWorkspace;
@@ -95,6 +97,14 @@ public class Workspace {
 
     public void setCriadoEm(LocalDateTime criadoEm) {
         this.criadoEm = criadoEm;
+    }
+
+    public LocalDateTime getAtualizadoEm() {
+        return atualizadoEm;
+    }
+
+    public void setAtualizadoEm(LocalDateTime atualizadoEm) {
+        this.atualizadoEm = atualizadoEm;
     }
 
     public Boolean getAtivo() {

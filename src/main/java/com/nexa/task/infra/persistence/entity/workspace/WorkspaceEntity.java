@@ -12,7 +12,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "Workspaces")
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class WorkspaceEntity {
@@ -50,4 +49,16 @@ public class WorkspaceEntity {
 
     @OneToMany(mappedBy = "workspace", fetch = FetchType.LAZY)
     private Set<TarefaEntity> tarefas = new HashSet<>();
+
+    public WorkspaceEntity(Long id, Long idUsuario, String nome, String descricao, LocalDateTime criadoEm, LocalDateTime atualizadoEm, Boolean ativo, CorWorkspaceEntity corWorkspace, IconeWorkspaceEntity iconeWorkspace) {
+        this.id = id;
+        this.idUsuario = idUsuario;
+        this.nome = nome;
+        this.descricao = descricao;
+        this.criadoEm = criadoEm;
+        this.atualizadoEm = atualizadoEm;
+        this.ativo = ativo;
+        this.corWorkspace = corWorkspace;
+        this.iconeWorkspace = iconeWorkspace;
+    }
 }
