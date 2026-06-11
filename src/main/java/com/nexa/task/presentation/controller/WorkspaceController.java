@@ -2,10 +2,7 @@ package com.nexa.task.presentation.controller;
 
 import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
-import com.nexa.task.application.usecase.workspace.BuscarWorkspacePorIdUseCase;
-import com.nexa.task.application.usecase.workspace.CadastrarWorkspaceUseCase;
-import com.nexa.task.application.usecase.workspace.ListarTodosWorkspacesUseCase;
-import com.nexa.task.application.usecase.workspace.ListarWorkspacesPorIdUsuarioUseCase;
+import com.nexa.task.application.usecase.workspace.*;
 import com.nexa.task.presentation.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,12 +29,14 @@ public class WorkspaceController
     private final ListarTodosWorkspacesUseCase listarTodosWorkspacesUseCase;
     private final BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase;
     private final ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase;
+    private final ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase;
 
-    public WorkspaceController(CadastrarWorkspaceUseCase cadastrarWorkspaceUseCase, ListarTodosWorkspacesUseCase listarTodosWorkspacesUseCase, BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase, ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase) {
+    public WorkspaceController(CadastrarWorkspaceUseCase cadastrarWorkspaceUseCase, ListarTodosWorkspacesUseCase listarTodosWorkspacesUseCase, BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase, ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase, ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase) {
         this.cadastrarWorkspaceUseCase = cadastrarWorkspaceUseCase;
         this.listarTodosWorkspacesUseCase = listarTodosWorkspacesUseCase;
         this.buscarWorkspacePorIdUseCase = buscarWorkspacePorIdUseCase;
         this.listarWorkspacesPorIdUsuarioUseCase = listarWorkspacesPorIdUsuarioUseCase;
+        this.listarWorkspacesPorIdUsuarioENomeUseCase = listarWorkspacesPorIdUsuarioENomeUseCase;
     }
 
     @Operation(summary = "Cadastrar workspace",
@@ -132,8 +131,15 @@ public class WorkspaceController
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/usuario/{idUsuario}")
-    public ResponseEntity<Page<WorkspaceResponseDTO>> listarWorkspacesPorIdUsuario(@PathVariable Long idUsuario, @PageableDefault(size = 10) Pageable pageable) {
-        Page<WorkspaceResponseDTO> workspaces = listarWorkspacesPorIdUsuarioUseCase.execute(idUsuario, pageable);
+    public ResponseEntity<Page<WorkspaceResponseDTO>> listarWorkspacesPorIdUsuario(@PathVariable Long idUsuario,
+                                                                                   @RequestParam(required = false) String nome,
+                                                                                   @PageableDefault(size = 10) Pageable pageable) {
+        Page<WorkspaceResponseDTO> workspaces;
+        if (nome != null && !nome.isBlank()) {
+            workspaces = listarWorkspacesPorIdUsuarioENomeUseCase.execute(idUsuario, nome, pageable);
+        } else {
+            workspaces = listarWorkspacesPorIdUsuarioUseCase.execute(idUsuario, pageable);
+        }
         return ResponseEntity.ok(workspaces);
     }
 }

@@ -3,10 +3,7 @@ package com.nexa.task.infra.config;
 import com.nexa.task.application.mapper.CorWorkspaceControllerMapper;
 import com.nexa.task.application.mapper.IconeWorkspaceControllerMapper;
 import com.nexa.task.application.mapper.WorkspaceControllerMapper;
-import com.nexa.task.application.usecase.workspace.BuscarWorkspacePorIdUseCase;
-import com.nexa.task.application.usecase.workspace.CadastrarWorkspaceUseCase;
-import com.nexa.task.application.usecase.workspace.ListarTodosWorkspacesUseCase;
-import com.nexa.task.application.usecase.workspace.ListarWorkspacesPorIdUsuarioUseCase;
+import com.nexa.task.application.usecase.workspace.*;
 import com.nexa.task.domain.repository.CorWorkspaceRepository;
 import com.nexa.task.domain.repository.IconeWorkspaceRepository;
 import com.nexa.task.domain.repository.WorkspaceRepository;
@@ -40,6 +37,11 @@ public class WorkspaceBeanConfig {
     @Bean
     ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase(WorkspaceRepository workspaceRepository, WorkspaceControllerMapper mapper) {
         return new ListarWorkspacesPorIdUsuarioUseCase(workspaceRepository, mapper);
+    }
+
+    @Bean
+    ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase(WorkspaceRepository workspaceRepository, WorkspaceControllerMapper mapper) {
+        return new ListarWorkspacesPorIdUsuarioENomeUseCase(workspaceRepository, mapper);
     }
 
     @Bean

@@ -5,10 +5,7 @@ import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
 import com.nexa.task.application.exception.BadRequestException;
 import com.nexa.task.application.exception.EntityNotFoundException;
-import com.nexa.task.application.usecase.workspace.BuscarWorkspacePorIdUseCase;
-import com.nexa.task.application.usecase.workspace.CadastrarWorkspaceUseCase;
-import com.nexa.task.application.usecase.workspace.ListarTodosWorkspacesUseCase;
-import com.nexa.task.application.usecase.workspace.ListarWorkspacesPorIdUsuarioUseCase;
+import com.nexa.task.application.usecase.workspace.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +44,9 @@ class WorkspaceControllerTest {
 
     @MockitoBean
     private ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase;
+
+    @MockitoBean
+    private ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -206,6 +206,29 @@ class WorkspaceControllerTest {
                 .thenReturn(page);
 
         mockMvc.perform(get("/v1/workspaces/usuario/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id_workspace").value(1))
+                .andExpect(jsonPath("$.content[0].id_usuario").value(1))
+                .andExpect(jsonPath("$.content[0].nome").value("Meu Workspace"))
+                .andExpect(jsonPath("$.content[0].descricao").value("Descrição"))
+                .andExpect(jsonPath("$.content[0].ativo").value(true))
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void deveListarWorkspacesPorIdUsuarioENome() throws Exception {
+
+        Page<WorkspaceResponseDTO> page =
+                new PageImpl<>(List.of(response));
+
+        when(listarWorkspacesPorIdUsuarioENomeUseCase
+                .execute(eq(1L), eq("Meu Workspace"), any(Pageable.class)))
+                .thenReturn(page);
+
+        mockMvc.perform(
+                        get("/v1/workspaces/usuario/1")
+                                .param("nome", "Meu Workspace")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id_workspace").value(1))
                 .andExpect(jsonPath("$.content[0].id_usuario").value(1))

@@ -12,4 +12,6 @@ public interface SpringDataWorkspaceRepository extends JpaRepository<WorkspaceEn
     boolean existsByNomeAndIdUsuario(String nome, Long idUsuario);
 
     Page<WorkspaceEntity> findByIdUsuario(Long idUsuario, Pageable pageable);
+
+    Page<WorkspaceEntity> findByIdUsuarioAndNomeContainingIgnoreCase(Long idUsuario, String nome, Pageable pageable);
 }
