@@ -6,12 +6,12 @@ import com.nexa.task.application.mapper.CorTagControllerMapper;
 import com.nexa.task.domain.entity.tag.CorTag;
 import com.nexa.task.domain.repository.CorTagRepository;
 
-public class BuscarCorTagPorIdUserCase {
+public class BuscarCorTagPorIdUseCase {
 
     private final CorTagRepository repository;
     private final CorTagControllerMapper mapper;
 
-    public BuscarCorTagPorIdUserCase(CorTagRepository repository, CorTagControllerMapper mapper) {
+    public BuscarCorTagPorIdUseCase(CorTagRepository repository, CorTagControllerMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }

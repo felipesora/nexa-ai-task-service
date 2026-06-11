@@ -5,6 +5,7 @@ import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
 import com.nexa.task.application.exception.BadRequestException;
 import com.nexa.task.application.exception.EntityNotFoundException;
+import com.nexa.task.application.usecase.workspace.BuscarWorkspacePorIdUseCase;
 import com.nexa.task.application.usecase.workspace.CadastrarWorkspaceUseCase;
 import com.nexa.task.application.usecase.workspace.ListarTodosWorkspacesUseCase;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +39,9 @@ class WorkspaceControllerTest {
 
     @MockitoBean
     private ListarTodosWorkspacesUseCase listarTodosWorkspacesUseCase;
+
+    @MockitoBean
+    private BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -154,5 +158,35 @@ class WorkspaceControllerTest {
                 .andExpect(jsonPath("$.content[0].descricao").value("Descrição"))
                 .andExpect(jsonPath("$.content[0].ativo").value(true))
                 .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void deveBuscarWorkspacePorIdComSucesso() throws Exception {
+
+        when(buscarWorkspacePorIdUseCase.execute(1L))
+                .thenReturn(response);
+
+        mockMvc.perform(get("/v1/workspaces/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id_workspace").value(1))
+                .andExpect(jsonPath("$.id_usuario").value(1))
+                .andExpect(jsonPath("$.nome").value("Meu Workspace"))
+                .andExpect(jsonPath("$.descricao").value("Descrição"))
+                .andExpect(jsonPath("$.ativo").value(true));
+    }
+
+    @Test
+    void deveRetornar404QuandoWorkspaceNaoForEncontrado() throws Exception {
+
+        when(buscarWorkspacePorIdUseCase.execute(999L))
+                .thenThrow(new EntityNotFoundException(
+                        "Workspace com id: 999 não encontrado."
+                ));
+
+        mockMvc.perform(get("/v1/workspaces/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Workspace com id: 999 não encontrado."));
     }
 }

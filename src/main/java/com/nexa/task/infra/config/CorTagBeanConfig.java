@@ -1,17 +1,11 @@
 package com.nexa.task.infra.config;
 
 import com.nexa.task.application.mapper.CorTagControllerMapper;
-import com.nexa.task.application.mapper.CorWorkspaceControllerMapper;
 import com.nexa.task.application.usecase.corTag.*;
-import com.nexa.task.application.usecase.corWorkspace.*;
 import com.nexa.task.domain.repository.CorTagRepository;
-import com.nexa.task.domain.repository.CorWorkspaceRepository;
 import com.nexa.task.infra.persistence.adapter.JpaCorTagRepository;
-import com.nexa.task.infra.persistence.adapter.JpaCorWorkspaceRepository;
 import com.nexa.task.infra.persistence.mapper.CorTagPersistenceMapper;
-import com.nexa.task.infra.persistence.mapper.CorWorkspacePersistenceMapper;
 import com.nexa.task.infra.persistence.repository.SpringDataCorTagRepository;
-import com.nexa.task.infra.persistence.repository.SpringDataCorWorkspaceRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,8 +23,8 @@ public class CorTagBeanConfig {
     }
 
     @Bean
-    BuscarCorTagPorIdUserCase buscarCorTagPorIdUserCase(CorTagRepository repository, CorTagControllerMapper mapper) {
-        return new BuscarCorTagPorIdUserCase(repository, mapper);
+    BuscarCorTagPorIdUseCase buscarCorTagPorIdUserCase(CorTagRepository repository, CorTagControllerMapper mapper) {
+        return new BuscarCorTagPorIdUseCase(repository, mapper);
     }
 
     @Bean

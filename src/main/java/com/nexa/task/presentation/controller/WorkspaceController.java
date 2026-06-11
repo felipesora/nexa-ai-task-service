@@ -1,8 +1,8 @@
 package com.nexa.task.presentation.controller;
 
-import com.nexa.task.application.dto.corTag.CorTagResponseDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
+import com.nexa.task.application.usecase.workspace.BuscarWorkspacePorIdUseCase;
 import com.nexa.task.application.usecase.workspace.CadastrarWorkspaceUseCase;
 import com.nexa.task.application.usecase.workspace.ListarTodosWorkspacesUseCase;
 import com.nexa.task.presentation.exception.ErrorResponse;
@@ -29,10 +29,12 @@ public class WorkspaceController
 {
     private final CadastrarWorkspaceUseCase cadastrarWorkspaceUseCase;
     private final ListarTodosWorkspacesUseCase listarTodosWorkspacesUseCase;
+    private final BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase;
 
-    public WorkspaceController(CadastrarWorkspaceUseCase cadastrarWorkspaceUseCase, ListarTodosWorkspacesUseCase listarTodosWorkspacesUseCase) {
+    public WorkspaceController(CadastrarWorkspaceUseCase cadastrarWorkspaceUseCase, ListarTodosWorkspacesUseCase listarTodosWorkspacesUseCase, BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase) {
         this.cadastrarWorkspaceUseCase = cadastrarWorkspaceUseCase;
         this.listarTodosWorkspacesUseCase = listarTodosWorkspacesUseCase;
+        this.buscarWorkspacePorIdUseCase = buscarWorkspacePorIdUseCase;
     }
 
     @Operation(summary = "Cadastrar workspace",
@@ -80,5 +82,31 @@ public class WorkspaceController
     public ResponseEntity<Page<WorkspaceResponseDTO>> listarTodosWorkspaces(@PageableDefault(size = 10) Pageable pageable) {
         Page<WorkspaceResponseDTO> workspaces = listarTodosWorkspacesUseCase.execute(pageable);
         return ResponseEntity.ok(workspaces);
+    }
+
+    @Operation(summary = "Buscar workspace por ID",
+            description = """
+                Retorna os dados de um workspace.
+
+                Requer autenticação JWT.
+                O acesso é permitido para:
+                - Usuários com ROLE_ADMIN.
+                - O proprietário do workspace solicitado.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Workspace encontrado com sucesso",
+                    content = @Content(schema = @Schema(implementation = WorkspaceResponseDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Workspace não encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<WorkspaceResponseDTO> buscarCorPorId(@PathVariable Long id) {
+        WorkspaceResponseDTO cor = buscarWorkspacePorIdUseCase.execute(id);
+        return ResponseEntity.ok(cor);
     }
 }

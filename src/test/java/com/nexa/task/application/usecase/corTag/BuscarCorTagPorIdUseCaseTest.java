@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class BuscarCorTagPorIdUserCaseTest {
+class BuscarCorTagPorIdUseCaseTest {
 
     @Mock
     private CorTagRepository repository;
@@ -29,7 +29,7 @@ class BuscarCorTagPorIdUserCaseTest {
     private CorTagControllerMapper mapper;
 
     @InjectMocks
-    private BuscarCorTagPorIdUserCase useCase;
+    private BuscarCorTagPorIdUseCase useCase;
 
     @Test
     void deveBuscarCorTagPorIdComSucesso() {

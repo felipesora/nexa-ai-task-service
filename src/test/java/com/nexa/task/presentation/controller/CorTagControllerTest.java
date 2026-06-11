@@ -39,7 +39,7 @@ class CorTagControllerTest {
     private ListarTodasCoresTagUseCase listarTodasCoresTagUseCase;
 
     @MockitoBean
-    private BuscarCorTagPorIdUserCase buscarCorTagPorIdUserCase;
+    private BuscarCorTagPorIdUseCase buscarCorTagPorIdUseCase;
 
     @MockitoBean
     private DesativarCorTagUseCase desativarCorTagUseCase;
@@ -144,7 +144,7 @@ class CorTagControllerTest {
     @Test
     void deveBuscarCorPorIdComSucesso() throws Exception {
 
-        when(buscarCorTagPorIdUserCase.execute(1L))
+        when(buscarCorTagPorIdUseCase.execute(1L))
                 .thenReturn(response);
 
         mockMvc.perform(get("/v1/cores-tag/1"))
@@ -157,7 +157,7 @@ class CorTagControllerTest {
     @Test
     void deveRetornar404QuandoCorNaoForEncontrada() throws Exception {
 
-        when(buscarCorTagPorIdUserCase.execute(999L))
+        when(buscarCorTagPorIdUseCase.execute(999L))
                 .thenThrow(new EntityNotFoundException(
                         "Cor da Tag com id: 999 não encontrada."
                 ));

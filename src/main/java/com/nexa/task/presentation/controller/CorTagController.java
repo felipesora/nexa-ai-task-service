@@ -27,14 +27,14 @@ public class CorTagController {
 
     private final CadastrarCorTagUseCase cadastrarCorTagUseCase;
     private final ListarTodasCoresTagUseCase listarTodasCoresTagUseCase;
-    private final BuscarCorTagPorIdUserCase buscarCorTagPorIdUserCase;
+    private final BuscarCorTagPorIdUseCase buscarCorTagPorIdUseCase;
     private final DesativarCorTagUseCase desativarCorTagUseCase;
     private final AtivarCorTagUseCase ativarCorTagUseCase;
 
-    public CorTagController(CadastrarCorTagUseCase cadastrarCorTagUseCase, ListarTodasCoresTagUseCase listarTodasCoresTagUseCase, BuscarCorTagPorIdUserCase buscarCorTagPorIdUserCase, DesativarCorTagUseCase desativarCorTagUseCase, AtivarCorTagUseCase ativarCorTagUseCase) {
+    public CorTagController(CadastrarCorTagUseCase cadastrarCorTagUseCase, ListarTodasCoresTagUseCase listarTodasCoresTagUseCase, BuscarCorTagPorIdUseCase buscarCorTagPorIdUseCase, DesativarCorTagUseCase desativarCorTagUseCase, AtivarCorTagUseCase ativarCorTagUseCase) {
         this.cadastrarCorTagUseCase = cadastrarCorTagUseCase;
         this.listarTodasCoresTagUseCase = listarTodasCoresTagUseCase;
-        this.buscarCorTagPorIdUserCase = buscarCorTagPorIdUserCase;
+        this.buscarCorTagPorIdUseCase = buscarCorTagPorIdUseCase;
         this.desativarCorTagUseCase = desativarCorTagUseCase;
         this.ativarCorTagUseCase = ativarCorTagUseCase;
     }
@@ -108,7 +108,7 @@ public class CorTagController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<CorTagResponseDTO> buscarCorPorId(@PathVariable Long id) {
-        CorTagResponseDTO cor = buscarCorTagPorIdUserCase.execute(id);
+        CorTagResponseDTO cor = buscarCorTagPorIdUseCase.execute(id);
         return ResponseEntity.ok(cor);
     }
 

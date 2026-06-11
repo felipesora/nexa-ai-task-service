@@ -8,6 +8,8 @@ import com.nexa.task.infra.persistence.repository.SpringDataWorkspaceRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Optional;
+
 public class JpaWorkspaceRepository implements WorkspaceRepository {
 
     private final SpringDataWorkspaceRepository repository;
@@ -28,6 +30,12 @@ public class JpaWorkspaceRepository implements WorkspaceRepository {
     @Override
     public Page<Workspace> findAll(Pageable pageable) {
         return repository.findAll(pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public Optional<Workspace> findById(Long id) {
+        return repository.findById(id)
                 .map(mapper::toDomain);
     }
 
