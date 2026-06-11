@@ -17,6 +17,7 @@ public class WorkspaceBuilder {
     private String nome = "Nome do workspace";
     private String descricao = "Descrição do workspace";
     private LocalDateTime criadoEm = LocalDateTime.now();
+    private LocalDateTime atualizadoEm = LocalDateTime.now();
     private Boolean ativo = true;
     private CorWorkspace corWorkspace = new CorWorkspaceBuilder().build();
     private IconeWorkspace iconeWorkspace = new IconeWorkspaceBuilder().build();
@@ -46,6 +47,11 @@ public class WorkspaceBuilder {
         return this;
     }
 
+    public WorkspaceBuilder comAtualizadoEm(LocalDateTime atualizadoEm) {
+        this.atualizadoEm = atualizadoEm;
+        return this;
+    }
+
     public WorkspaceBuilder comCor(CorWorkspace corWorkspace) {
         this.corWorkspace = corWorkspace;
         return this;
@@ -68,6 +74,7 @@ public class WorkspaceBuilder {
                 nome,
                 descricao,
                 criadoEm,
+                atualizadoEm,
                 ativo,
                 corWorkspace,
                 iconeWorkspace
