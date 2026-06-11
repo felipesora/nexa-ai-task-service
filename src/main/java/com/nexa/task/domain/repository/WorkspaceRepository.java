@@ -12,6 +12,8 @@ public interface WorkspaceRepository {
 
     Page<Workspace> findAll(Pageable pageable);
 
+    Page<Workspace> findByIdUsuario(Long idUsuario, Pageable pageable);
+
     Optional<Workspace> findById(Long id);
 
     boolean existsByNomeAndIdUsuario(String nome, Long idUsuario);

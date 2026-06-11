@@ -34,6 +34,12 @@ public class JpaWorkspaceRepository implements WorkspaceRepository {
     }
 
     @Override
+    public Page<Workspace> findByIdUsuario(Long idUsuario, Pageable pageable) {
+        return repository.findByIdUsuario(idUsuario, pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public Optional<Workspace> findById(Long id) {
         return repository.findById(id)
                 .map(mapper::toDomain);
