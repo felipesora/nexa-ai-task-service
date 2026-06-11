@@ -14,6 +14,10 @@ public class WorkspacePersistenceMapper {
     }
 
     public WorkspaceEntity toEntity(Workspace workspace) {
+        if (workspace == null) {
+            return null;
+        }
+
         return new WorkspaceEntity(
                 workspace.getId(),
                 workspace.getIdUsuario(),
@@ -28,6 +32,10 @@ public class WorkspacePersistenceMapper {
     }
 
     public Workspace toDomain(WorkspaceEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+
         return new Workspace(
                 entity.getId(),
                 entity.getIdUsuario(),

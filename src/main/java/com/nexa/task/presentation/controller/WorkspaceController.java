@@ -1,6 +1,5 @@
 package com.nexa.task.presentation.controller;
 
-import com.nexa.task.application.dto.corWorkspace.CorWorkspaceResponseDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
 import com.nexa.task.application.usecase.workspace.CadastrarWorkspaceUseCase;

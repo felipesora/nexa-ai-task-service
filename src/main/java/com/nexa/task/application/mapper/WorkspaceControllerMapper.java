@@ -41,8 +41,8 @@ public class WorkspaceControllerMapper {
                 workspace.getCriadoEm(),
                 workspace.getAtualizadoEm(),
                 workspace.getAtivo(),
-                corWorkspaceMapper.toResponse(workspace.getCorWorkspace()),
-                iconeWorkspaceMapper.toResponse(workspace.getIconeWorkspace())
+                workspace.getCorWorkspace() != null ? corWorkspaceMapper.toResponse(workspace.getCorWorkspace()) : null,
+                workspace.getIconeWorkspace() != null ? iconeWorkspaceMapper.toResponse(workspace.getIconeWorkspace()) : null
         );
     }
 }
