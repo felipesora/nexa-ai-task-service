@@ -5,7 +5,7 @@ spring:
   application:
     name: nexa-auth
   datasource:
-    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/nexa_auth?createDatabaseIfNotExist=true
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/nexa_task?createDatabaseIfNotExist=true
     username: ${DB_USER}
     password: ${DB_PASSWORD}
   jpa:

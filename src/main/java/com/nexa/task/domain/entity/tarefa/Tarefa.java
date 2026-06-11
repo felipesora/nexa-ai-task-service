@@ -30,10 +30,8 @@ public class Tarefa {
                   LocalDateTime atualizadoEm, Boolean ativo, Workspace workspace, List<Tag> tags) {
         validarIdUsuario(idUsuario);
         validarTitulo(titulo);
-        validarDescricao(descricao);
         validarPrioridade(prioridade);
         validarStatus(status);
-        validarDificuldade(dificuldade);
         validarWorkspace(workspace);
 
         this.id = id;
@@ -84,12 +82,6 @@ public class Tarefa {
         }
     }
 
-    private void validarDescricao(String descricao) {
-        if (descricao == null || descricao.isBlank()) {
-            throw new DomainException("Descrição da tarefa é obrigatória.");
-        }
-    }
-
     private void validarPrioridade(PrioridadeTarefa prioridade) {
         if (prioridade == null) {
             throw new DomainException("Prioridade da tarefa é obrigatória.");
@@ -99,12 +91,6 @@ public class Tarefa {
     private void validarStatus(StatusTarefa status) {
         if (status == null) {
             throw new DomainException("Status da tarefa é obrigatório.");
-        }
-    }
-
-    private void validarDificuldade(DificuldadeTarefa dificuldade) {
-        if (dificuldade == null) {
-            throw new DomainException("Dificuldade da tarefa é obrigatório.");
         }
     }
 

@@ -27,7 +27,7 @@ public class WorkspaceEntity {
     @Column(nullable = false, length = 150)
     private String nome;
 
-    @Column(nullable = false, length = 500)
+    @Column(nullable = true, length = 500)
     private String descricao;
 
     @Column(nullable = false, name = "criado_em")
