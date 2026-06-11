@@ -55,4 +55,9 @@ public class JpaWorkspaceRepository implements WorkspaceRepository {
     public boolean existsByNomeAndIdUsuario(String nome, Long idUsuario) {
         return repository.existsByNomeAndIdUsuario(nome, idUsuario);
     }
+
+    @Override
+    public boolean existsByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id) {
+        return repository.existsByNomeAndIdUsuarioAndIdNot(nome, idUsuario, id);
+    }
 }

@@ -21,10 +21,9 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(WorkspaceController.class)
@@ -47,6 +46,9 @@ class WorkspaceControllerTest {
 
     @MockitoBean
     private ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase;
+
+    @MockitoBean
+    private AtualizarWorkspaceUseCase atualizarWorkspaceUseCase;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -236,5 +238,99 @@ class WorkspaceControllerTest {
                 .andExpect(jsonPath("$.content[0].descricao").value("Descrição"))
                 .andExpect(jsonPath("$.content[0].ativo").value(true))
                 .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void deveAtualizarWorkspaceComSucesso() throws Exception {
+
+        doNothing().when(atualizarWorkspaceUseCase)
+                .execute(1L, request);
+
+        mockMvc.perform(
+                        put("/v1/workspaces/1")
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoWorkspaceNaoForEncontradoAoAtualizar() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Workspace com id: 999 não encontrado"
+        ))
+                .when(atualizarWorkspaceUseCase)
+                .execute(eq(999L), any(WorkspaceRequestDTO.class));
+
+        mockMvc.perform(
+                        put("/v1/workspaces/999")
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Workspace com id: 999 não encontrado"));
+    }
+
+    @Test
+    void deveRetornar404QuandoCorNaoForEncontradaAoAtualizar() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Cor com id: 1 não encontrada"
+        ))
+                .when(atualizarWorkspaceUseCase)
+                .execute(eq(1L), any(WorkspaceRequestDTO.class));
+
+        mockMvc.perform(
+                        put("/v1/workspaces/1")
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Cor com id: 1 não encontrada"));
+    }
+
+    @Test
+    void deveRetornar404QuandoIconeNaoForEncontradoAoAtualizar() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Ícone com id: 1 não encontrado"
+        ))
+                .when(atualizarWorkspaceUseCase)
+                .execute(eq(1L), any(WorkspaceRequestDTO.class));
+
+        mockMvc.perform(
+                        put("/v1/workspaces/1")
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Ícone com id: 1 não encontrado"));
+    }
+
+    @Test
+    void deveRetornar400QuandoNomeJaExistirAoAtualizar() throws Exception {
+
+        doThrow(new BadRequestException(
+                "Já existe um workspace com esse nome para este usuário"
+        ))
+                .when(atualizarWorkspaceUseCase)
+                .execute(eq(1L), any(WorkspaceRequestDTO.class));
+
+        mockMvc.perform(
+                        put("/v1/workspaces/1")
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message")
+                        .value("Já existe um workspace com esse nome para este usuário"));
     }
 }

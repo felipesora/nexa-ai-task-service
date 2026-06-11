@@ -19,4 +19,6 @@ public interface WorkspaceRepository {
     Optional<Workspace> findById(Long id);
 
     boolean existsByNomeAndIdUsuario(String nome, Long idUsuario);
+
+    boolean existsByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id);
 }

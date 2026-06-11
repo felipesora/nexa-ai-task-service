@@ -30,13 +30,15 @@ public class WorkspaceController
     private final BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase;
     private final ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase;
     private final ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase;
+    private final AtualizarWorkspaceUseCase atualizarWorkspaceUseCase;
 
-    public WorkspaceController(CadastrarWorkspaceUseCase cadastrarWorkspaceUseCase, ListarTodosWorkspacesUseCase listarTodosWorkspacesUseCase, BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase, ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase, ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase) {
+    public WorkspaceController(CadastrarWorkspaceUseCase cadastrarWorkspaceUseCase, ListarTodosWorkspacesUseCase listarTodosWorkspacesUseCase, BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase, ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase, ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase, AtualizarWorkspaceUseCase atualizarWorkspaceUseCase) {
         this.cadastrarWorkspaceUseCase = cadastrarWorkspaceUseCase;
         this.listarTodosWorkspacesUseCase = listarTodosWorkspacesUseCase;
         this.buscarWorkspacePorIdUseCase = buscarWorkspacePorIdUseCase;
         this.listarWorkspacesPorIdUsuarioUseCase = listarWorkspacesPorIdUsuarioUseCase;
         this.listarWorkspacesPorIdUsuarioENomeUseCase = listarWorkspacesPorIdUsuarioENomeUseCase;
+        this.atualizarWorkspaceUseCase = atualizarWorkspaceUseCase;
     }
 
     @Operation(summary = "Cadastrar workspace",
@@ -141,5 +143,27 @@ public class WorkspaceController
             workspaces = listarWorkspacesPorIdUsuarioUseCase.execute(idUsuario, pageable);
         }
         return ResponseEntity.ok(workspaces);
+    }
+
+    @Operation(
+            summary = "Atualizar workspace",
+            description = """
+            Atualiza os dados de um workspace.
+
+            Apenas o dono do workspace pode atualizar os dados,
+            exceto administradores.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Workspace atualizado com sucesso", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Workspace não encontrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> atualizarWorkspace(@PathVariable Long id, @RequestBody @Valid WorkspaceRequestDTO request) {
+        atualizarWorkspaceUseCase.execute(id, request);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -45,6 +45,12 @@ public class WorkspaceBeanConfig {
     }
 
     @Bean
+    AtualizarWorkspaceUseCase atualizarWorkspaceUseCase(WorkspaceRepository workspaceRepository, CorWorkspaceRepository corWorkspaceRepository,
+                                                        IconeWorkspaceRepository iconeWorkspaceRepository) {
+        return new AtualizarWorkspaceUseCase(workspaceRepository, corWorkspaceRepository, iconeWorkspaceRepository);
+    }
+
+    @Bean
     JpaWorkspaceRepository jpaWorkspaceRepository(SpringDataWorkspaceRepository repository, WorkspacePersistenceMapper mapper) {
         return new JpaWorkspaceRepository(repository, mapper);
     }
