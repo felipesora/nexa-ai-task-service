@@ -50,6 +50,12 @@ class WorkspaceControllerTest {
     @MockitoBean
     private AtualizarWorkspaceUseCase atualizarWorkspaceUseCase;
 
+    @MockitoBean
+    private DesativarWorkspaceUseCase desativarWorkspaceUseCase;
+
+    @MockitoBean
+    private AtivarWorkspaceUseCase ativarWorkspaceUseCase;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -332,5 +338,57 @@ class WorkspaceControllerTest {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.message")
                         .value("Já existe um workspace com esse nome para este usuário"));
+    }
+
+    @Test
+    void deveDesativarWorkspaceComSucesso() throws Exception {
+
+        doNothing().when(desativarWorkspaceUseCase)
+                .execute(1L);
+
+        mockMvc.perform(delete("/v1/workspaces/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoWorkspaceNaoForEncontradoAoDesativar() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Workspace com id: 999 não encontrado"
+        ))
+                .when(desativarWorkspaceUseCase)
+                .execute(999L);
+
+        mockMvc.perform(delete("/v1/workspaces/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Workspace com id: 999 não encontrado"));
+    }
+
+    @Test
+    void deveAtivarWorkspaceComSucesso() throws Exception {
+
+        doNothing().when(ativarWorkspaceUseCase)
+                .execute(1L);
+
+        mockMvc.perform(patch("/v1/workspaces/ativar/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoWorkspaceNaoForEncontradoAoAtivar() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Workspace com id: 999 não encontrado"
+        ))
+                .when(ativarWorkspaceUseCase)
+                .execute(999L);
+
+        mockMvc.perform(patch("/v1/workspaces/ativar/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Workspace com id: 999 não encontrado"));
     }
 }

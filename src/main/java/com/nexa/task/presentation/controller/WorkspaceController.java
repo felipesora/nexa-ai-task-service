@@ -31,14 +31,18 @@ public class WorkspaceController
     private final ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase;
     private final ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase;
     private final AtualizarWorkspaceUseCase atualizarWorkspaceUseCase;
+    private final DesativarWorkspaceUseCase desativarWorkspaceUseCase;
+    private final AtivarWorkspaceUseCase ativarWorkspaceUseCase;
 
-    public WorkspaceController(CadastrarWorkspaceUseCase cadastrarWorkspaceUseCase, ListarTodosWorkspacesUseCase listarTodosWorkspacesUseCase, BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase, ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase, ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase, AtualizarWorkspaceUseCase atualizarWorkspaceUseCase) {
+    public WorkspaceController(CadastrarWorkspaceUseCase cadastrarWorkspaceUseCase, ListarTodosWorkspacesUseCase listarTodosWorkspacesUseCase, BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase, ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase, ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase, AtualizarWorkspaceUseCase atualizarWorkspaceUseCase, DesativarWorkspaceUseCase desativarWorkspaceUseCase, AtivarWorkspaceUseCase ativarWorkspaceUseCase) {
         this.cadastrarWorkspaceUseCase = cadastrarWorkspaceUseCase;
         this.listarTodosWorkspacesUseCase = listarTodosWorkspacesUseCase;
         this.buscarWorkspacePorIdUseCase = buscarWorkspacePorIdUseCase;
         this.listarWorkspacesPorIdUsuarioUseCase = listarWorkspacesPorIdUsuarioUseCase;
         this.listarWorkspacesPorIdUsuarioENomeUseCase = listarWorkspacesPorIdUsuarioENomeUseCase;
         this.atualizarWorkspaceUseCase = atualizarWorkspaceUseCase;
+        this.desativarWorkspaceUseCase = desativarWorkspaceUseCase;
+        this.ativarWorkspaceUseCase = ativarWorkspaceUseCase;
     }
 
     @Operation(summary = "Cadastrar workspace",
@@ -117,6 +121,7 @@ public class WorkspaceController
     @Operation(summary = "Listar workspaces por ID do usuário",
             description = """
                 Retorna uma lista paginada de workspaces de um usuário.
+                Pode-se filtrar workspaces pelo nome.
 
                 Requer autenticação JWT.
                 O acesso é permitido para:
@@ -164,6 +169,47 @@ public class WorkspaceController
     @PutMapping("/{id}")
     public ResponseEntity<Void> atualizarWorkspace(@PathVariable Long id, @RequestBody @Valid WorkspaceRequestDTO request) {
         atualizarWorkspaceUseCase.execute(id, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Desativar workspace",
+            description = """
+            Realiza a desativação lógica de um workspace.
+
+            Apenas o dono do workspace pode desativar o workspace,
+            exceto administradores.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Workspace desativado com sucesso", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário Sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Workspace não encontrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> desativarWorkspace(@PathVariable Long id) {
+        desativarWorkspaceUseCase.execute(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Ativar workspace",
+            description = """
+            Reativa um workspace previamente desativado.
+
+            Apenas administradores podem executar esta operação.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Workspace ativado com sucesso", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Workspace não encontrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PatchMapping("/ativar/{id}")
+    public ResponseEntity<Void> ativarUsuario(@PathVariable Long id) {
+        ativarWorkspaceUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }
 }

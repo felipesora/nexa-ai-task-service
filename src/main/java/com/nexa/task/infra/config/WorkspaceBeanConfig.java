@@ -51,6 +51,16 @@ public class WorkspaceBeanConfig {
     }
 
     @Bean
+    DesativarWorkspaceUseCase desativarWorkspaceUseCase(WorkspaceRepository workspaceRepository) {
+        return new DesativarWorkspaceUseCase(workspaceRepository);
+    }
+
+    @Bean
+    AtivarWorkspaceUseCase ativarWorkspaceUseCase(WorkspaceRepository workspaceRepository) {
+        return new AtivarWorkspaceUseCase(workspaceRepository);
+    }
+
+    @Bean
     JpaWorkspaceRepository jpaWorkspaceRepository(SpringDataWorkspaceRepository repository, WorkspacePersistenceMapper mapper) {
         return new JpaWorkspaceRepository(repository, mapper);
     }
