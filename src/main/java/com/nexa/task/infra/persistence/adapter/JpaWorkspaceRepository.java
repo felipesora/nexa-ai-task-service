@@ -5,6 +5,8 @@ import com.nexa.task.domain.repository.WorkspaceRepository;
 import com.nexa.task.infra.persistence.entity.workspace.WorkspaceEntity;
 import com.nexa.task.infra.persistence.mapper.WorkspacePersistenceMapper;
 import com.nexa.task.infra.persistence.repository.SpringDataWorkspaceRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public class JpaWorkspaceRepository implements WorkspaceRepository {
 
@@ -21,6 +23,12 @@ public class JpaWorkspaceRepository implements WorkspaceRepository {
         WorkspaceEntity entity = mapper.toEntity(workspace);
         repository.save(entity);
         return mapper.toDomain(entity);
+    }
+
+    @Override
+    public Page<Workspace> findAll(Pageable pageable) {
+        return repository.findAll(pageable)
+                .map(mapper::toDomain);
     }
 
     @Override

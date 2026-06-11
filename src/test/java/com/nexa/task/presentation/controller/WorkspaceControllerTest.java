@@ -6,17 +6,24 @@ import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
 import com.nexa.task.application.exception.BadRequestException;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.usecase.workspace.CadastrarWorkspaceUseCase;
+import com.nexa.task.application.usecase.workspace.ListarTodosWorkspacesUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -28,6 +35,9 @@ class WorkspaceControllerTest {
 
     @MockitoBean
     private CadastrarWorkspaceUseCase cadastrarWorkspaceUseCase;
+
+    @MockitoBean
+    private ListarTodosWorkspacesUseCase listarTodosWorkspacesUseCase;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -125,5 +135,24 @@ class WorkspaceControllerTest {
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.message")
                         .value("Ícone com id: 1 não encontrado"));
+    }
+
+    @Test
+    void deveListarTodosOsWorkspaces() throws Exception {
+
+        Page<WorkspaceResponseDTO> page =
+                new PageImpl<>(List.of(response));
+
+        when(listarTodosWorkspacesUseCase.execute(any(Pageable.class)))
+                .thenReturn(page);
+
+        mockMvc.perform(get("/v1/workspaces"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id_workspace").value(1))
+                .andExpect(jsonPath("$.content[0].id_usuario").value(1))
+                .andExpect(jsonPath("$.content[0].nome").value("Meu Workspace"))
+                .andExpect(jsonPath("$.content[0].descricao").value("Descrição"))
+                .andExpect(jsonPath("$.content[0].ativo").value(true))
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 }
