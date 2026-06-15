@@ -23,9 +23,13 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -52,6 +56,12 @@ class TarefaControllerTest {
 
     @MockitoBean
     private ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase;
+
+    @MockitoBean
+    private DesativarTarefaUseCase desativarTarefaUseCase;
+
+    @MockitoBean
+    private AtivarTarefaUseCase ativarTarefaUseCase;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -273,7 +283,7 @@ class TarefaControllerTest {
 
         mockMvc.perform(
                         get("/v1/tarefas/usuario/1")
-                                .param("nome", "Minha tarefa")
+                                .param("titulo", "Minha tarefa")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id_tarefa").value(1))
@@ -286,5 +296,57 @@ class TarefaControllerTest {
                 .andExpect(jsonPath("$.content[0].ativo").value(true))
                 .andExpect(jsonPath("$.content[0].id_workspace").value(1))
                 .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void deveDesativarTarefaComSucesso() throws Exception {
+
+        doNothing().when(desativarTarefaUseCase)
+                .execute(1L);
+
+        mockMvc.perform(delete("/v1/tarefas/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoTarefaNaoForEncontradaAoDesativar() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Tarefa com id: 999 não encontrada"
+        ))
+                .when(desativarTarefaUseCase)
+                .execute(999L);
+
+        mockMvc.perform(delete("/v1/tarefas/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Tarefa com id: 999 não encontrada"));
+    }
+
+    @Test
+    void deveAtivarTarefaComSucesso() throws Exception {
+
+        doNothing().when(ativarTarefaUseCase)
+                .execute(1L);
+
+        mockMvc.perform(patch("/v1/tarefas/ativar/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoTarefaNaoForEncontradaAoAtivar() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Tarefa com id: 999 não encontrada"
+        ))
+                .when(ativarTarefaUseCase)
+                .execute(999L);
+
+        mockMvc.perform(patch("/v1/tarefas/ativar/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Tarefa com id: 999 não encontrada"));
     }
 }

@@ -31,14 +31,18 @@ public class TarefaController {
     private final ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase;
     private final ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase;
     private final BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase;
+    private final DesativarTarefaUseCase desativarTarefaUseCase;
+    private final AtivarTarefaUseCase ativarTarefaUseCase;
 
-    public TarefaController(CadastrarTarefaUseCase cadastrarTarefaUseCase, ListarTodasTarefasUseCase listarTodasTarefasUseCase, ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase, ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase, ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase, BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase) {
+    public TarefaController(CadastrarTarefaUseCase cadastrarTarefaUseCase, ListarTodasTarefasUseCase listarTodasTarefasUseCase, ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase, ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase, ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase, BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase, DesativarTarefaUseCase desativarTarefaUseCase, AtivarTarefaUseCase ativarTarefaUseCase) {
         this.cadastrarTarefaUseCase = cadastrarTarefaUseCase;
         this.listarTodasTarefasUseCase = listarTodasTarefasUseCase;
         this.listarTarefasPorIdWorkspaceUseCase = listarTarefasPorIdWorkspaceUseCase;
         this.listarTarefasPorIdUsuarioUseCase = listarTarefasPorIdUsuarioUseCase;
         this.listarTarefasPorIdUsuarioETituloUseCase = listarTarefasPorIdUsuarioETituloUseCase;
         this.buscarTarefaPorIdUseCase = buscarTarefaPorIdUseCase;
+        this.desativarTarefaUseCase = desativarTarefaUseCase;
+        this.ativarTarefaUseCase = ativarTarefaUseCase;
     }
 
     @Operation(summary = "Cadastrar tarefa",
@@ -169,5 +173,46 @@ public class TarefaController {
             tarefas = listarTarefasPorIdUsuarioUseCase.execute(idUsuario, pageable);
         }
         return ResponseEntity.ok(tarefas);
+    }
+
+    @Operation(
+            summary = "Desativar tarefa",
+            description = """
+            Realiza a desativação lógica de uma tarefa.
+
+            Apenas o dono da tarefa pode desativa-la,
+            exceto administradores.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Tarefa desativada com sucesso", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Tarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> desativarTarefa(@PathVariable Long id) {
+        desativarTarefaUseCase.execute(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Ativar tarefa",
+            description = """
+            Reativa uma tarefa previamente desativada.
+
+            Apenas administradores podem executar esta operaÃ§Ã£o.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Tarefa ativada com sucesso", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Tarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PatchMapping("/ativar/{id}")
+    public ResponseEntity<Void> ativarTarefa(@PathVariable Long id) {
+        ativarTarefaUseCase.execute(id);
+        return ResponseEntity.noContent().build();
     }
 }
