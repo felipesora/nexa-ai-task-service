@@ -3,7 +3,6 @@ package com.nexa.task.presentation.controller;
 import com.nexa.task.application.dto.tarefa.TarefaCreateDTO;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.dto.tarefa.TarefaUpdateDTO;
-import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
 import com.nexa.task.application.usecase.tarefa.*;
 import com.nexa.task.presentation.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,10 +34,12 @@ public class TarefaController {
     private final BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase;
     private final AtualizarTarefaUseCase atualizarTarefaUseCase;
     private final ConcluirTarefaUseCase concluirTarefaUseCase;
+    private final IniciarTarefaUseCase iniciarTarefaUseCase;
+    private final ReabrirTarefaUseCase reabrirTarefaUseCase;
     private final DesativarTarefaUseCase desativarTarefaUseCase;
     private final AtivarTarefaUseCase ativarTarefaUseCase;
 
-    public TarefaController(CadastrarTarefaUseCase cadastrarTarefaUseCase, ListarTodasTarefasUseCase listarTodasTarefasUseCase, ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase, ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase, ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase, BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase, AtualizarTarefaUseCase atualizarTarefaUseCase, ConcluirTarefaUseCase concluirTarefaUseCase, DesativarTarefaUseCase desativarTarefaUseCase, AtivarTarefaUseCase ativarTarefaUseCase) {
+    public TarefaController(CadastrarTarefaUseCase cadastrarTarefaUseCase, ListarTodasTarefasUseCase listarTodasTarefasUseCase, ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase, ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase, ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase, BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase, AtualizarTarefaUseCase atualizarTarefaUseCase, ConcluirTarefaUseCase concluirTarefaUseCase, IniciarTarefaUseCase iniciarTarefaUseCase, ReabrirTarefaUseCase reabrirTarefaUseCase, DesativarTarefaUseCase desativarTarefaUseCase, AtivarTarefaUseCase ativarTarefaUseCase) {
         this.cadastrarTarefaUseCase = cadastrarTarefaUseCase;
         this.listarTodasTarefasUseCase = listarTodasTarefasUseCase;
         this.listarTarefasPorIdWorkspaceUseCase = listarTarefasPorIdWorkspaceUseCase;
@@ -47,6 +48,8 @@ public class TarefaController {
         this.buscarTarefaPorIdUseCase = buscarTarefaPorIdUseCase;
         this.atualizarTarefaUseCase = atualizarTarefaUseCase;
         this.concluirTarefaUseCase = concluirTarefaUseCase;
+        this.iniciarTarefaUseCase = iniciarTarefaUseCase;
+        this.reabrirTarefaUseCase = reabrirTarefaUseCase;
         this.desativarTarefaUseCase = desativarTarefaUseCase;
         this.ativarTarefaUseCase = ativarTarefaUseCase;
     }
@@ -206,15 +209,16 @@ public class TarefaController {
     @Operation(
             summary = "Concluir uma tarefa",
             description = """
-            Conclui uma tarefa.
+            Altera o status da tarefa para CONCLUIDA e registra a data de conclusão.
 
-            Apenas o dono da tarefa pode concluir a tarefa,
-            exceto administradores.
+            Requer autenticação JWT.
+            Apenas o proprietário da tarefa ou usuários com ROLE_ADMIN
+            podem executar esta operação.
             """
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Tarefa concluida com sucesso", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "204", description = "Tarefa concluída com sucesso", content = @Content),
+            @ApiResponse(responseCode = "400", description = "A tarefa já está concluída ou não pode ser concluída", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Tarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -222,6 +226,55 @@ public class TarefaController {
     @PatchMapping("/{id}/concluir")
     public ResponseEntity<Void> concluirTarefa(@PathVariable Long id) {
         concluirTarefaUseCase.execute(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Iniciar uma tarefa",
+            description = """
+            Altera o status da tarefa para EM_ANDAMENTO.
+            
+            Requer autenticação JWT.
+    
+            Apenas o proprietário da tarefa ou usuários com ROLE_ADMIN
+            podem executar esta operação.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Tarefa iniciada com sucesso", content = @Content),
+            @ApiResponse(responseCode = "400", description = "A tarefa já está em andamento ou não pode ser iniciada", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Tarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PatchMapping("/{id}/iniciar")
+    public ResponseEntity<Void> iniciarTarefa(@PathVariable Long id) {
+        iniciarTarefaUseCase.execute(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Reabrir tarefa",
+            description = """
+            Reabre uma tarefa concluída, alterando seu status para PENDENTE
+            e removendo a data de conclusão.
+    
+            Requer autenticação JWT.
+    
+            Apenas o proprietário da tarefa ou usuários com ROLE_ADMIN
+            podem executar esta operação.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Tarefa iniciada com sucesso", content = @Content),
+            @ApiResponse(responseCode = "400", description = "A tarefa não está concluída ou não pode ser reaberta", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Tarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PatchMapping("/{id}/reabrir")
+    public ResponseEntity<Void> reabrirTarefa(@PathVariable Long id) {
+        reabrirTarefaUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }
 

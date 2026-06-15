@@ -63,6 +63,12 @@ class TarefaControllerTest {
     private ConcluirTarefaUseCase concluirTarefaUseCase;
 
     @MockitoBean
+    private IniciarTarefaUseCase iniciarTarefaUseCase;
+
+    @MockitoBean
+    private ReabrirTarefaUseCase reabrirTarefaUseCase;
+
+    @MockitoBean
     private DesativarTarefaUseCase desativarTarefaUseCase;
 
     @MockitoBean
@@ -414,6 +420,120 @@ class TarefaControllerTest {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.message")
                         .value("A tarefa já está concluída."));
+    }
+
+    @Test
+    void deveIniciarTarefaComSucesso() throws Exception {
+
+        doNothing().when(iniciarTarefaUseCase)
+                .execute(1L);
+
+        mockMvc.perform(
+                        patch("/v1/tarefas/1/iniciar")
+                )
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoTarefaNaoForEncontradaAoIniciar() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Tarefa com id: 999 não encontrada"
+        ))
+                .when(iniciarTarefaUseCase)
+                .execute(999L);
+
+        mockMvc.perform(
+                        patch("/v1/tarefas/999/iniciar")
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Tarefa com id: 999 não encontrada"));
+    }
+
+    @Test
+    void deveRetornar400QuandoTarefaJaEstiverEmAndamento() throws Exception {
+
+        doThrow(new BadRequestException(
+                "A tarefa já está em andamento."
+        ))
+                .when(iniciarTarefaUseCase)
+                .execute(1L);
+
+        mockMvc.perform(
+                        patch("/v1/tarefas/1/iniciar")
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message")
+                        .value("A tarefa já está em andamento."));
+    }
+
+    @Test
+    void deveRetornar400QuandoTarefaEstiverConcluidaAoIniciar() throws Exception {
+
+        doThrow(new BadRequestException(
+                "Tarefas concluídas devem ser reabertas antes de serem iniciadas."
+        ))
+                .when(iniciarTarefaUseCase)
+                .execute(1L);
+
+        mockMvc.perform(
+                        patch("/v1/tarefas/1/iniciar")
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message")
+                        .value("Tarefas concluídas devem ser reabertas antes de serem iniciadas."));
+    }
+
+    @Test
+    void deveReabrirTarefaComSucesso() throws Exception {
+
+        doNothing().when(reabrirTarefaUseCase)
+                .execute(1L);
+
+        mockMvc.perform(
+                        patch("/v1/tarefas/1/reabrir")
+                )
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoTarefaNaoForEncontradaAoReabrir() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Tarefa com id: 999 não encontrada"
+        ))
+                .when(reabrirTarefaUseCase)
+                .execute(999L);
+
+        mockMvc.perform(
+                        patch("/v1/tarefas/999/reabrir")
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Tarefa com id: 999 não encontrada"));
+    }
+
+    @Test
+    void deveRetornar400QuandoTarefaNaoPuderSerReaberta() throws Exception {
+
+        doThrow(new BadRequestException(
+                "Somente tarefas concluídas podem ser reabertas."
+        ))
+                .when(reabrirTarefaUseCase)
+                .execute(1L);
+
+        mockMvc.perform(
+                        patch("/v1/tarefas/1/reabrir")
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message")
+                        .value("Somente tarefas concluídas podem ser reabertas."));
     }
 
     @Test

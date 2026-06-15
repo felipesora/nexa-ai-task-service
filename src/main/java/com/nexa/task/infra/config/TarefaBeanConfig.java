@@ -62,6 +62,16 @@ public class TarefaBeanConfig {
     }
 
     @Bean
+    IniciarTarefaUseCase iniciarTarefaUseCase(TarefaRepository repository) {
+        return new IniciarTarefaUseCase(repository);
+    }
+
+    @Bean
+    ReabrirTarefaUseCase reabrirTarefaUseCase(TarefaRepository repository) {
+        return new ReabrirTarefaUseCase(repository);
+    }
+
+    @Bean
     DesativarTarefaUseCase desativarTarefaUseCase(TarefaRepository tarefaRepository) {
         return new DesativarTarefaUseCase(tarefaRepository);
     }
