@@ -1,6 +1,6 @@
 package com.nexa.task.application.mapper;
 
-import com.nexa.task.application.dto.tarefa.TarefaRequestDTO;
+import com.nexa.task.application.dto.tarefa.TarefaCreateDTO;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.domain.entity.tarefa.StatusTarefa;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 public class TarefaControllerMapper {
 
-    public Tarefa toDomain(TarefaRequestDTO request, Workspace workspace) {
+    public Tarefa toDomain(TarefaCreateDTO request, Workspace workspace) {
 
         //deixar tags null por enquanto
         return new Tarefa(

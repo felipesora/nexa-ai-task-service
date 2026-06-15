@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
-public record TarefaRequestDTO(
+public record TarefaCreateDTO(
         @NotNull(message = "ID do usuário é obrigatório")
         @JsonProperty("id_usuario")
         Long idUsuario,

@@ -1,7 +1,9 @@
 package com.nexa.task.presentation.controller;
 
-import com.nexa.task.application.dto.tarefa.TarefaRequestDTO;
+import com.nexa.task.application.dto.tarefa.TarefaCreateDTO;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
+import com.nexa.task.application.dto.tarefa.TarefaUpdateDTO;
+import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
 import com.nexa.task.application.usecase.tarefa.*;
 import com.nexa.task.presentation.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,16 +33,20 @@ public class TarefaController {
     private final ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase;
     private final ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase;
     private final BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase;
+    private final AtualizarTarefaUseCase atualizarTarefaUseCase;
+    private final ConcluirTarefaUseCase concluirTarefaUseCase;
     private final DesativarTarefaUseCase desativarTarefaUseCase;
     private final AtivarTarefaUseCase ativarTarefaUseCase;
 
-    public TarefaController(CadastrarTarefaUseCase cadastrarTarefaUseCase, ListarTodasTarefasUseCase listarTodasTarefasUseCase, ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase, ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase, ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase, BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase, DesativarTarefaUseCase desativarTarefaUseCase, AtivarTarefaUseCase ativarTarefaUseCase) {
+    public TarefaController(CadastrarTarefaUseCase cadastrarTarefaUseCase, ListarTodasTarefasUseCase listarTodasTarefasUseCase, ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase, ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase, ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase, BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase, AtualizarTarefaUseCase atualizarTarefaUseCase, ConcluirTarefaUseCase concluirTarefaUseCase, DesativarTarefaUseCase desativarTarefaUseCase, AtivarTarefaUseCase ativarTarefaUseCase) {
         this.cadastrarTarefaUseCase = cadastrarTarefaUseCase;
         this.listarTodasTarefasUseCase = listarTodasTarefasUseCase;
         this.listarTarefasPorIdWorkspaceUseCase = listarTarefasPorIdWorkspaceUseCase;
         this.listarTarefasPorIdUsuarioUseCase = listarTarefasPorIdUsuarioUseCase;
         this.listarTarefasPorIdUsuarioETituloUseCase = listarTarefasPorIdUsuarioETituloUseCase;
         this.buscarTarefaPorIdUseCase = buscarTarefaPorIdUseCase;
+        this.atualizarTarefaUseCase = atualizarTarefaUseCase;
+        this.concluirTarefaUseCase = concluirTarefaUseCase;
         this.desativarTarefaUseCase = desativarTarefaUseCase;
         this.ativarTarefaUseCase = ativarTarefaUseCase;
     }
@@ -63,7 +69,7 @@ public class TarefaController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping
-    public ResponseEntity<TarefaResponseDTO> cadastrarTarefa(@RequestBody @Valid TarefaRequestDTO request,
+    public ResponseEntity<TarefaResponseDTO> cadastrarTarefa(@RequestBody @Valid TarefaCreateDTO request,
                                                                    UriComponentsBuilder uriBuilder) {
         TarefaResponseDTO response = cadastrarTarefaUseCase.execute(request);
         URI endereco = uriBuilder.path("/v1/tarefas/{id}").buildAndExpand(response.id()).toUri();
@@ -173,6 +179,50 @@ public class TarefaController {
             tarefas = listarTarefasPorIdUsuarioUseCase.execute(idUsuario, pageable);
         }
         return ResponseEntity.ok(tarefas);
+    }
+
+    @Operation(
+            summary = "Atualizar tarefa",
+            description = """
+            Atualiza os dados de uma tarefa.
+
+            Apenas o dono da tarefa pode atualizar os dados,
+            exceto administradores.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Tarefa atualizada com sucesso", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Tarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> atualizarTarefa(@PathVariable Long id, @RequestBody @Valid TarefaUpdateDTO dto) {
+        atualizarTarefaUseCase.execute(id, dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Concluir uma tarefa",
+            description = """
+            Conclui uma tarefa.
+
+            Apenas o dono da tarefa pode concluir a tarefa,
+            exceto administradores.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Tarefa concluida com sucesso", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Tarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PatchMapping("/{id}/concluir")
+    public ResponseEntity<Void> concluirTarefa(@PathVariable Long id) {
+        concluirTarefaUseCase.execute(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(

@@ -1,14 +1,7 @@
 package com.nexa.task.infra.config;
 
 import com.nexa.task.application.mapper.TarefaControllerMapper;
-import com.nexa.task.application.usecase.tarefa.AtivarTarefaUseCase;
-import com.nexa.task.application.usecase.tarefa.BuscarTarefaPorIdUseCase;
-import com.nexa.task.application.usecase.tarefa.CadastrarTarefaUseCase;
-import com.nexa.task.application.usecase.tarefa.DesativarTarefaUseCase;
-import com.nexa.task.application.usecase.tarefa.ListarTarefasPorIdUsuarioETituloUseCase;
-import com.nexa.task.application.usecase.tarefa.ListarTarefasPorIdUsuarioUseCase;
-import com.nexa.task.application.usecase.tarefa.ListarTarefasPorIdWorkspaceUseCase;
-import com.nexa.task.application.usecase.tarefa.ListarTodasTarefasUseCase;
+import com.nexa.task.application.usecase.tarefa.*;
 import com.nexa.task.domain.repository.TarefaRepository;
 import com.nexa.task.domain.repository.WorkspaceRepository;
 import com.nexa.task.infra.persistence.adapter.JpaTarefaRepository;
@@ -56,6 +49,16 @@ public class TarefaBeanConfig {
     ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase(TarefaRepository tarefaRepository,
                                                                                      TarefaControllerMapper mapper) {
         return new ListarTarefasPorIdUsuarioETituloUseCase(tarefaRepository, mapper);
+    }
+
+    @Bean
+    AtualizarTarefaUseCase atualizarTarefaUseCase(TarefaRepository repository) {
+        return new AtualizarTarefaUseCase(repository);
+    }
+
+    @Bean
+    ConcluirTarefaUseCase concluirTarefaUseCase(TarefaRepository repository) {
+        return new ConcluirTarefaUseCase(repository);
     }
 
     @Bean

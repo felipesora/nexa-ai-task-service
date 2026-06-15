@@ -1,0 +1,89 @@
+package com.nexa.task.application.usecase.tarefa;
+
+import com.nexa.task.application.dto.tarefa.TarefaUpdateDTO;
+import com.nexa.task.application.exception.EntityNotFoundException;
+import com.nexa.task.domain.builder.tarefa.TarefaBuilder;
+import com.nexa.task.domain.entity.tarefa.DificuldadeTarefa;
+import com.nexa.task.domain.entity.tarefa.PrioridadeTarefa;
+import com.nexa.task.domain.entity.tarefa.Tarefa;
+import com.nexa.task.domain.repository.TarefaRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class AtualizarTarefaUseCaseTest {
+
+    @Mock
+    private TarefaRepository tarefaRepository;
+
+    @InjectMocks
+    private AtualizarTarefaUseCase useCase;
+
+    @Test
+    void deveAtualizarTarefaComSucesso() {
+
+        Tarefa tarefa = new TarefaBuilder()
+                .comId(1L)
+                .comTitulo("Título antigo")
+                .comDescricao("Descrição antiga")
+                .build();
+
+        LocalDateTime dataLimite = LocalDateTime.now().plusDays(5);
+
+        TarefaUpdateDTO dto = new TarefaUpdateDTO(
+                "Novo título",
+                "Nova descrição",
+                PrioridadeTarefa.ALTA,
+                DificuldadeTarefa.MEDIA,
+                dataLimite
+        );
+
+        when(tarefaRepository.findById(1L))
+                .thenReturn(Optional.of(tarefa));
+
+        useCase.execute(1L, dto);
+
+        assertEquals("Novo título", tarefa.getTitulo());
+        assertEquals("Nova descrição", tarefa.getDescricao());
+        assertEquals(PrioridadeTarefa.ALTA, tarefa.getPrioridade());
+        assertEquals(DificuldadeTarefa.MEDIA, tarefa.getDificuldade());
+        assertEquals(dataLimite, tarefa.getDataLimite());
+        assertNotNull(tarefa.getAtualizadoEm());
+
+        verify(tarefaRepository).findById(1L);
+        verify(tarefaRepository).save(tarefa);
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoTarefaNaoForEncontrada() {
+
+        when(tarefaRepository.findById(999L))
+                .thenReturn(Optional.empty());
+
+        EntityNotFoundException exception =
+                assertThrows(
+                        EntityNotFoundException.class,
+                        () -> useCase.execute(
+                                999L,
+                                mock(TarefaUpdateDTO.class)
+                        )
+                );
+
+        assertEquals(
+                "Tarefa com id: 999 não encontrada",
+                exception.getMessage()
+        );
+
+        verify(tarefaRepository).findById(999L);
+        verify(tarefaRepository, never()).save(any());
+    }
+}

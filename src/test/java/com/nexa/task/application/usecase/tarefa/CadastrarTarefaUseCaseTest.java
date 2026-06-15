@@ -1,6 +1,6 @@
 package com.nexa.task.application.usecase.tarefa;
 
-import com.nexa.task.application.dto.tarefa.TarefaRequestDTO;
+import com.nexa.task.application.dto.tarefa.TarefaCreateDTO;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.mapper.TarefaControllerMapper;
@@ -43,7 +43,7 @@ class CadastrarTarefaUseCaseTest {
     @Test
     void deveCadastrarTarefaComSucesso() {
 
-        TarefaRequestDTO request = new TarefaRequestDTO(
+        TarefaCreateDTO request = new TarefaCreateDTO(
                 1L,
                 "Minha tarefa",
                 "Descrição da tarefa",
@@ -107,7 +107,7 @@ class CadastrarTarefaUseCaseTest {
     @Test
     void deveLancarExcecaoQuandoWorkspaceNaoEncontrado() {
 
-        TarefaRequestDTO request = new TarefaRequestDTO(
+        TarefaCreateDTO request = new TarefaCreateDTO(
                 1L,
                 "Minha tarefa",
                 "Descrição da tarefa",

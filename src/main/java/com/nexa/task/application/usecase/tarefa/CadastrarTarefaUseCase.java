@@ -1,6 +1,6 @@
 package com.nexa.task.application.usecase.tarefa;
 
-import com.nexa.task.application.dto.tarefa.TarefaRequestDTO;
+import com.nexa.task.application.dto.tarefa.TarefaCreateDTO;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.mapper.TarefaControllerMapper;
@@ -21,11 +21,11 @@ public class CadastrarTarefaUseCase {
         this.mapper = mapper;
     }
 
-    public TarefaResponseDTO execute(TarefaRequestDTO request) {
-        Workspace workspace = workspaceRepository.findById(request.idWorkspace())
-                .orElseThrow(() -> new EntityNotFoundException("Workspace com id: " + request.idWorkspace() + " não encontrado"));
+    public TarefaResponseDTO execute(TarefaCreateDTO dto) {
+        Workspace workspace = workspaceRepository.findById(dto.idWorkspace())
+                .orElseThrow(() -> new EntityNotFoundException("Workspace com id: " + dto.idWorkspace() + " não encontrado"));
 
-        Tarefa salvo = tarefaRepository.save(mapper.toDomain(request, workspace));
+        Tarefa salvo = tarefaRepository.save(mapper.toDomain(dto, workspace));
         return mapper.toResponse(salvo);
     }
 }

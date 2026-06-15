@@ -1,8 +1,10 @@
 package com.nexa.task.presentation.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nexa.task.application.dto.tarefa.TarefaRequestDTO;
+import com.nexa.task.application.dto.tarefa.TarefaCreateDTO;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
+import com.nexa.task.application.dto.tarefa.TarefaUpdateDTO;
+import com.nexa.task.application.exception.BadRequestException;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.usecase.tarefa.*;
 import com.nexa.task.domain.entity.tarefa.DificuldadeTarefa;
@@ -27,10 +29,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TarefaController.class)
@@ -58,6 +57,12 @@ class TarefaControllerTest {
     private ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase;
 
     @MockitoBean
+    private AtualizarTarefaUseCase atualizarTarefaUseCase;
+
+    @MockitoBean
+    private ConcluirTarefaUseCase concluirTarefaUseCase;
+
+    @MockitoBean
     private DesativarTarefaUseCase desativarTarefaUseCase;
 
     @MockitoBean
@@ -66,15 +71,16 @@ class TarefaControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private TarefaRequestDTO request;
+    private TarefaCreateDTO request;
     private TarefaResponseDTO response;
+    private TarefaUpdateDTO updateDto;
 
     @BeforeEach
     void setUp() {
 
         LocalDateTime dataLimite = LocalDateTime.now().plusDays(1);
 
-        request = new TarefaRequestDTO(
+        request = new TarefaCreateDTO(
                 1L,
                 "Minha tarefa",
                 "Descrição da tarefa",
@@ -98,6 +104,14 @@ class TarefaControllerTest {
                 LocalDateTime.now(),
                 true,
                 1L
+        );
+
+        updateDto = new TarefaUpdateDTO(
+                "Minha tarefa atualizada",
+                "Descrição atualizada",
+                PrioridadeTarefa.MEDIA,
+                DificuldadeTarefa.ALTA,
+                LocalDateTime.now().plusDays(2)
         );
     }
 
@@ -145,7 +159,7 @@ class TarefaControllerTest {
     @Test
     void deveRetornar400QuandoRequestForInvalido() throws Exception {
 
-        TarefaRequestDTO requestInvalido = new TarefaRequestDTO(
+        TarefaCreateDTO requestInvalido = new TarefaCreateDTO(
                 null,
                 "",
                 "",
@@ -296,6 +310,110 @@ class TarefaControllerTest {
                 .andExpect(jsonPath("$.content[0].ativo").value(true))
                 .andExpect(jsonPath("$.content[0].id_workspace").value(1))
                 .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void deveAtualizarTarefaComSucesso() throws Exception {
+
+        doNothing().when(atualizarTarefaUseCase)
+                .execute(1L, updateDto);
+
+        mockMvc.perform(
+                        put("/v1/tarefas/1")
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateDto))
+                )
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoTarefaNaoForEncontradaAoAtualizar() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Tarefa com id: 999 não encontrada"
+        ))
+                .when(atualizarTarefaUseCase)
+                .execute(eq(999L), any(TarefaUpdateDTO.class));
+
+        mockMvc.perform(
+                        put("/v1/tarefas/999")
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateDto))
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Tarefa com id: 999 não encontrada"));
+    }
+
+    @Test
+    void deveRetornar400QuandoRequestDeAtualizacaoForInvalido() throws Exception {
+
+        TarefaUpdateDTO dtoInvalido = new TarefaUpdateDTO(
+                "",
+                "",
+                null,
+                null,
+                null
+        );
+
+        mockMvc.perform(
+                        put("/v1/tarefas/1")
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dtoInvalido))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message")
+                        .value("Erro de validação"));
+    }
+
+    @Test
+    void deveConcluirTarefaComSucesso() throws Exception {
+
+        doNothing().when(concluirTarefaUseCase)
+                .execute(1L);
+
+        mockMvc.perform(
+                        patch("/v1/tarefas/1/concluir")
+                )
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoTarefaNaoForEncontradaAoConcluir() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Tarefa com id: 999 não encontrada"
+        ))
+                .when(concluirTarefaUseCase)
+                .execute(999L);
+
+        mockMvc.perform(
+                        patch("/v1/tarefas/999/concluir")
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Tarefa com id: 999 não encontrada"));
+    }
+
+    @Test
+    void deveRetornar400QuandoTarefaJaEstiverConcluida() throws Exception {
+
+        doThrow(new BadRequestException(
+                "A tarefa já está concluída."
+        ))
+                .when(concluirTarefaUseCase)
+                .execute(1L);
+
+        mockMvc.perform(
+                        patch("/v1/tarefas/1/concluir")
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message")
+                        .value("A tarefa já está concluída."));
     }
 
     @Test

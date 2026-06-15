@@ -55,7 +55,7 @@ class AtivarTarefaUseCaseTest {
                         () -> useCase.execute(999L));
 
         assertEquals(
-                "Tarefa com id: 999 nÃ£o encontrada",
+                "Tarefa com id: 999 não encontrada",
                 exception.getMessage()
         );
 
