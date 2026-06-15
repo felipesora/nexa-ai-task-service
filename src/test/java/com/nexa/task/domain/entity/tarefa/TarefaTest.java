@@ -44,14 +44,6 @@ class TarefaTest {
     }
 
     @Test
-    void deveLancarDomainExceptionCasoDescricaoEstejaVazio() {
-        DomainException exception = assertThrows(DomainException.class,
-                () -> new TarefaBuilder().comDescricao(null).build());
-
-        assertEquals("Descrição da tarefa é obrigatória.", exception.getMessage());
-    }
-
-    @Test
     void deveLancarDomainExceptionCasoPrioridadeEstejaVazio() {
         DomainException exception = assertThrows(DomainException.class,
                 () -> new TarefaBuilder().comPrioridade(null).build());
@@ -65,14 +57,6 @@ class TarefaTest {
                 () -> new TarefaBuilder().comStatus(null).build());
 
         assertEquals("Status da tarefa é obrigatório.", exception.getMessage());
-    }
-
-    @Test
-    void deveLancarDomainExceptionCasoDificuldadeEstejaVazio() {
-        DomainException exception = assertThrows(DomainException.class,
-                () -> new TarefaBuilder().comDificuldade(null).build());
-
-        assertEquals("Dificuldade da tarefa é obrigatório.", exception.getMessage());
     }
 
     @Test

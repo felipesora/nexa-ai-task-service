@@ -39,14 +39,6 @@ class WorkspaceTest {
     }
 
     @Test
-    void deveLancarDomainExceptionCasoDescricaoEstejaVazio() {
-        DomainException exception = assertThrows(DomainException.class,
-                () -> new WorkspaceBuilder().comDescricao(null).build());
-
-        assertEquals("Descrição do workspace é obrigatória.", exception.getMessage());
-    }
-
-    @Test
     void deveAlterarStatusParaAtivoQuandoAtivarWorkspace() {
 
         Workspace workspace = new WorkspaceBuilder().comAtivo(false).build();

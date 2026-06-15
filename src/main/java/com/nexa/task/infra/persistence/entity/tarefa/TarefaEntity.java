@@ -17,7 +17,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "Tarefas")
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class TarefaEntity {
@@ -33,7 +32,7 @@ public class TarefaEntity {
     @Column(nullable = false, length = 200)
     private String titulo;
 
-    @Column(nullable = false, length = 700)
+    @Column(nullable = true, length = 700)
     private String descricao;
 
     @Enumerated(EnumType.STRING)
@@ -45,13 +44,13 @@ public class TarefaEntity {
     private StatusTarefa status;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private DificuldadeTarefa dificuldade;
 
-    @Column(nullable = false, name = "data_limite")
+    @Column(nullable = true, name = "data_limite")
     private LocalDateTime dataLimite;
 
-    @Column(nullable = false, name = "data_conclusao")
+    @Column(nullable = true, name = "data_conclusao")
     private LocalDateTime dataConclusao;
 
     @Column(nullable = false, name = "criado_em")
@@ -77,4 +76,20 @@ public class TarefaEntity {
             inverseJoinColumns = @JoinColumn(name = "id_tag")
     )
     private Set<TagEntity> tags = new HashSet<>();
+
+    public TarefaEntity(Long id, Long idUsuario, String titulo, String descricao, PrioridadeTarefa prioridade, StatusTarefa status, DificuldadeTarefa dificuldade, LocalDateTime dataLimite, LocalDateTime dataConclusao, LocalDateTime criadoEm, LocalDateTime atualizadoEm, Boolean ativo, WorkspaceEntity workspace) {
+        this.id = id;
+        this.idUsuario = idUsuario;
+        this.titulo = titulo;
+        this.descricao = descricao;
+        this.prioridade = prioridade;
+        this.status = status;
+        this.dificuldade = dificuldade;
+        this.dataLimite = dataLimite;
+        this.dataConclusao = dataConclusao;
+        this.criadoEm = criadoEm;
+        this.atualizadoEm = atualizadoEm;
+        this.ativo = ativo;
+        this.workspace = workspace;
+    }
 }

@@ -20,7 +20,6 @@ public class Workspace {
                      LocalDateTime atualizadoEm, Boolean ativo, CorWorkspace corWorkspace, IconeWorkspace iconeWorkspace) {
         validarIdUsuario(idUsuario);
         validarNome(nome);
-        validarDescricao(descricao);
 
         this.id = id;
         this.idUsuario = idUsuario;
@@ -50,12 +49,6 @@ public class Workspace {
     private void validarNome(String nome) {
         if (nome == null || nome.isBlank()) {
             throw new DomainException("Nome do workspace é obrigatório.");
-        }
-    }
-
-    private void validarDescricao(String descricao) {
-        if (descricao == null || descricao.isBlank()) {
-            throw new DomainException("Descrição do workspace é obrigatória.");
         }
     }
 
