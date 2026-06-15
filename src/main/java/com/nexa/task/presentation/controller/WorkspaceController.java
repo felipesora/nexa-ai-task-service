@@ -113,9 +113,9 @@ public class WorkspaceController
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{id}")
-    public ResponseEntity<WorkspaceResponseDTO> buscarCorPorId(@PathVariable Long id) {
-        WorkspaceResponseDTO cor = buscarWorkspacePorIdUseCase.execute(id);
-        return ResponseEntity.ok(cor);
+    public ResponseEntity<WorkspaceResponseDTO> buscarWorkspacePorId(@PathVariable Long id) {
+        WorkspaceResponseDTO workspace = buscarWorkspacePorIdUseCase.execute(id);
+        return ResponseEntity.ok(workspace);
     }
 
     @Operation(summary = "Listar workspaces por ID do usuário",

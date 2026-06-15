@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nexa.task.application.dto.tarefa.TarefaRequestDTO;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.exception.EntityNotFoundException;
-import com.nexa.task.application.usecase.tarefa.CadastrarTarefaUseCase;
+import com.nexa.task.application.usecase.tarefa.*;
 import com.nexa.task.domain.entity.tarefa.DificuldadeTarefa;
 import com.nexa.task.domain.entity.tarefa.PrioridadeTarefa;
 import com.nexa.task.domain.entity.tarefa.StatusTarefa;
@@ -12,13 +12,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -30,6 +37,21 @@ class TarefaControllerTest {
 
     @MockitoBean
     private CadastrarTarefaUseCase cadastrarTarefaUseCase;
+
+    @MockitoBean
+    private ListarTodasTarefasUseCase listarTodasTarefasUseCase;
+
+    @MockitoBean
+    private BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase;
+
+    @MockitoBean
+    private ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase;
+
+    @MockitoBean
+    private ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase;
+
+    @MockitoBean
+    private ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -130,5 +152,139 @@ class TarefaControllerTest {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.message")
                         .value("Erro de validação"));
+    }
+
+    @Test
+    void deveListarTodasAsTarefas() throws Exception {
+
+        Page<TarefaResponseDTO> page =
+                new PageImpl<>(List.of(response));
+
+        when(listarTodasTarefasUseCase.execute(any(Pageable.class)))
+                .thenReturn(page);
+
+        mockMvc.perform(get("/v1/tarefas"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id_tarefa").value(1))
+                .andExpect(jsonPath("$.content[0].id_usuario").value(1))
+                .andExpect(jsonPath("$.content[0].titulo").value("Minha tarefa"))
+                .andExpect(jsonPath("$.content[0].descricao").value("Descrição da tarefa"))
+                .andExpect(jsonPath("$.content[0].prioridade").value("ALTA"))
+                .andExpect(jsonPath("$.content[0].status").value("PENDENTE"))
+                .andExpect(jsonPath("$.content[0].dificuldade").value("MEDIA"))
+                .andExpect(jsonPath("$.content[0].ativo").value(true))
+                .andExpect(jsonPath("$.content[0].id_workspace").value(1))
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void deveBuscarTarefaPorIdComSucesso() throws Exception {
+
+        when(buscarTarefaPorIdUseCase.execute(1L))
+                .thenReturn(response);
+
+        mockMvc.perform(get("/v1/tarefas/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id_tarefa").value(1))
+                .andExpect(jsonPath("$.id_usuario").value(1))
+                .andExpect(jsonPath("$.titulo").value("Minha tarefa"))
+                .andExpect(jsonPath("$.descricao").value("Descrição da tarefa"))
+                .andExpect(jsonPath("$.prioridade").value("ALTA"))
+                .andExpect(jsonPath("$.status").value("PENDENTE"))
+                .andExpect(jsonPath("$.dificuldade").value("MEDIA"))
+                .andExpect(jsonPath("$.ativo").value(true))
+                .andExpect(jsonPath("$.id_workspace").value(1));
+    }
+
+    @Test
+    void deveRetornar404QuandoTarefaNaoForEncontrada() throws Exception {
+
+        when(buscarTarefaPorIdUseCase.execute(999L))
+                .thenThrow(
+                        new EntityNotFoundException(
+                                "Tarefa com id: 999 não encontrada."
+                        )
+                );
+
+        mockMvc.perform(get("/v1/tarefas/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Tarefa com id: 999 não encontrada."));
+    }
+
+    @Test
+    void deveListarTarefasPorIdWorkspace() throws Exception {
+
+        Page<TarefaResponseDTO> page =
+                new PageImpl<>(List.of(response));
+
+        when(listarTarefasPorIdWorkspaceUseCase
+                .execute(eq(1L), any(Pageable.class)))
+                .thenReturn(page);
+
+        mockMvc.perform(get("/v1/tarefas/workspace/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id_tarefa").value(1))
+                .andExpect(jsonPath("$.content[0].id_usuario").value(1))
+                .andExpect(jsonPath("$.content[0].titulo").value("Minha tarefa"))
+                .andExpect(jsonPath("$.content[0].descricao").value("Descrição da tarefa"))
+                .andExpect(jsonPath("$.content[0].prioridade").value("ALTA"))
+                .andExpect(jsonPath("$.content[0].status").value("PENDENTE"))
+                .andExpect(jsonPath("$.content[0].dificuldade").value("MEDIA"))
+                .andExpect(jsonPath("$.content[0].ativo").value(true))
+                .andExpect(jsonPath("$.content[0].id_workspace").value(1))
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void deveListarTarefasPorIdUsuario() throws Exception {
+
+        Page<TarefaResponseDTO> page =
+                new PageImpl<>(List.of(response));
+
+        when(listarTarefasPorIdUsuarioUseCase
+                .execute(eq(1L), any(Pageable.class)))
+                .thenReturn(page);
+
+        mockMvc.perform(get("/v1/tarefas/usuario/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id_tarefa").value(1))
+                .andExpect(jsonPath("$.content[0].id_usuario").value(1))
+                .andExpect(jsonPath("$.content[0].titulo").value("Minha tarefa"))
+                .andExpect(jsonPath("$.content[0].descricao").value("Descrição da tarefa"))
+                .andExpect(jsonPath("$.content[0].prioridade").value("ALTA"))
+                .andExpect(jsonPath("$.content[0].status").value("PENDENTE"))
+                .andExpect(jsonPath("$.content[0].dificuldade").value("MEDIA"))
+                .andExpect(jsonPath("$.content[0].ativo").value(true))
+                .andExpect(jsonPath("$.content[0].id_workspace").value(1))
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void deveListarTarefasPorIdUsuarioENome() throws Exception {
+
+        Page<TarefaResponseDTO> page =
+                new PageImpl<>(List.of(response));
+
+        when(listarTarefasPorIdUsuarioETituloUseCase
+                .execute(eq(1L), eq("Minha tarefa"), any(Pageable.class)))
+                .thenReturn(page);
+
+        mockMvc.perform(
+                        get("/v1/tarefas/usuario/1")
+                                .param("nome", "Minha tarefa")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id_tarefa").value(1))
+                .andExpect(jsonPath("$.content[0].id_usuario").value(1))
+                .andExpect(jsonPath("$.content[0].titulo").value("Minha tarefa"))
+                .andExpect(jsonPath("$.content[0].descricao").value("Descrição da tarefa"))
+                .andExpect(jsonPath("$.content[0].prioridade").value("ALTA"))
+                .andExpect(jsonPath("$.content[0].status").value("PENDENTE"))
+                .andExpect(jsonPath("$.content[0].dificuldade").value("MEDIA"))
+                .andExpect(jsonPath("$.content[0].ativo").value(true))
+                .andExpect(jsonPath("$.content[0].id_workspace").value(1))
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 }
