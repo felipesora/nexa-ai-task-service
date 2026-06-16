@@ -51,6 +51,16 @@ public class SubtarefaBeanConfig {
     }
 
     @Bean
+    ConcluirSubtarefaUseCase concluirSubtarefaUseCase(SubtarefaRepository subtarefaRepository) {
+        return new ConcluirSubtarefaUseCase(subtarefaRepository);
+    }
+
+    @Bean
+    DesmarcarSubtarefaConcluidaUseCase desmarcarSubtarefaConcluidaUseCase(SubtarefaRepository subtarefaRepository) {
+        return new DesmarcarSubtarefaConcluidaUseCase(subtarefaRepository);
+    }
+
+    @Bean
     SubtarefaControllerMapper subtarefaControllerMapper() {
         return new SubtarefaControllerMapper();
     }

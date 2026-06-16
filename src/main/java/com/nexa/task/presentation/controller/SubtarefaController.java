@@ -33,8 +33,10 @@ public class SubtarefaController {
     private final AtualizarSubtarefaUseCase atualizarSubtarefaUseCase;
     private final DesativarSubtarefaUseCase desativarSubtarefaUseCase;
     private final AtivarSubtarefaUseCase ativarSubtarefaUseCase;
+    private final ConcluirSubtarefaUseCase concluirSubtarefaUseCase;
+    private final DesmarcarSubtarefaConcluidaUseCase desmarcarSubtarefaConcluidaUseCase;
 
-    public SubtarefaController(CadastrarSubtarefaUseCase cadastrarSubtarefaUseCase, ListarTodasSubtarefasUseCase listarTodasSubtarefasUseCase, ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase, BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase, AtualizarSubtarefaUseCase atualizarSubtarefaUseCase, DesativarSubtarefaUseCase desativarSubtarefaUseCase, AtivarSubtarefaUseCase ativarSubtarefaUseCase) {
+    public SubtarefaController(CadastrarSubtarefaUseCase cadastrarSubtarefaUseCase, ListarTodasSubtarefasUseCase listarTodasSubtarefasUseCase, ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase, BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase, AtualizarSubtarefaUseCase atualizarSubtarefaUseCase, DesativarSubtarefaUseCase desativarSubtarefaUseCase, AtivarSubtarefaUseCase ativarSubtarefaUseCase, ConcluirSubtarefaUseCase concluirSubtarefaUseCase, DesmarcarSubtarefaConcluidaUseCase desmarcarSubtarefaConcluidaUseCase) {
         this.cadastrarSubtarefaUseCase = cadastrarSubtarefaUseCase;
         this.listarTodasSubtarefasUseCase = listarTodasSubtarefasUseCase;
         this.listarSubtarefasPorIdTarefaUseCase = listarSubtarefasPorIdTarefaUseCase;
@@ -42,6 +44,8 @@ public class SubtarefaController {
         this.atualizarSubtarefaUseCase = atualizarSubtarefaUseCase;
         this.desativarSubtarefaUseCase = desativarSubtarefaUseCase;
         this.ativarSubtarefaUseCase = ativarSubtarefaUseCase;
+        this.concluirSubtarefaUseCase = concluirSubtarefaUseCase;
+        this.desmarcarSubtarefaConcluidaUseCase = desmarcarSubtarefaConcluidaUseCase;
     }
 
     @Operation(summary = "Cadastrar subtarefa",
@@ -200,6 +204,46 @@ public class SubtarefaController {
     @PatchMapping("/ativar/{id}")
     public ResponseEntity<Void> ativarSubtarefa(@PathVariable Long id) {
         ativarSubtarefaUseCase.execute(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Marcar subtarefa como concluída",
+            description = """
+                Marca uma subtarefa como concluída.
+
+                Apenas o proprietário da subtarefa ou um administrador
+                pode realizar esta operação.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Subtarefa marcada como concluída com sucesso", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Subtarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PatchMapping("/{id}/concluir")
+    public ResponseEntity<Void> concluirSubtarefa(@PathVariable Long id) {
+        concluirSubtarefaUseCase.execute(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Desmarcar subtarefa como concluída",
+            description = """
+                Remove a marcação de concluída de uma subtarefa.
+
+                Apenas o proprietário da subtarefa ou um administrador
+                pode realizar esta operação.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Marcação de conclusão removida com sucesso", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Subtarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PatchMapping("/{id}/desmarcar-conclusao")
+    public ResponseEntity<Void> desmarcarConclusaoSubtarefa(@PathVariable Long id) {
+        desmarcarSubtarefaConcluidaUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }
 }

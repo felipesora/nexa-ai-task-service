@@ -4,14 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nexa.task.application.dto.subtarefa.SubtarefaCreateDTO;
 import com.nexa.task.application.dto.subtarefa.SubtarefaResponseDTO;
 import com.nexa.task.application.exception.EntityNotFoundException;
-import com.nexa.task.application.usecase.subtarefa.AtivarSubtarefaUseCase;
-import com.nexa.task.application.usecase.subtarefa.BuscarSubtarefaPorIdUseCase;
-import com.nexa.task.application.usecase.subtarefa.CadastrarSubtarefaUseCase;
-import com.nexa.task.application.usecase.subtarefa.DesativarSubtarefaUseCase;
-import com.nexa.task.application.usecase.subtarefa.ListarSubtarefasPorIdTarefaUseCase;
-import com.nexa.task.application.usecase.subtarefa.ListarTodasSubtarefasUseCase;
+import com.nexa.task.application.usecase.subtarefa.*;
 import com.nexa.task.application.dto.subtarefa.SubtarefaUpdateDTO;
-import com.nexa.task.application.usecase.subtarefa.AtualizarSubtarefaUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +60,12 @@ class SubtarefaControllerTest {
 
     @MockitoBean
     private AtivarSubtarefaUseCase ativarSubtarefaUseCase;
+
+    @MockitoBean
+    private ConcluirSubtarefaUseCase concluirSubtarefaUseCase;
+
+    @MockitoBean
+    private DesmarcarSubtarefaConcluidaUseCase desmarcarSubtarefaConcluidaUseCase;
 
     private SubtarefaCreateDTO request;
     private SubtarefaResponseDTO response;
@@ -341,4 +341,63 @@ class SubtarefaControllerTest {
                         .value("Subtarefa com id: 999 não encontrada"));
     }
 
+    @Test
+    void deveConcluirSubtarefaComSucesso() throws Exception {
+
+        doNothing().when(concluirSubtarefaUseCase)
+                .execute(1L);
+
+        mockMvc.perform(
+                        patch("/v1/subtarefas/1/concluir")
+                )
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoSubtarefaNaoForEncontradaAoConcluir() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Subtarefa com id: 999 não encontrada"
+        ))
+                .when(concluirSubtarefaUseCase)
+                .execute(999L);
+
+        mockMvc.perform(
+                        patch("/v1/subtarefas/999/concluir")
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Subtarefa com id: 999 não encontrada"));
+    }
+
+    @Test
+    void deveDesmarcarConclusaoSubtarefaComSucesso() throws Exception {
+
+        doNothing().when(desmarcarSubtarefaConcluidaUseCase)
+                .execute(1L);
+
+        mockMvc.perform(
+                        patch("/v1/subtarefas/1/desmarcar-conclusao")
+                )
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoSubtarefaNaoForEncontradaAoDesmarcarConclusao() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Subtarefa com id: 999 não encontrada"
+        ))
+                .when(desmarcarSubtarefaConcluidaUseCase)
+                .execute(999L);
+
+        mockMvc.perform(
+                        patch("/v1/subtarefas/999/desmarcar-conclusao")
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Subtarefa com id: 999 não encontrada"));
+    }
 }
