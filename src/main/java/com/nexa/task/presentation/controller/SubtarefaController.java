@@ -4,8 +4,10 @@ import com.nexa.task.application.dto.subtarefa.SubtarefaRequestDTO;
 import com.nexa.task.application.dto.subtarefa.SubtarefaResponseDTO;
 import com.nexa.task.application.usecase.subtarefa.BuscarSubtarefaPorIdUseCase;
 import com.nexa.task.application.usecase.subtarefa.CadastrarSubtarefaUseCase;
+import com.nexa.task.application.usecase.subtarefa.DesativarSubtarefaUseCase;
 import com.nexa.task.application.usecase.subtarefa.ListarSubtarefasPorIdTarefaUseCase;
 import com.nexa.task.application.usecase.subtarefa.ListarTodasSubtarefasUseCase;
+import com.nexa.task.application.usecase.subtarefa.AtivarSubtarefaUseCase;
 import com.nexa.task.presentation.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,12 +34,16 @@ public class SubtarefaController {
     private final ListarTodasSubtarefasUseCase listarTodasSubtarefasUseCase;
     private final ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase;
     private final BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase;
+    private final DesativarSubtarefaUseCase desativarSubtarefaUseCase;
+    private final AtivarSubtarefaUseCase ativarSubtarefaUseCase;
 
-    public SubtarefaController(CadastrarSubtarefaUseCase cadastrarSubtarefaUseCase, ListarTodasSubtarefasUseCase listarTodasSubtarefasUseCase, ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase, BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase) {
+    public SubtarefaController(CadastrarSubtarefaUseCase cadastrarSubtarefaUseCase, ListarTodasSubtarefasUseCase listarTodasSubtarefasUseCase, ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase, BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase, DesativarSubtarefaUseCase desativarSubtarefaUseCase, AtivarSubtarefaUseCase ativarSubtarefaUseCase) {
         this.cadastrarSubtarefaUseCase = cadastrarSubtarefaUseCase;
         this.listarTodasSubtarefasUseCase = listarTodasSubtarefasUseCase;
         this.listarSubtarefasPorIdTarefaUseCase = listarSubtarefasPorIdTarefaUseCase;
         this.buscarSubtarefaPorIdUseCase = buscarSubtarefaPorIdUseCase;
+        this.desativarSubtarefaUseCase = desativarSubtarefaUseCase;
+        this.ativarSubtarefaUseCase = ativarSubtarefaUseCase;
     }
 
     @Operation(summary = "Cadastrar subtarefa",
@@ -136,5 +142,44 @@ public class SubtarefaController {
                                                                                @PageableDefault(size = 10) Pageable pageable) {
         Page<SubtarefaResponseDTO> subtarefas = listarSubtarefasPorIdTarefaUseCase.execute(idTarefa, pageable);
         return ResponseEntity.ok(subtarefas);
+    }
+
+    @Operation(summary = "Desativar subtarefa",
+            description = """
+                Realiza a desativação lógica de uma subtarefa.
+
+                Apenas o dono da subtarefa pode desativa-la,
+                exceto administradores.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Subtarefa desativada com sucesso", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Subtarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> desativarSubtarefa(@PathVariable Long id) {
+        desativarSubtarefaUseCase.execute(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Ativar subtarefa",
+            description = """
+                Reativa uma subtarefa previamente desativada.
+
+                Apenas administradores podem executar esta operação.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Subtarefa ativada com sucesso", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Subtarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PatchMapping("/ativar/{id}")
+    public ResponseEntity<Void> ativarSubtarefa(@PathVariable Long id) {
+        ativarSubtarefaUseCase.execute(id);
+        return ResponseEntity.noContent().build();
     }
 }

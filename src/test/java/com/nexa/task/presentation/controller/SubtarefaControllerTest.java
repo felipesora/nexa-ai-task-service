@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nexa.task.application.dto.subtarefa.SubtarefaRequestDTO;
 import com.nexa.task.application.dto.subtarefa.SubtarefaResponseDTO;
 import com.nexa.task.application.exception.EntityNotFoundException;
+import com.nexa.task.application.usecase.subtarefa.AtivarSubtarefaUseCase;
 import com.nexa.task.application.usecase.subtarefa.BuscarSubtarefaPorIdUseCase;
 import com.nexa.task.application.usecase.subtarefa.CadastrarSubtarefaUseCase;
+import com.nexa.task.application.usecase.subtarefa.DesativarSubtarefaUseCase;
 import com.nexa.task.application.usecase.subtarefa.ListarSubtarefasPorIdTarefaUseCase;
 import com.nexa.task.application.usecase.subtarefa.ListarTodasSubtarefasUseCase;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,9 +24,13 @@ import java.util.List;
 import java.time.LocalDateTime;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -49,6 +55,12 @@ class SubtarefaControllerTest {
 
     @MockitoBean
     private BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase;
+
+    @MockitoBean
+    private DesativarSubtarefaUseCase desativarSubtarefaUseCase;
+
+    @MockitoBean
+    private AtivarSubtarefaUseCase ativarSubtarefaUseCase;
 
     private SubtarefaRequestDTO request;
     private SubtarefaResponseDTO response;
@@ -216,5 +228,56 @@ class SubtarefaControllerTest {
                 .andExpect(jsonPath("$.totalElements").value(1));
     }
 
+    @Test
+    void deveDesativarSubtarefaComSucesso() throws Exception {
+
+        doNothing().when(desativarSubtarefaUseCase)
+                .execute(1L);
+
+        mockMvc.perform(delete("/v1/subtarefas/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoSubtarefaNaoForEncontradaAoDesativar() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Subtarefa com id: 999 não encontrada"
+        ))
+                .when(desativarSubtarefaUseCase)
+                .execute(999L);
+
+        mockMvc.perform(delete("/v1/subtarefas/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Subtarefa com id: 999 não encontrada"));
+    }
+
+    @Test
+    void deveAtivarSubtarefaComSucesso() throws Exception {
+
+        doNothing().when(ativarSubtarefaUseCase)
+                .execute(1L);
+
+        mockMvc.perform(patch("/v1/subtarefas/ativar/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoSubtarefaNaoForEncontradaAoAtivar() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Subtarefa com id: 999 não encontrada"
+        ))
+                .when(ativarSubtarefaUseCase)
+                .execute(999L);
+
+        mockMvc.perform(patch("/v1/subtarefas/ativar/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Subtarefa com id: 999 não encontrada"));
+    }
 
 }
