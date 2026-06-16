@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Subtarefas")
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class SubtarefaEntity {
@@ -38,4 +37,14 @@ public class SubtarefaEntity {
     @ManyToOne
     @JoinColumn(name = "id_tarefa", nullable = false)
     private TarefaEntity tarefa;
+
+    public SubtarefaEntity(Long id, String titulo, Boolean concluida, LocalDateTime criadoEm, LocalDateTime atualizadoEm, Boolean ativo, TarefaEntity tarefa) {
+        this.id = id;
+        this.titulo = titulo;
+        this.concluida = concluida;
+        this.criadoEm = criadoEm;
+        this.atualizadoEm = atualizadoEm;
+        this.ativo = ativo;
+        this.tarefa = tarefa;
+    }
 }
