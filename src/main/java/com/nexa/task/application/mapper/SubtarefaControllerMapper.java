@@ -1,6 +1,6 @@
 package com.nexa.task.application.mapper;
 
-import com.nexa.task.application.dto.subtarefa.SubtarefaRequestDTO;
+import com.nexa.task.application.dto.subtarefa.SubtarefaCreateDTO;
 import com.nexa.task.application.dto.subtarefa.SubtarefaResponseDTO;
 import com.nexa.task.domain.entity.subtarefa.Subtarefa;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 public class SubtarefaControllerMapper {
 
-    public Subtarefa toDomain(SubtarefaRequestDTO request, Tarefa tarefa) {
+    public Subtarefa toDomain(SubtarefaCreateDTO request, Tarefa tarefa) {
         return new Subtarefa(
                 null,
                 request.titulo(),

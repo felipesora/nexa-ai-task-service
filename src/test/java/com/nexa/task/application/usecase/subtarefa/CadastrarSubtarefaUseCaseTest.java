@@ -1,10 +1,9 @@
 package com.nexa.task.application.usecase.subtarefa;
 
-import com.nexa.task.application.dto.subtarefa.SubtarefaRequestDTO;
+import com.nexa.task.application.dto.subtarefa.SubtarefaCreateDTO;
 import com.nexa.task.application.dto.subtarefa.SubtarefaResponseDTO;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.mapper.SubtarefaControllerMapper;
-import com.nexa.task.application.usecase.subtarefa.CadastrarSubtarefaUseCase;
 import com.nexa.task.domain.builder.subtarefa.SubtarefaBuilder;
 import com.nexa.task.domain.builder.tarefa.TarefaBuilder;
 import com.nexa.task.domain.entity.subtarefa.Subtarefa;
@@ -41,7 +40,7 @@ class CadastrarSubtarefaUseCaseTest {
     @Test
     void deveCadastrarSubtarefaComSucesso() {
 
-        SubtarefaRequestDTO request = new SubtarefaRequestDTO(
+        SubtarefaCreateDTO request = new SubtarefaCreateDTO(
                 "Minha subtarefa",
                 1L
         );
@@ -96,7 +95,7 @@ class CadastrarSubtarefaUseCaseTest {
     @Test
     void deveLancarExcecaoQuandoTarefaNaoEncontrada() {
 
-        SubtarefaRequestDTO request = new SubtarefaRequestDTO(
+        SubtarefaCreateDTO request = new SubtarefaCreateDTO(
                 "Minha subtarefa",
                 999L
         );

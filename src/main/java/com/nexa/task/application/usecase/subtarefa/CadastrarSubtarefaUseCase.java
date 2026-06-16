@@ -1,6 +1,6 @@
 package com.nexa.task.application.usecase.subtarefa;
 
-import com.nexa.task.application.dto.subtarefa.SubtarefaRequestDTO;
+import com.nexa.task.application.dto.subtarefa.SubtarefaCreateDTO;
 import com.nexa.task.application.dto.subtarefa.SubtarefaResponseDTO;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.mapper.SubtarefaControllerMapper;
@@ -8,6 +8,7 @@ import com.nexa.task.domain.entity.subtarefa.Subtarefa;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.repository.SubtarefaRepository;
 import com.nexa.task.domain.repository.TarefaRepository;
+import jakarta.transaction.Transactional;
 
 public class CadastrarSubtarefaUseCase {
 
@@ -21,11 +22,12 @@ public class CadastrarSubtarefaUseCase {
         this.mapper = mapper;
     }
 
-    public SubtarefaResponseDTO execute(SubtarefaRequestDTO request) {
-        Tarefa tarefa = tarefaRepository.findById(request.idTarefa())
-                .orElseThrow(() -> new EntityNotFoundException("Tarefa com id: " + request.idTarefa() + " não encontrada"));
+    @Transactional
+    public SubtarefaResponseDTO execute(SubtarefaCreateDTO dto) {
+        Tarefa tarefa = tarefaRepository.findById(dto.idTarefa())
+                .orElseThrow(() -> new EntityNotFoundException("Tarefa com id: " + dto.idTarefa() + " não encontrada"));
 
-        Subtarefa salvo = subtarefaRepository.save(mapper.toDomain(request, tarefa));
+        Subtarefa salvo = subtarefaRepository.save(mapper.toDomain(dto, tarefa));
         return mapper.toResponse(salvo);
     }
 }

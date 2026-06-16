@@ -1,7 +1,7 @@
 package com.nexa.task.presentation.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nexa.task.application.dto.subtarefa.SubtarefaRequestDTO;
+import com.nexa.task.application.dto.subtarefa.SubtarefaCreateDTO;
 import com.nexa.task.application.dto.subtarefa.SubtarefaResponseDTO;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.usecase.subtarefa.AtivarSubtarefaUseCase;
@@ -10,6 +10,8 @@ import com.nexa.task.application.usecase.subtarefa.CadastrarSubtarefaUseCase;
 import com.nexa.task.application.usecase.subtarefa.DesativarSubtarefaUseCase;
 import com.nexa.task.application.usecase.subtarefa.ListarSubtarefasPorIdTarefaUseCase;
 import com.nexa.task.application.usecase.subtarefa.ListarTodasSubtarefasUseCase;
+import com.nexa.task.application.dto.subtarefa.SubtarefaUpdateDTO;
+import com.nexa.task.application.usecase.subtarefa.AtualizarSubtarefaUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(SubtarefaController.class)
@@ -57,18 +59,22 @@ class SubtarefaControllerTest {
     private BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase;
 
     @MockitoBean
+    private AtualizarSubtarefaUseCase atualizarSubtarefaUseCase;
+
+    @MockitoBean
     private DesativarSubtarefaUseCase desativarSubtarefaUseCase;
 
     @MockitoBean
     private AtivarSubtarefaUseCase ativarSubtarefaUseCase;
 
-    private SubtarefaRequestDTO request;
+    private SubtarefaCreateDTO request;
     private SubtarefaResponseDTO response;
+    private SubtarefaUpdateDTO updateDto;
 
     @BeforeEach
     void setUp() {
 
-        request = new SubtarefaRequestDTO(
+        request = new SubtarefaCreateDTO(
                 "Minha subtarefa",
                 1L
         );
@@ -81,6 +87,10 @@ class SubtarefaControllerTest {
                 LocalDateTime.now(),
                 true,
                 1L
+        );
+
+        updateDto = new SubtarefaUpdateDTO(
+                "Subtarefa atualizada"
         );
     }
 
@@ -130,8 +140,8 @@ class SubtarefaControllerTest {
     @Test
     void deveRetornar400QuandoRequestForInvalido() throws Exception {
 
-        SubtarefaRequestDTO requestInvalido =
-                new SubtarefaRequestDTO(
+        SubtarefaCreateDTO requestInvalido =
+                new SubtarefaCreateDTO(
                         "",
                         null
                 );
@@ -226,6 +236,57 @@ class SubtarefaControllerTest {
                 .andExpect(jsonPath("$.content[0].id_tarefa")
                         .value(1))
                 .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void deveAtualizarSubtarefaComSucesso() throws Exception {
+
+        doNothing().when(atualizarSubtarefaUseCase)
+                .execute(1L, updateDto);
+
+        mockMvc.perform(
+                        put("/v1/subtarefas/1")
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateDto))
+                )
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoSubtarefaNaoForEncontradaAoAtualizar() throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Subtarefa com id: 999 não encontrada."
+        ))
+                .when(atualizarSubtarefaUseCase)
+                .execute(eq(999L), any(SubtarefaUpdateDTO.class));
+
+        mockMvc.perform(
+                        put("/v1/subtarefas/999")
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateDto))
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Subtarefa com id: 999 não encontrada."));
+    }
+
+    @Test
+    void deveRetornar400QuandoRequestDeAtualizacaoForInvalido() throws Exception {
+
+        SubtarefaUpdateDTO dtoInvalido =
+                new SubtarefaUpdateDTO("");
+
+        mockMvc.perform(
+                        put("/v1/subtarefas/1")
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dtoInvalido))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message")
+                        .value("Erro de validação"));
     }
 
     @Test

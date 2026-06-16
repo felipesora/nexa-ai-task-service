@@ -1,13 +1,9 @@
 package com.nexa.task.presentation.controller;
 
-import com.nexa.task.application.dto.subtarefa.SubtarefaRequestDTO;
+import com.nexa.task.application.dto.subtarefa.SubtarefaCreateDTO;
 import com.nexa.task.application.dto.subtarefa.SubtarefaResponseDTO;
-import com.nexa.task.application.usecase.subtarefa.BuscarSubtarefaPorIdUseCase;
-import com.nexa.task.application.usecase.subtarefa.CadastrarSubtarefaUseCase;
-import com.nexa.task.application.usecase.subtarefa.DesativarSubtarefaUseCase;
-import com.nexa.task.application.usecase.subtarefa.ListarSubtarefasPorIdTarefaUseCase;
-import com.nexa.task.application.usecase.subtarefa.ListarTodasSubtarefasUseCase;
-import com.nexa.task.application.usecase.subtarefa.AtivarSubtarefaUseCase;
+import com.nexa.task.application.dto.subtarefa.SubtarefaUpdateDTO;
+import com.nexa.task.application.usecase.subtarefa.*;
 import com.nexa.task.presentation.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,14 +30,16 @@ public class SubtarefaController {
     private final ListarTodasSubtarefasUseCase listarTodasSubtarefasUseCase;
     private final ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase;
     private final BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase;
+    private final AtualizarSubtarefaUseCase atualizarSubtarefaUseCase;
     private final DesativarSubtarefaUseCase desativarSubtarefaUseCase;
     private final AtivarSubtarefaUseCase ativarSubtarefaUseCase;
 
-    public SubtarefaController(CadastrarSubtarefaUseCase cadastrarSubtarefaUseCase, ListarTodasSubtarefasUseCase listarTodasSubtarefasUseCase, ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase, BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase, DesativarSubtarefaUseCase desativarSubtarefaUseCase, AtivarSubtarefaUseCase ativarSubtarefaUseCase) {
+    public SubtarefaController(CadastrarSubtarefaUseCase cadastrarSubtarefaUseCase, ListarTodasSubtarefasUseCase listarTodasSubtarefasUseCase, ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase, BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase, AtualizarSubtarefaUseCase atualizarSubtarefaUseCase, DesativarSubtarefaUseCase desativarSubtarefaUseCase, AtivarSubtarefaUseCase ativarSubtarefaUseCase) {
         this.cadastrarSubtarefaUseCase = cadastrarSubtarefaUseCase;
         this.listarTodasSubtarefasUseCase = listarTodasSubtarefasUseCase;
         this.listarSubtarefasPorIdTarefaUseCase = listarSubtarefasPorIdTarefaUseCase;
         this.buscarSubtarefaPorIdUseCase = buscarSubtarefaPorIdUseCase;
+        this.atualizarSubtarefaUseCase = atualizarSubtarefaUseCase;
         this.desativarSubtarefaUseCase = desativarSubtarefaUseCase;
         this.ativarSubtarefaUseCase = ativarSubtarefaUseCase;
     }
@@ -64,7 +62,7 @@ public class SubtarefaController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping
-    public ResponseEntity<SubtarefaResponseDTO> cadastrarSubtarefa(@RequestBody @Valid SubtarefaRequestDTO request,
+    public ResponseEntity<SubtarefaResponseDTO> cadastrarSubtarefa(@RequestBody @Valid SubtarefaCreateDTO request,
                                                              UriComponentsBuilder uriBuilder) {
         SubtarefaResponseDTO response = cadastrarSubtarefaUseCase.execute(request);
         URI endereco = uriBuilder.path("/v1/subtarefas/{id}").buildAndExpand(response.id()).toUri();
@@ -142,6 +140,28 @@ public class SubtarefaController {
                                                                                @PageableDefault(size = 10) Pageable pageable) {
         Page<SubtarefaResponseDTO> subtarefas = listarSubtarefasPorIdTarefaUseCase.execute(idTarefa, pageable);
         return ResponseEntity.ok(subtarefas);
+    }
+
+    @Operation(
+            summary = "Atualizar subtarefa",
+            description = """
+            Atualiza os dados de uma subtarefa.
+
+            Apenas o dono da subtarefa pode atualizar os dados,
+            exceto administradores.
+            """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Subtarefa atualizada com sucesso", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Subtarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> atualizarSubtarefa(@PathVariable Long id, @RequestBody @Valid SubtarefaUpdateDTO dto) {
+        atualizarSubtarefaUseCase.execute(id, dto);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Desativar subtarefa",

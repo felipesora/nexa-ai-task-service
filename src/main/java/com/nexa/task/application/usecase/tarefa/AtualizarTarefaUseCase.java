@@ -2,7 +2,6 @@ package com.nexa.task.application.usecase.tarefa;
 
 import com.nexa.task.application.dto.tarefa.TarefaUpdateDTO;
 import com.nexa.task.application.exception.EntityNotFoundException;
-import com.nexa.task.application.mapper.TarefaControllerMapper;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.repository.TarefaRepository;
 import jakarta.transaction.Transactional;
