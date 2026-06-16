@@ -1,7 +1,10 @@
 package com.nexa.task.infra.config;
 
 import com.nexa.task.application.mapper.SubtarefaControllerMapper;
+import com.nexa.task.application.usecase.subtarefa.BuscarSubtarefaPorIdUseCase;
 import com.nexa.task.application.usecase.subtarefa.CadastrarSubtarefaUseCase;
+import com.nexa.task.application.usecase.subtarefa.ListarSubtarefasPorIdTarefaUseCase;
+import com.nexa.task.application.usecase.subtarefa.ListarTodasSubtarefasUseCase;
 import com.nexa.task.domain.repository.SubtarefaRepository;
 import com.nexa.task.domain.repository.TarefaRepository;
 import com.nexa.task.infra.persistence.adapter.JpaSubtarefaRepository;
@@ -18,6 +21,21 @@ public class SubtarefaBeanConfig {
     CadastrarSubtarefaUseCase cadastrarSubtarefaUseCase(SubtarefaRepository subtarefaRepository, TarefaRepository tarefaRepository,
                                                         SubtarefaControllerMapper mapper) {
         return new CadastrarSubtarefaUseCase(subtarefaRepository, tarefaRepository, mapper);
+    }
+
+    @Bean
+    ListarTodasSubtarefasUseCase listarTodasSubtarefasUseCase(SubtarefaRepository subtarefaRepository, SubtarefaControllerMapper mapper) {
+        return new ListarTodasSubtarefasUseCase(subtarefaRepository, mapper);
+    }
+
+    @Bean
+    ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase(SubtarefaRepository subtarefaRepository, SubtarefaControllerMapper mapper) {
+        return new ListarSubtarefasPorIdTarefaUseCase(subtarefaRepository, mapper);
+    }
+
+    @Bean
+    BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase(SubtarefaRepository subtarefaRepository, SubtarefaControllerMapper mapper) {
+        return new BuscarSubtarefaPorIdUseCase(subtarefaRepository, mapper);
     }
 
     @Bean
