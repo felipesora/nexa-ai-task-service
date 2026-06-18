@@ -1,11 +1,16 @@
 package com.nexa.task.presentation.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
 import com.nexa.task.application.exception.BadRequestException;
 import com.nexa.task.application.exception.EntityNotFoundException;
+import com.nexa.task.application.usecase.tarefa.ListarTarefasPorIdWorkspaceUseCase;
 import com.nexa.task.application.usecase.workspace.*;
+import com.nexa.task.domain.entity.tarefa.DificuldadeTarefa;
+import com.nexa.task.domain.entity.tarefa.PrioridadeTarefa;
+import com.nexa.task.domain.entity.tarefa.StatusTarefa;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +53,9 @@ class WorkspaceControllerTest {
     private ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase;
 
     @MockitoBean
+    private ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase;
+
+    @MockitoBean
     private AtualizarWorkspaceUseCase atualizarWorkspaceUseCase;
 
     @MockitoBean
@@ -61,6 +69,7 @@ class WorkspaceControllerTest {
 
     private WorkspaceRequestDTO request;
     private WorkspaceResponseDTO response;
+    private TarefaResponseDTO tarefaResponse;
 
     @BeforeEach
     void setUp() {
@@ -83,6 +92,22 @@ class WorkspaceControllerTest {
                 true,
                 null,
                 null
+        );
+
+        tarefaResponse = new TarefaResponseDTO(
+                1L,
+                1L,
+                "Minha tarefa",
+                "Descrição da tarefa",
+                PrioridadeTarefa.ALTA,
+                StatusTarefa.PENDENTE,
+                DificuldadeTarefa.MEDIA,
+                LocalDateTime.now().plusDays(1),
+                null,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                true,
+                1L
         );
     }
 
@@ -244,6 +269,55 @@ class WorkspaceControllerTest {
                 .andExpect(jsonPath("$.content[0].descricao").value("Descrição"))
                 .andExpect(jsonPath("$.content[0].ativo").value(true))
                 .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void deveListarTarefasPeloWorkspace() throws Exception {
+
+        Page<TarefaResponseDTO> page =
+                new PageImpl<>(List.of(tarefaResponse));
+
+        when(listarTarefasPorIdWorkspaceUseCase
+                .execute(eq(1L), any(Pageable.class)))
+                .thenReturn(page);
+
+        mockMvc.perform(get("/v1/workspaces/1/tarefas"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id_tarefa").value(1))
+                .andExpect(jsonPath("$.content[0].id_usuario").value(1))
+                .andExpect(jsonPath("$.content[0].titulo").value("Minha tarefa"))
+                .andExpect(jsonPath("$.content[0].descricao")
+                        .value("Descrição da tarefa"))
+                .andExpect(jsonPath("$.content[0].prioridade")
+                        .value("ALTA"))
+                .andExpect(jsonPath("$.content[0].status")
+                        .value("PENDENTE"))
+                .andExpect(jsonPath("$.content[0].dificuldade")
+                        .value("MEDIA"))
+                .andExpect(jsonPath("$.content[0].ativo")
+                        .value(true))
+                .andExpect(jsonPath("$.content[0].id_workspace")
+                        .value(1))
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void deveRetornar404QuandoWorkspaceNaoForEncontradoAoListarTarefas()
+            throws Exception {
+
+        when(listarTarefasPorIdWorkspaceUseCase
+                .execute(eq(999L), any(Pageable.class)))
+                .thenThrow(
+                        new EntityNotFoundException(
+                                "Workspace com id: 999 não encontrado."
+                        )
+                );
+
+        mockMvc.perform(get("/v1/workspaces/999/tarefas"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Workspace com id: 999 não encontrado."));
     }
 
     @Test

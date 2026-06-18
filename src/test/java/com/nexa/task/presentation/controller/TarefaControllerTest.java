@@ -1,11 +1,13 @@
 package com.nexa.task.presentation.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nexa.task.application.dto.subtarefa.SubtarefaResponseDTO;
 import com.nexa.task.application.dto.tarefa.TarefaCreateDTO;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.dto.tarefa.TarefaUpdateDTO;
 import com.nexa.task.application.exception.BadRequestException;
 import com.nexa.task.application.exception.EntityNotFoundException;
+import com.nexa.task.application.usecase.subtarefa.ListarSubtarefasPorIdTarefaUseCase;
 import com.nexa.task.application.usecase.tarefa.*;
 import com.nexa.task.domain.entity.tarefa.DificuldadeTarefa;
 import com.nexa.task.domain.entity.tarefa.PrioridadeTarefa;
@@ -48,13 +50,13 @@ class TarefaControllerTest {
     private BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase;
 
     @MockitoBean
-    private ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase;
-
-    @MockitoBean
     private ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase;
 
     @MockitoBean
     private ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase;
+
+    @MockitoBean
+    private ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase;
 
     @MockitoBean
     private AtualizarTarefaUseCase atualizarTarefaUseCase;
@@ -80,6 +82,7 @@ class TarefaControllerTest {
     private TarefaCreateDTO request;
     private TarefaResponseDTO response;
     private TarefaUpdateDTO updateDto;
+    private SubtarefaResponseDTO subtarefaResponse;
 
     @BeforeEach
     void setUp() {
@@ -118,6 +121,16 @@ class TarefaControllerTest {
                 PrioridadeTarefa.MEDIA,
                 DificuldadeTarefa.ALTA,
                 LocalDateTime.now().plusDays(2)
+        );
+
+        subtarefaResponse = new SubtarefaResponseDTO(
+                1L,
+                "Minha subtarefa",
+                false,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                true,
+                1L
         );
     }
 
@@ -244,30 +257,6 @@ class TarefaControllerTest {
     }
 
     @Test
-    void deveListarTarefasPorIdWorkspace() throws Exception {
-
-        Page<TarefaResponseDTO> page =
-                new PageImpl<>(List.of(response));
-
-        when(listarTarefasPorIdWorkspaceUseCase
-                .execute(eq(1L), any(Pageable.class)))
-                .thenReturn(page);
-
-        mockMvc.perform(get("/v1/tarefas/workspace/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].id_tarefa").value(1))
-                .andExpect(jsonPath("$.content[0].id_usuario").value(1))
-                .andExpect(jsonPath("$.content[0].titulo").value("Minha tarefa"))
-                .andExpect(jsonPath("$.content[0].descricao").value("Descrição da tarefa"))
-                .andExpect(jsonPath("$.content[0].prioridade").value("ALTA"))
-                .andExpect(jsonPath("$.content[0].status").value("PENDENTE"))
-                .andExpect(jsonPath("$.content[0].dificuldade").value("MEDIA"))
-                .andExpect(jsonPath("$.content[0].ativo").value(true))
-                .andExpect(jsonPath("$.content[0].id_workspace").value(1))
-                .andExpect(jsonPath("$.totalElements").value(1));
-    }
-
-    @Test
     void deveListarTarefasPorIdUsuario() throws Exception {
 
         Page<TarefaResponseDTO> page =
@@ -316,6 +305,49 @@ class TarefaControllerTest {
                 .andExpect(jsonPath("$.content[0].ativo").value(true))
                 .andExpect(jsonPath("$.content[0].id_workspace").value(1))
                 .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void deveListarSubtarefasPelaTarefa() throws Exception {
+
+        Page<SubtarefaResponseDTO> page =
+                new PageImpl<>(List.of(subtarefaResponse));
+
+        when(listarSubtarefasPorIdTarefaUseCase
+                .execute(eq(1L), any(Pageable.class)))
+                .thenReturn(page);
+
+        mockMvc.perform(get("/v1/tarefas/1/subtarefas"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id_subtarefa").value(1))
+                .andExpect(jsonPath("$.content[0].titulo")
+                        .value("Minha subtarefa"))
+                .andExpect(jsonPath("$.content[0].concluida")
+                        .value(false))
+                .andExpect(jsonPath("$.content[0].ativo")
+                        .value(true))
+                .andExpect(jsonPath("$.content[0].id_tarefa")
+                        .value(1))
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void deveRetornar404QuandoTarefaNaoForEncontradaAoListarSubtarefas()
+            throws Exception {
+
+        when(listarSubtarefasPorIdTarefaUseCase
+                .execute(eq(999L), any(Pageable.class)))
+                .thenThrow(
+                        new EntityNotFoundException(
+                                "Tarefa com id: 999 não encontrada."
+                        )
+                );
+
+        mockMvc.perform(get("/v1/tarefas/999/subtarefas"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Tarefa com id: 999 não encontrada."));
     }
 
     @Test

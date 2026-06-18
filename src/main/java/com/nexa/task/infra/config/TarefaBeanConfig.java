@@ -35,8 +35,9 @@ public class TarefaBeanConfig {
 
     @Bean
     ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase(TarefaRepository tarefaRepository,
+                                                                          WorkspaceRepository workspaceRepository,
                                                                           TarefaControllerMapper mapper) {
-        return new ListarTarefasPorIdWorkspaceUseCase(tarefaRepository, mapper);
+        return new ListarTarefasPorIdWorkspaceUseCase(tarefaRepository, workspaceRepository, mapper);
     }
 
     @Bean
