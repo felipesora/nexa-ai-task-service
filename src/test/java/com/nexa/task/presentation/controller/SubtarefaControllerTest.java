@@ -47,9 +47,6 @@ class SubtarefaControllerTest {
     private ListarTodasSubtarefasUseCase listarTodasSubtarefasUseCase;
 
     @MockitoBean
-    private ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase;
-
-    @MockitoBean
     private BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase;
 
     @MockitoBean
@@ -212,30 +209,6 @@ class SubtarefaControllerTest {
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.message")
                         .value("Subtarefa com id: 999 não encontrada."));
-    }
-
-    @Test
-    void deveListarSubtarefasPorIdTarefa() throws Exception {
-
-        Page<SubtarefaResponseDTO> page =
-                new PageImpl<>(List.of(response));
-
-        when(listarSubtarefasPorIdTarefaUseCase
-                .execute(eq(1L), any(Pageable.class)))
-                .thenReturn(page);
-
-        mockMvc.perform(get("/v1/subtarefas/tarefa/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].id_subtarefa").value(1))
-                .andExpect(jsonPath("$.content[0].titulo")
-                        .value("Minha subtarefa"))
-                .andExpect(jsonPath("$.content[0].concluida")
-                        .value(false))
-                .andExpect(jsonPath("$.content[0].ativo")
-                        .value(true))
-                .andExpect(jsonPath("$.content[0].id_tarefa")
-                        .value(1))
-                .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test

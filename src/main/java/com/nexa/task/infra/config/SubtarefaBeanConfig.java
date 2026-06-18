@@ -26,8 +26,10 @@ public class SubtarefaBeanConfig {
     }
 
     @Bean
-    ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase(SubtarefaRepository subtarefaRepository, SubtarefaControllerMapper mapper) {
-        return new ListarSubtarefasPorIdTarefaUseCase(subtarefaRepository, mapper);
+    ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase(SubtarefaRepository subtarefaRepository,
+                                                                          TarefaRepository tarefaRepository,
+                                                                          SubtarefaControllerMapper mapper) {
+        return new ListarSubtarefasPorIdTarefaUseCase(subtarefaRepository, tarefaRepository, mapper);
     }
 
     @Bean

@@ -1,7 +1,9 @@
 package com.nexa.task.presentation.controller;
 
+import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
+import com.nexa.task.application.usecase.tarefa.ListarTarefasPorIdWorkspaceUseCase;
 import com.nexa.task.application.usecase.workspace.*;
 import com.nexa.task.presentation.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,16 +32,18 @@ public class WorkspaceController
     private final BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase;
     private final ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase;
     private final ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase;
+    private final ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase;
     private final AtualizarWorkspaceUseCase atualizarWorkspaceUseCase;
     private final DesativarWorkspaceUseCase desativarWorkspaceUseCase;
     private final AtivarWorkspaceUseCase ativarWorkspaceUseCase;
 
-    public WorkspaceController(CadastrarWorkspaceUseCase cadastrarWorkspaceUseCase, ListarTodosWorkspacesUseCase listarTodosWorkspacesUseCase, BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase, ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase, ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase, AtualizarWorkspaceUseCase atualizarWorkspaceUseCase, DesativarWorkspaceUseCase desativarWorkspaceUseCase, AtivarWorkspaceUseCase ativarWorkspaceUseCase) {
+    public WorkspaceController(CadastrarWorkspaceUseCase cadastrarWorkspaceUseCase, ListarTodosWorkspacesUseCase listarTodosWorkspacesUseCase, BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase, ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase, ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase, ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase, AtualizarWorkspaceUseCase atualizarWorkspaceUseCase, DesativarWorkspaceUseCase desativarWorkspaceUseCase, AtivarWorkspaceUseCase ativarWorkspaceUseCase) {
         this.cadastrarWorkspaceUseCase = cadastrarWorkspaceUseCase;
         this.listarTodosWorkspacesUseCase = listarTodosWorkspacesUseCase;
         this.buscarWorkspacePorIdUseCase = buscarWorkspacePorIdUseCase;
         this.listarWorkspacesPorIdUsuarioUseCase = listarWorkspacesPorIdUsuarioUseCase;
         this.listarWorkspacesPorIdUsuarioENomeUseCase = listarWorkspacesPorIdUsuarioENomeUseCase;
+        this.listarTarefasPorIdWorkspaceUseCase = listarTarefasPorIdWorkspaceUseCase;
         this.atualizarWorkspaceUseCase = atualizarWorkspaceUseCase;
         this.desativarWorkspaceUseCase = desativarWorkspaceUseCase;
         this.ativarWorkspaceUseCase = ativarWorkspaceUseCase;
@@ -148,6 +152,31 @@ public class WorkspaceController
             workspaces = listarWorkspacesPorIdUsuarioUseCase.execute(idUsuario, pageable);
         }
         return ResponseEntity.ok(workspaces);
+    }
+
+    @Operation(summary = "Listar tarefas por ID de um workspace",
+            description = """
+                Retorna uma lista paginada de tarefas de um workspace.
+
+                Requer autenticação JWT.
+                O acesso é permitido para:
+                - Usuários com ROLE_ADMIN.
+                - O proprietário do workspace solicitado.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Tarefas retornados com sucesso",
+                    content = @Content(schema = @Schema(implementation = Page.class))),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/{idWorkspace}/tarefas")
+    public ResponseEntity<Page<TarefaResponseDTO>> listarTarefasPeloWorkspace(@PathVariable Long idWorkspace,
+                                                                              @PageableDefault(size = 10) Pageable pageable) {
+        Page<TarefaResponseDTO> tarefas = listarTarefasPorIdWorkspaceUseCase.execute(idWorkspace, pageable);
+        return ResponseEntity.ok(tarefas);
     }
 
     @Operation(

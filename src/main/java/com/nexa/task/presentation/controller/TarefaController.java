@@ -1,8 +1,10 @@
 package com.nexa.task.presentation.controller;
 
+import com.nexa.task.application.dto.subtarefa.SubtarefaResponseDTO;
 import com.nexa.task.application.dto.tarefa.TarefaCreateDTO;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.dto.tarefa.TarefaUpdateDTO;
+import com.nexa.task.application.usecase.subtarefa.ListarSubtarefasPorIdTarefaUseCase;
 import com.nexa.task.application.usecase.tarefa.*;
 import com.nexa.task.presentation.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,9 +30,9 @@ public class TarefaController {
 
     private final CadastrarTarefaUseCase cadastrarTarefaUseCase;
     private final ListarTodasTarefasUseCase listarTodasTarefasUseCase;
-    private final ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase;
     private final ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase;
     private final ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase;
+    private final ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase;
     private final BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase;
     private final AtualizarTarefaUseCase atualizarTarefaUseCase;
     private final ConcluirTarefaUseCase concluirTarefaUseCase;
@@ -39,12 +41,12 @@ public class TarefaController {
     private final DesativarTarefaUseCase desativarTarefaUseCase;
     private final AtivarTarefaUseCase ativarTarefaUseCase;
 
-    public TarefaController(CadastrarTarefaUseCase cadastrarTarefaUseCase, ListarTodasTarefasUseCase listarTodasTarefasUseCase, ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase, ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase, ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase, BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase, AtualizarTarefaUseCase atualizarTarefaUseCase, ConcluirTarefaUseCase concluirTarefaUseCase, IniciarTarefaUseCase iniciarTarefaUseCase, ReabrirTarefaUseCase reabrirTarefaUseCase, DesativarTarefaUseCase desativarTarefaUseCase, AtivarTarefaUseCase ativarTarefaUseCase) {
+    public TarefaController(CadastrarTarefaUseCase cadastrarTarefaUseCase, ListarTodasTarefasUseCase listarTodasTarefasUseCase, ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase, ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase, ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase, BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase, AtualizarTarefaUseCase atualizarTarefaUseCase, ConcluirTarefaUseCase concluirTarefaUseCase, IniciarTarefaUseCase iniciarTarefaUseCase, ReabrirTarefaUseCase reabrirTarefaUseCase, DesativarTarefaUseCase desativarTarefaUseCase, AtivarTarefaUseCase ativarTarefaUseCase) {
         this.cadastrarTarefaUseCase = cadastrarTarefaUseCase;
         this.listarTodasTarefasUseCase = listarTodasTarefasUseCase;
-        this.listarTarefasPorIdWorkspaceUseCase = listarTarefasPorIdWorkspaceUseCase;
         this.listarTarefasPorIdUsuarioUseCase = listarTarefasPorIdUsuarioUseCase;
         this.listarTarefasPorIdUsuarioETituloUseCase = listarTarefasPorIdUsuarioETituloUseCase;
+        this.listarSubtarefasPorIdTarefaUseCase = listarSubtarefasPorIdTarefaUseCase;
         this.buscarTarefaPorIdUseCase = buscarTarefaPorIdUseCase;
         this.atualizarTarefaUseCase = atualizarTarefaUseCase;
         this.concluirTarefaUseCase = concluirTarefaUseCase;
@@ -127,29 +129,29 @@ public class TarefaController {
         return ResponseEntity.ok(tarefa);
     }
 
-    @Operation(summary = "Listar tarefas por ID do workspace",
+    @Operation(summary = "Listar subtarefas por ID de uma tarefa",
             description = """
-                Retorna uma lista paginada de tarefas de um workspace.
+                Retorna uma lista paginada de subtarefas de uma tarefa.
 
                 Requer autenticação JWT.
                 O acesso é permitido para:
                 - Usuários com ROLE_ADMIN.
-                - O proprietário das tarefas solicitadas.
+                - O proprietário da tarefa solicitada.
                 """
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Tarefas retornadas com sucesso",
+            @ApiResponse(responseCode = "200", description = "Subtarefas retornados com sucesso",
                     content = @Content(schema = @Schema(implementation = Page.class))),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/workspace/{idWorkspace}")
-    public ResponseEntity<Page<TarefaResponseDTO>> listarTarefasPorIdWorkspace(@PathVariable Long idWorkspace,
-                                                                             @PageableDefault(size = 10) Pageable pageable) {
-        Page<TarefaResponseDTO> tarefas = listarTarefasPorIdWorkspaceUseCase.execute(idWorkspace, pageable);
-        return ResponseEntity.ok(tarefas);
+    @GetMapping("/{idTarefa}/subtarefas")
+    public ResponseEntity<Page<SubtarefaResponseDTO>> listarSubtarefasPelaTarefa(@PathVariable Long idTarefa,
+                                                                                 @PageableDefault(size = 10) Pageable pageable) {
+        Page<SubtarefaResponseDTO> subtarefas = listarSubtarefasPorIdTarefaUseCase.execute(idTarefa, pageable);
+        return ResponseEntity.ok(subtarefas);
     }
 
     @Operation(summary = "Listar tarefas por ID do usuário",

@@ -28,7 +28,6 @@ public class SubtarefaController {
 
     private final CadastrarSubtarefaUseCase cadastrarSubtarefaUseCase;
     private final ListarTodasSubtarefasUseCase listarTodasSubtarefasUseCase;
-    private final ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase;
     private final BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase;
     private final AtualizarSubtarefaUseCase atualizarSubtarefaUseCase;
     private final DesativarSubtarefaUseCase desativarSubtarefaUseCase;
@@ -36,10 +35,9 @@ public class SubtarefaController {
     private final ConcluirSubtarefaUseCase concluirSubtarefaUseCase;
     private final DesmarcarSubtarefaConcluidaUseCase desmarcarSubtarefaConcluidaUseCase;
 
-    public SubtarefaController(CadastrarSubtarefaUseCase cadastrarSubtarefaUseCase, ListarTodasSubtarefasUseCase listarTodasSubtarefasUseCase, ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase, BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase, AtualizarSubtarefaUseCase atualizarSubtarefaUseCase, DesativarSubtarefaUseCase desativarSubtarefaUseCase, AtivarSubtarefaUseCase ativarSubtarefaUseCase, ConcluirSubtarefaUseCase concluirSubtarefaUseCase, DesmarcarSubtarefaConcluidaUseCase desmarcarSubtarefaConcluidaUseCase) {
+    public SubtarefaController(CadastrarSubtarefaUseCase cadastrarSubtarefaUseCase, ListarTodasSubtarefasUseCase listarTodasSubtarefasUseCase, BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase, AtualizarSubtarefaUseCase atualizarSubtarefaUseCase, DesativarSubtarefaUseCase desativarSubtarefaUseCase, AtivarSubtarefaUseCase ativarSubtarefaUseCase, ConcluirSubtarefaUseCase concluirSubtarefaUseCase, DesmarcarSubtarefaConcluidaUseCase desmarcarSubtarefaConcluidaUseCase) {
         this.cadastrarSubtarefaUseCase = cadastrarSubtarefaUseCase;
         this.listarTodasSubtarefasUseCase = listarTodasSubtarefasUseCase;
-        this.listarSubtarefasPorIdTarefaUseCase = listarSubtarefasPorIdTarefaUseCase;
         this.buscarSubtarefaPorIdUseCase = buscarSubtarefaPorIdUseCase;
         this.atualizarSubtarefaUseCase = atualizarSubtarefaUseCase;
         this.desativarSubtarefaUseCase = desativarSubtarefaUseCase;
@@ -119,31 +117,6 @@ public class SubtarefaController {
     public ResponseEntity<SubtarefaResponseDTO> buscarSubtarefaPorId(@PathVariable Long id) {
         SubtarefaResponseDTO subtarefa = buscarSubtarefaPorIdUseCase.execute(id);
         return ResponseEntity.ok(subtarefa);
-    }
-
-    @Operation(summary = "Listar subtarefas por ID da tarefa",
-            description = """
-                Retorna uma lista paginada de subtarefas de uma tarefa.
-
-                Requer autenticação JWT.
-                O acesso é permitido para:
-                - Usuários com ROLE_ADMIN.
-                - O proprietário das subtarefas solicitadas.
-                """
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Subtarefas retornadas com sucesso",
-                    content = @Content(schema = @Schema(implementation = Page.class))),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @GetMapping("/tarefa/{idTarefa}")
-    public ResponseEntity<Page<SubtarefaResponseDTO>> listarSubtarefasPorIdTarefa(@PathVariable Long idTarefa,
-                                                                               @PageableDefault(size = 10) Pageable pageable) {
-        Page<SubtarefaResponseDTO> subtarefas = listarSubtarefasPorIdTarefaUseCase.execute(idTarefa, pageable);
-        return ResponseEntity.ok(subtarefas);
     }
 
     @Operation(
