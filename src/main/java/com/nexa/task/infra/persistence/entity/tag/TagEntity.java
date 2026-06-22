@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "Tags")
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class TagEntity {
@@ -29,4 +28,12 @@ public class TagEntity {
     @ManyToOne
     @JoinColumn(name = "id_cor", nullable = true)
     private CorTagEntity corTag;
+
+    public TagEntity(Long id, Long idUsuario, String nome, Boolean ativo, CorTagEntity corTag) {
+        this.id = id;
+        this.idUsuario = idUsuario;
+        this.nome = nome;
+        this.ativo = ativo;
+        this.corTag = corTag;
+    }
 }
