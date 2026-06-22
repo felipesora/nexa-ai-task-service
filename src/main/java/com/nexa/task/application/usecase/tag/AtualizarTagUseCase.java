@@ -1,6 +1,7 @@
 package com.nexa.task.application.usecase.tag;
 
 import com.nexa.task.application.dto.tag.TagUpdateDTO;
+import com.nexa.task.application.exception.BadRequestException;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.domain.entity.tag.CorTag;
 import com.nexa.task.domain.entity.tag.Tag;
@@ -23,6 +24,8 @@ public class AtualizarTagUseCase {
         Tag tag = tagRepository.findById(idTag)
                 .orElseThrow(() -> new EntityNotFoundException("Tag com id: " + idTag + " não encontrada."));
 
+        validarNomeUnicoDeTag(tag, updateDTO.nome());
+
         CorTag corTag = null;
 
         if (updateDTO.idCor() != null) {
@@ -33,5 +36,11 @@ public class AtualizarTagUseCase {
         tag.setNome(updateDTO.nome());
         tag.setCorTag(corTag);
         tagRepository.save(tag);
+    }
+
+    private void validarNomeUnicoDeTag(Tag tag, String nome) {
+        if (tagRepository.existsByNomeAndIdUsuarioAndIdNot(nome, tag.getIdUsuario(), tag.getId())) {
+            throw new BadRequestException("Já existe uma tag com esse nome para este usuário");
+        }
     }
 }

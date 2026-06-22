@@ -1,6 +1,7 @@
 package com.nexa.task.application.usecase.tag;
 
 import com.nexa.task.application.dto.tag.TagUpdateDTO;
+import com.nexa.task.application.exception.BadRequestException;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.domain.builder.tag.CorTagBuilder;
 import com.nexa.task.domain.builder.tag.TagBuilder;
@@ -135,6 +136,39 @@ class AtualizarTagUseCaseTest {
 
         assertEquals("Cor com id: 99 não encontrada", exception.getMessage());
 
+        verify(tagRepository, never()).save(any());
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoNomeJaExistirParaUsuarioAoAtualizar() {
+        Long idTag = 1L;
+
+        TagUpdateDTO request = new TagUpdateDTO(
+                "Tag Atualizada",
+                10L
+        );
+
+        Tag tag = new TagBuilder()
+                .comId(idTag)
+                .comIdUsuario(1L)
+                .comNome("Tag Antiga")
+                .build();
+
+        when(tagRepository.findById(idTag)).thenReturn(Optional.of(tag));
+        when(tagRepository.existsByNomeAndIdUsuarioAndIdNot(
+                "Tag Atualizada",
+                1L,
+                idTag
+        )).thenReturn(true);
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> useCase.execute(idTag, request)
+        );
+
+        assertEquals("Já existe uma tag com esse nome para este usuário", exception.getMessage());
+
+        verify(corTagRepository, never()).findById(any());
         verify(tagRepository, never()).save(any());
     }
 }

@@ -2,6 +2,7 @@ package com.nexa.task.application.usecase.tag;
 
 import com.nexa.task.application.dto.tag.TagCreateDTO;
 import com.nexa.task.application.dto.tag.TagResponseDTO;
+import com.nexa.task.application.exception.BadRequestException;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.mapper.TagControllerMapper;
 import com.nexa.task.domain.builder.tag.CorTagBuilder;
@@ -21,6 +22,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -126,5 +130,28 @@ class CadastrarTagUseCaseTest {
         );
 
         assertEquals("Cor com id: 99 não encontrada", exception.getMessage());
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoNomeJaExistirParaUsuario() {
+        TagCreateDTO request = new TagCreateDTO(
+                1L,
+                "Urgente",
+                10L
+        );
+
+        when(tagRepository.existsByNomeAndIdUsuario("Urgente", 1L))
+                .thenReturn(true);
+
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> useCase.execute(request)
+        );
+
+        assertEquals("Já existe uma tag com esse nome para este usuário", exception.getMessage());
+
+        verify(corTagRepository, never()).findById(any());
+        verify(tagRepository, never()).save(any());
+        verify(mapper, never()).toDomain(any(), any());
     }
 }

@@ -2,6 +2,7 @@ package com.nexa.task.application.usecase.tag;
 
 import com.nexa.task.application.dto.tag.TagCreateDTO;
 import com.nexa.task.application.dto.tag.TagResponseDTO;
+import com.nexa.task.application.exception.BadRequestException;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.mapper.TagControllerMapper;
 import com.nexa.task.domain.entity.tag.CorTag;
@@ -24,6 +25,8 @@ public class CadastrarTagUseCase {
 
     @Transactional
     public TagResponseDTO execute(TagCreateDTO request) {
+        validarNomeUnicoDeTag(request);
+
         CorTag corTag = null;
 
         if (request.idCor() != null) {
@@ -33,5 +36,11 @@ public class CadastrarTagUseCase {
 
         Tag salvo = tagRepository.save(mapper.toDomain(request, corTag));
         return mapper.toResponse(salvo);
+    }
+
+    private void validarNomeUnicoDeTag(TagCreateDTO request) {
+        if (tagRepository.existsByNomeAndIdUsuario(request.nome(), request.idUsuario())) {
+            throw new BadRequestException("Já existe uma tag com esse nome para este usuário");
+        }
     }
 }
