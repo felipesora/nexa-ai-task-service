@@ -1,10 +1,12 @@
 package com.nexa.task.presentation.controller;
 
 import com.nexa.task.application.dto.subtarefa.SubtarefaResponseDTO;
+import com.nexa.task.application.dto.tag.TagResponseDTO;
 import com.nexa.task.application.dto.tarefa.TarefaCreateDTO;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.dto.tarefa.TarefaUpdateDTO;
 import com.nexa.task.application.usecase.subtarefa.ListarSubtarefasPorIdTarefaUseCase;
+import com.nexa.task.application.usecase.tag.ListarTagsPorIdTarefaUseCase;
 import com.nexa.task.application.usecase.tarefa.*;
 import com.nexa.task.presentation.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +35,7 @@ public class TarefaController {
     private final ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase;
     private final ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase;
     private final ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase;
+    private final ListarTagsPorIdTarefaUseCase listarTagsPorIdTarefaUseCase;
     private final BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase;
     private final AtualizarTarefaUseCase atualizarTarefaUseCase;
     private final ConcluirTarefaUseCase concluirTarefaUseCase;
@@ -40,13 +43,16 @@ public class TarefaController {
     private final ReabrirTarefaUseCase reabrirTarefaUseCase;
     private final DesativarTarefaUseCase desativarTarefaUseCase;
     private final AtivarTarefaUseCase ativarTarefaUseCase;
+    private final AdicionarTagNaTarefaUseCase adicionarTagNaTarefaUseCase;
+    private final RemoverTagDaTarefaUseCase removerTagDaTarefaUseCase;
 
-    public TarefaController(CadastrarTarefaUseCase cadastrarTarefaUseCase, ListarTodasTarefasUseCase listarTodasTarefasUseCase, ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase, ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase, ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase, BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase, AtualizarTarefaUseCase atualizarTarefaUseCase, ConcluirTarefaUseCase concluirTarefaUseCase, IniciarTarefaUseCase iniciarTarefaUseCase, ReabrirTarefaUseCase reabrirTarefaUseCase, DesativarTarefaUseCase desativarTarefaUseCase, AtivarTarefaUseCase ativarTarefaUseCase) {
+    public TarefaController(CadastrarTarefaUseCase cadastrarTarefaUseCase, ListarTodasTarefasUseCase listarTodasTarefasUseCase, ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase, ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase, ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase, ListarTagsPorIdTarefaUseCase listarTagsPorIdTarefaUseCase, BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase, AtualizarTarefaUseCase atualizarTarefaUseCase, ConcluirTarefaUseCase concluirTarefaUseCase, IniciarTarefaUseCase iniciarTarefaUseCase, ReabrirTarefaUseCase reabrirTarefaUseCase, DesativarTarefaUseCase desativarTarefaUseCase, AtivarTarefaUseCase ativarTarefaUseCase, AdicionarTagNaTarefaUseCase adicionarTagNaTarefaUseCase, RemoverTagDaTarefaUseCase removerTagDaTarefaUseCase) {
         this.cadastrarTarefaUseCase = cadastrarTarefaUseCase;
         this.listarTodasTarefasUseCase = listarTodasTarefasUseCase;
         this.listarTarefasPorIdUsuarioUseCase = listarTarefasPorIdUsuarioUseCase;
         this.listarTarefasPorIdUsuarioETituloUseCase = listarTarefasPorIdUsuarioETituloUseCase;
         this.listarSubtarefasPorIdTarefaUseCase = listarSubtarefasPorIdTarefaUseCase;
+        this.listarTagsPorIdTarefaUseCase = listarTagsPorIdTarefaUseCase;
         this.buscarTarefaPorIdUseCase = buscarTarefaPorIdUseCase;
         this.atualizarTarefaUseCase = atualizarTarefaUseCase;
         this.concluirTarefaUseCase = concluirTarefaUseCase;
@@ -54,6 +60,8 @@ public class TarefaController {
         this.reabrirTarefaUseCase = reabrirTarefaUseCase;
         this.desativarTarefaUseCase = desativarTarefaUseCase;
         this.ativarTarefaUseCase = ativarTarefaUseCase;
+        this.adicionarTagNaTarefaUseCase = adicionarTagNaTarefaUseCase;
+        this.removerTagDaTarefaUseCase = removerTagDaTarefaUseCase;
     }
 
     @Operation(summary = "Cadastrar tarefa",
@@ -152,6 +160,89 @@ public class TarefaController {
                                                                                  @PageableDefault(size = 10) Pageable pageable) {
         Page<SubtarefaResponseDTO> subtarefas = listarSubtarefasPorIdTarefaUseCase.execute(idTarefa, pageable);
         return ResponseEntity.ok(subtarefas);
+    }
+
+    @Operation(summary = "Listar tags por ID de uma tarefa",
+            description = """
+                Retorna uma lista paginada de tags de uma tarefa.
+
+                Requer autenticação JWT.
+                O acesso é permitido para:
+                - Usuários com ROLE_ADMIN.
+                - O proprietário da tarefa solicitada.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Tags retornadas com sucesso",
+                    content = @Content(schema = @Schema(implementation = Page.class))),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/{idTarefa}/tags")
+    public ResponseEntity<Page<TagResponseDTO>> listarTagsPelaTarefa(@PathVariable Long idTarefa,
+                                                                           @PageableDefault(size = 10) Pageable pageable) {
+        Page<TagResponseDTO> tags = listarTagsPorIdTarefaUseCase.execute(idTarefa, pageable);
+        return ResponseEntity.ok(tags);
+    }
+
+    @Operation(
+            summary = "Adicionar tag em uma tarefa",
+            description = """
+        Associa uma tag existente a uma tarefa.
+
+        Requer autenticação JWT.
+
+        O acesso é permitido para:
+        - Usuários com ROLE_ADMIN.
+        - O proprietário da tarefa.
+        """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Tag adicionada à tarefa com sucesso", content = @Content),
+            @ApiResponse(responseCode = "400", description = "A tag já está associada à tarefa ou os dados são inválidos",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Tarefa ou tag não encontrada",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/{idTarefa}/tags/{idTag}")
+    public ResponseEntity<Void> adicionarTag(@PathVariable Long idTarefa, @PathVariable Long idTag) {
+        adicionarTagNaTarefaUseCase.execute(idTarefa, idTag);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Remover tag de uma tarefa",
+            description = """
+        Remove a associação de uma tag de uma tarefa.
+
+        Requer autenticação JWT.
+
+        O acesso é permitido para:
+        - Usuários com ROLE_ADMIN.
+        - O proprietário da tarefa.
+        """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Tag removida da tarefa com sucesso", content = @Content),
+            @ApiResponse(responseCode = "400", description = "A tag não está associada à tarefa",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Tarefa ou tag não encontrada",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/{idTarefa}/tags/{idTag}")
+    public ResponseEntity<Void> removerTag(@PathVariable Long idTarefa, @PathVariable Long idTag) {
+        removerTagDaTarefaUseCase.execute(idTarefa, idTag);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Listar tarefas por ID do usuário",
@@ -320,4 +411,6 @@ public class TarefaController {
         ativarTarefaUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }
+
+
 }

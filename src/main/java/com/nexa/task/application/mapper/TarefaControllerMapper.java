@@ -12,7 +12,6 @@ public class TarefaControllerMapper {
 
     public Tarefa toDomain(TarefaCreateDTO request, Workspace workspace) {
 
-        //deixar tags null por enquanto
         return new Tarefa(
                 null,
                 request.idUsuario(),

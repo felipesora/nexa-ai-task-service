@@ -3,12 +3,17 @@ package com.nexa.task.infra.persistence.mapper;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.infra.persistence.entity.tarefa.TarefaEntity;
 
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
 public class TarefaPersistenceMapper {
 
     private final WorkspacePersistenceMapper workspaceMapper;
+    private final TagPersistenceMapper tagMapper;
 
-    public TarefaPersistenceMapper(WorkspacePersistenceMapper workspaceMapper) {
+    public TarefaPersistenceMapper(WorkspacePersistenceMapper workspaceMapper, TagPersistenceMapper tagMapper) {
         this.workspaceMapper = workspaceMapper;
+        this.tagMapper = tagMapper;
     }
 
     public TarefaEntity toEntity(Tarefa tarefa) {
@@ -16,7 +21,7 @@ public class TarefaPersistenceMapper {
             return null;
         }
 
-        return new TarefaEntity(
+        TarefaEntity entity = new TarefaEntity(
                 tarefa.getId(),
                 tarefa.getIdUsuario(),
                 tarefa.getTitulo(),
@@ -31,6 +36,15 @@ public class TarefaPersistenceMapper {
                 tarefa.getAtivo(),
                 workspaceMapper.toEntity(tarefa.getWorkspace())
         );
+
+        entity.setTags(
+                tarefa.getTags()
+                        .stream()
+                        .map(tagMapper::toEntity)
+                        .collect(Collectors.toSet())
+        );
+
+        return entity;
     }
 
     public Tarefa toDomain(TarefaEntity entity) {
@@ -38,7 +52,6 @@ public class TarefaPersistenceMapper {
             return null;
         }
 
-        // por enquanto deixar null as tags
         return new Tarefa(
                 entity.getId(),
                 entity.getIdUsuario(),
@@ -53,7 +66,10 @@ public class TarefaPersistenceMapper {
                 entity.getAtualizadoEm(),
                 entity.getAtivo(),
                 workspaceMapper.toDomain(entity.getWorkspace()),
-                null
+                entity.getTags()
+                        .stream()
+                        .map(tagMapper::toDomain)
+                        .collect(Collectors.toCollection(ArrayList::new))
         );
     }
 }
