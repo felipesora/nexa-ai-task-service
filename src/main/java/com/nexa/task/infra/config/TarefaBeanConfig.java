@@ -2,9 +2,11 @@ package com.nexa.task.infra.config;
 
 import com.nexa.task.application.mapper.TarefaControllerMapper;
 import com.nexa.task.application.usecase.tarefa.*;
+import com.nexa.task.domain.repository.TagRepository;
 import com.nexa.task.domain.repository.TarefaRepository;
 import com.nexa.task.domain.repository.WorkspaceRepository;
 import com.nexa.task.infra.persistence.adapter.JpaTarefaRepository;
+import com.nexa.task.infra.persistence.mapper.TagPersistenceMapper;
 import com.nexa.task.infra.persistence.mapper.TarefaPersistenceMapper;
 import com.nexa.task.infra.persistence.mapper.WorkspacePersistenceMapper;
 import com.nexa.task.infra.persistence.repository.SpringDataTarefaRepository;
@@ -83,6 +85,16 @@ public class TarefaBeanConfig {
     }
 
     @Bean
+    AdicionarTagNaTarefaUseCase adicionarTagNaTarefaUseCase(TagRepository tagRepository, TarefaRepository tarefaRepository) {
+        return new AdicionarTagNaTarefaUseCase(tagRepository, tarefaRepository);
+    }
+
+    @Bean
+    RemoverTagDaTarefaUseCase removerTagDaTarefaUseCase(TagRepository tagRepository, TarefaRepository tarefaRepository) {
+        return new RemoverTagDaTarefaUseCase(tagRepository, tarefaRepository);
+    }
+
+    @Bean
     TarefaControllerMapper tarefaControllerMapper() {
         return new TarefaControllerMapper();
     }
@@ -93,7 +105,7 @@ public class TarefaBeanConfig {
     }
 
     @Bean
-    TarefaPersistenceMapper tarefaPersistenceMapper(WorkspacePersistenceMapper workspaceMapper) {
-        return new TarefaPersistenceMapper(workspaceMapper);
+    TarefaPersistenceMapper tarefaPersistenceMapper(WorkspacePersistenceMapper workspaceMapper, TagPersistenceMapper tagMapper) {
+        return new TarefaPersistenceMapper(workspaceMapper, tagMapper);
     }
 }

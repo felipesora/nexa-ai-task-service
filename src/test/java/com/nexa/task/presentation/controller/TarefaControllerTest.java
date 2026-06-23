@@ -81,6 +81,12 @@ class TarefaControllerTest {
     @MockitoBean
     private AtivarTarefaUseCase ativarTarefaUseCase;
 
+    @MockitoBean
+    private AdicionarTagNaTarefaUseCase adicionarTagNaTarefaUseCase;
+
+    @MockitoBean
+    private RemoverTagDaTarefaUseCase removerTagDaTarefaUseCase;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -676,5 +682,84 @@ class TarefaControllerTest {
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.message")
                         .value("Tarefa com id: 999 não encontrada"));
+    }
+
+    @Test
+    void deveAdicionarTagNaTarefaComSucesso() throws Exception {
+
+        doNothing()
+                .when(adicionarTagNaTarefaUseCase)
+                .execute(1L, 2L);
+
+        mockMvc.perform(post("/v1/tarefas/1/tags/2"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404QuandoAdicionarTagETarefaNaoForEncontrada()
+            throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Tarefa com id: 1 não encontrada."
+        ))
+                .when(adicionarTagNaTarefaUseCase)
+                .execute(1L, 2L);
+
+        mockMvc.perform(post("/v1/tarefas/1/tags/2"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Tarefa com id: 1 não encontrada."));
+    }
+
+    @Test
+    void deveRetornar400QuandoTagJaEstiverVinculada()
+            throws Exception {
+
+        doThrow(new BadRequestException(
+                "A tag já está vinculada à tarefa."
+        ))
+                .when(adicionarTagNaTarefaUseCase)
+                .execute(1L, 2L);
+
+        mockMvc.perform(post("/v1/tarefas/1/tags/2"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message")
+                        .value("A tag já está vinculada à tarefa."));
+    }
+
+    @Test
+    void deveRetornar404QuandoRemoverTagETarefaNaoForEncontrada()
+            throws Exception {
+
+        doThrow(new EntityNotFoundException(
+                "Tarefa com id: 1 não encontrada."
+        ))
+                .when(removerTagDaTarefaUseCase)
+                .execute(1L, 2L);
+
+        mockMvc.perform(delete("/v1/tarefas/1/tags/2"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message")
+                        .value("Tarefa com id: 1 não encontrada."));
+    }
+
+    @Test
+    void deveRetornar400QuandoTagNaoEstiverVinculada()
+            throws Exception {
+
+        doThrow(new BadRequestException(
+                "A tag não está vinculada à tarefa."
+        ))
+                .when(removerTagDaTarefaUseCase)
+                .execute(1L, 2L);
+
+        mockMvc.perform(delete("/v1/tarefas/1/tags/2"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message")
+                        .value("A tag não está vinculada à tarefa."));
     }
 }

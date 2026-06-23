@@ -5,6 +5,7 @@ import com.nexa.task.domain.entity.workspace.Workspace;
 import com.nexa.task.domain.exception.DomainException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Tarefa {
@@ -22,7 +23,7 @@ public class Tarefa {
     private LocalDateTime atualizadoEm;
     private Boolean ativo;
     private Workspace workspace;
-    private List<Tag> tags;
+    private List<Tag> tags = new ArrayList<>();
 
     public Tarefa(Long id, Long idUsuario, String titulo, String descricao,
                   PrioridadeTarefa prioridade, StatusTarefa status, DificuldadeTarefa dificuldade,
@@ -47,7 +48,7 @@ public class Tarefa {
         this.atualizadoEm = atualizadoEm;
         this.ativo = ativo;
         this.workspace = workspace;
-        this.tags = tags;
+        this.tags = tags != null ? tags : new ArrayList<>();
     }
 
     public void ativar() {
@@ -209,6 +210,8 @@ public class Tarefa {
     }
 
     public void setTags(List<Tag> tags) {
-        this.tags = tags;
+        this.tags = tags != null
+                ? tags
+                : new ArrayList<>();
     }
 }
