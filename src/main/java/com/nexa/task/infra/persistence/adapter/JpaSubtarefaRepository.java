@@ -8,6 +8,7 @@ import com.nexa.task.infra.persistence.repository.SpringDataSubtarefaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public class JpaSubtarefaRepository implements SubtarefaRepository {
@@ -37,6 +38,14 @@ public class JpaSubtarefaRepository implements SubtarefaRepository {
     public Page<Subtarefa> findByIdTarefa(Long idTarefa, Pageable pageable) {
         return repository.findByTarefa_Id(idTarefa, pageable)
                 .map(mapper::toDomain);
+    }
+
+    @Override
+    public List<Subtarefa> findAllByTarefa(Long idTarefa) {
+        return repository.findByTarefa_Id(idTarefa)
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 
     @Override
