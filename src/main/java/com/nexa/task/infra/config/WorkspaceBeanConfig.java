@@ -4,9 +4,7 @@ import com.nexa.task.application.mapper.CorWorkspaceControllerMapper;
 import com.nexa.task.application.mapper.IconeWorkspaceControllerMapper;
 import com.nexa.task.application.mapper.WorkspaceControllerMapper;
 import com.nexa.task.application.usecase.workspace.*;
-import com.nexa.task.domain.repository.CorWorkspaceRepository;
-import com.nexa.task.domain.repository.IconeWorkspaceRepository;
-import com.nexa.task.domain.repository.WorkspaceRepository;
+import com.nexa.task.domain.repository.*;
 import com.nexa.task.infra.persistence.adapter.JpaWorkspaceRepository;
 import com.nexa.task.infra.persistence.mapper.CorWorkspacePersistenceMapper;
 import com.nexa.task.infra.persistence.mapper.IconeWorkspacePersistenceMapper;
@@ -51,8 +49,10 @@ public class WorkspaceBeanConfig {
     }
 
     @Bean
-    DesativarWorkspaceUseCase desativarWorkspaceUseCase(WorkspaceRepository workspaceRepository) {
-        return new DesativarWorkspaceUseCase(workspaceRepository);
+    DesativarWorkspaceUseCase desativarWorkspaceUseCase(WorkspaceRepository workspaceRepository,
+                                                        TarefaRepository tarefaRepository,
+                                                        SubtarefaRepository subtarefaRepository) {
+        return new DesativarWorkspaceUseCase(workspaceRepository, tarefaRepository, subtarefaRepository);
     }
 
     @Bean

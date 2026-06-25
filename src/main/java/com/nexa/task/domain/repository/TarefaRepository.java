@@ -4,6 +4,7 @@ import com.nexa.task.domain.entity.tarefa.Tarefa;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface TarefaRepository {
@@ -13,6 +14,8 @@ public interface TarefaRepository {
     Page<Tarefa> findAll(Pageable pageable);
 
     Page<Tarefa> findByIdWorkspace(Long idWorkspace, Pageable pageable);
+
+    List<Tarefa> findAllByWorkspace(Long idWorkspace);
 
     Page<Tarefa> findByIdUsuario(Long idUsuario, Pageable pageable);
 

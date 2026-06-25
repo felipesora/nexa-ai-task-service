@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface SpringDataTarefaRepository extends JpaRepository<TarefaEntity, Long> {
 
@@ -14,4 +16,6 @@ public interface SpringDataTarefaRepository extends JpaRepository<TarefaEntity, 
     Page<TarefaEntity> findByIdUsuario(Long idUsuario, Pageable pageable);
 
     Page<TarefaEntity> findByIdUsuarioAndTituloContainingIgnoreCase(Long idUsuario, String titulo, Pageable pageable);
+
+    List<TarefaEntity> findAllByWorkspace_Id(Long idWorkspace);
 }

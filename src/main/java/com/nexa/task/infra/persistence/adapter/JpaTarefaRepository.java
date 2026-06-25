@@ -8,6 +8,7 @@ import com.nexa.task.infra.persistence.repository.SpringDataTarefaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public class JpaTarefaRepository implements TarefaRepository {
@@ -37,6 +38,14 @@ public class JpaTarefaRepository implements TarefaRepository {
     public Page<Tarefa> findByIdWorkspace(Long idWorkspace, Pageable pageable) {
         return repository.findByWorkspace_Id(idWorkspace, pageable)
                 .map(mapper::toDomain);
+    }
+
+    @Override
+    public List<Tarefa> findAllByWorkspace(Long idWorkspace) {
+        return repository.findAllByWorkspace_Id(idWorkspace)
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 
     @Override
