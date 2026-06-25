@@ -9,12 +9,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -22,6 +24,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/v1/cores-tag")
+@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Cores de Tag", description = "Operações para gerenciamento das cores utilizadas nas tags.")
 public class CorTagController {
 
@@ -58,6 +61,7 @@ public class CorTagController {
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<CorTagResponseDTO> cadastrarCor(@RequestBody @Valid CorTagRequestDTO request,
                                                                 UriComponentsBuilder uriBuilder) {
@@ -129,6 +133,7 @@ public class CorTagController {
             @ApiResponse(responseCode = "404", description = "Cor não encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> desativarCor(@PathVariable Long id) {
         desativarCorTagUseCase.execute(id);
@@ -152,6 +157,7 @@ public class CorTagController {
             @ApiResponse(responseCode = "404", description = "Cor não encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/ativar/{id}")
     public ResponseEntity<Void> ativarCor(@PathVariable Long id) {
         ativarCorTagUseCase.execute(id);

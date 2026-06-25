@@ -11,12 +11,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -24,6 +26,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/v1/workspaces")
+@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Workspaces", description = "Operações para gerenciamento dos workspaces.")
 public class WorkspaceController
 {
@@ -66,6 +69,7 @@ public class WorkspaceController
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("#request.idUsuario == authentication.principal.id or hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<WorkspaceResponseDTO> cadastrarWorkspace(@RequestBody @Valid WorkspaceRequestDTO request,
                                                                    UriComponentsBuilder uriBuilder) {

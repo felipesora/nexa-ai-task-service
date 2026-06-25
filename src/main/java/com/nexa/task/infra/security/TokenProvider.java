@@ -42,4 +42,12 @@ public class TokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
+    public Long getIdUsuario(String token) {
+        return getClaims(token).get("idUsuario", Long.class);
+    }
+
+    public String getRole(String token) {
+        return getClaims(token).get("role", String.class);
+    }
 }

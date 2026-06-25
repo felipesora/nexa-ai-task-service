@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -27,6 +28,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/v1/tarefas")
+@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Tarefas", description = "Operações para gerenciamento das tarefas.")
 public class TarefaController {
 

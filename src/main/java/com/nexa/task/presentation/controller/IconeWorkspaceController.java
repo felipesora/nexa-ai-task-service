@@ -9,12 +9,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -22,6 +24,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/v1/icones-workspace")
+@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Ícones de Workspace", description = "Operações para gerenciamento dos ícones utilizados nos workspaces.")
 public class IconeWorkspaceController {
 
@@ -58,6 +61,7 @@ public class IconeWorkspaceController {
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<IconeWorkspaceResponseDTO> cadastrarIcone(@RequestBody @Valid IconeWorkspaceRequestDTO request,
                                                                     UriComponentsBuilder uriBuilder) {
@@ -129,6 +133,7 @@ public class IconeWorkspaceController {
             @ApiResponse(responseCode = "404", description = "Ícone não encontrado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> desativarIcone(@PathVariable Long id) {
         desativarIconeWorkspaceUseCase.execute(id);
@@ -152,6 +157,7 @@ public class IconeWorkspaceController {
             @ApiResponse(responseCode = "404", description = "Ícone não encontrado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/ativar/{id}")
     public ResponseEntity<Void> ativarIcone(@PathVariable Long id) {
         ativarIconeWorkspaceUseCase.execute(id);
