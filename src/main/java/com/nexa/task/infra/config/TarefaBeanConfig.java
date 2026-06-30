@@ -20,14 +20,16 @@ public class TarefaBeanConfig {
     @Bean
     CadastrarTarefaUseCase cadastrarTarefaUseCase(TarefaRepository tarefaRepository,
                                                   WorkspaceRepository workspaceRepository,
-                                                  TarefaControllerMapper mapper) {
-        return new CadastrarTarefaUseCase(tarefaRepository, workspaceRepository, mapper);
+                                                  TarefaControllerMapper mapper,
+                                                  AuthenticationService authService) {
+        return new CadastrarTarefaUseCase(tarefaRepository, workspaceRepository, mapper, authService);
     }
 
     @Bean
     BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase(TarefaRepository tarefaRepository,
-                                                      TarefaControllerMapper mapper) {
-        return new BuscarTarefaPorIdUseCase(tarefaRepository, mapper);
+                                                      TarefaControllerMapper mapper,
+                                                      AuthenticationService authService) {
+        return new BuscarTarefaPorIdUseCase(tarefaRepository, mapper, authService);
     }
 
     @Bean
@@ -46,39 +48,42 @@ public class TarefaBeanConfig {
 
     @Bean
     ListarTarefasPorIdUsuarioUseCase listarTarefasPorIdUsuarioUseCase(TarefaRepository tarefaRepository,
-                                                                      TarefaControllerMapper mapper) {
-        return new ListarTarefasPorIdUsuarioUseCase(tarefaRepository, mapper);
+                                                                      TarefaControllerMapper mapper,
+                                                                      AuthenticationService authService) {
+        return new ListarTarefasPorIdUsuarioUseCase(tarefaRepository, mapper, authService);
     }
 
     @Bean
     ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase(TarefaRepository tarefaRepository,
-                                                                                     TarefaControllerMapper mapper) {
-        return new ListarTarefasPorIdUsuarioETituloUseCase(tarefaRepository, mapper);
+                                                                                     TarefaControllerMapper mapper,
+                                                                                    AuthenticationService authService) {
+        return new ListarTarefasPorIdUsuarioETituloUseCase(tarefaRepository, mapper, authService);
     }
 
     @Bean
-    AtualizarTarefaUseCase atualizarTarefaUseCase(TarefaRepository repository) {
-        return new AtualizarTarefaUseCase(repository);
+    AtualizarTarefaUseCase atualizarTarefaUseCase(TarefaRepository repository,
+                                                  AuthenticationService authService) {
+        return new AtualizarTarefaUseCase(repository, authService);
     }
 
     @Bean
-    ConcluirTarefaUseCase concluirTarefaUseCase(TarefaRepository repository) {
-        return new ConcluirTarefaUseCase(repository);
+    ConcluirTarefaUseCase concluirTarefaUseCase(TarefaRepository repository, AuthenticationService authService) {
+        return new ConcluirTarefaUseCase(repository, authService);
     }
 
     @Bean
-    IniciarTarefaUseCase iniciarTarefaUseCase(TarefaRepository repository) {
-        return new IniciarTarefaUseCase(repository);
+    IniciarTarefaUseCase iniciarTarefaUseCase(TarefaRepository repository, AuthenticationService authService) {
+        return new IniciarTarefaUseCase(repository, authService);
     }
 
     @Bean
-    ReabrirTarefaUseCase reabrirTarefaUseCase(TarefaRepository repository) {
-        return new ReabrirTarefaUseCase(repository);
+    ReabrirTarefaUseCase reabrirTarefaUseCase(TarefaRepository repository, AuthenticationService authService) {
+        return new ReabrirTarefaUseCase(repository, authService);
     }
 
     @Bean
-    DesativarTarefaUseCase desativarTarefaUseCase(TarefaRepository tarefaRepository) {
-        return new DesativarTarefaUseCase(tarefaRepository);
+    DesativarTarefaUseCase desativarTarefaUseCase(TarefaRepository tarefaRepository, AuthenticationService authService) {
+        return new DesativarTarefaUseCase(tarefaRepository, authService);
     }
 
     @Bean
@@ -87,13 +92,14 @@ public class TarefaBeanConfig {
     }
 
     @Bean
-    AdicionarTagNaTarefaUseCase adicionarTagNaTarefaUseCase(TagRepository tagRepository, TarefaRepository tarefaRepository) {
-        return new AdicionarTagNaTarefaUseCase(tagRepository, tarefaRepository);
+    AdicionarTagNaTarefaUseCase adicionarTagNaTarefaUseCase(TagRepository tagRepository, TarefaRepository tarefaRepository,
+                                                            AuthenticationService authService) {
+        return new AdicionarTagNaTarefaUseCase(tagRepository, tarefaRepository, authService);
     }
 
     @Bean
-    RemoverTagDaTarefaUseCase removerTagDaTarefaUseCase(TagRepository tagRepository, TarefaRepository tarefaRepository) {
-        return new RemoverTagDaTarefaUseCase(tagRepository, tarefaRepository);
+    RemoverTagDaTarefaUseCase removerTagDaTarefaUseCase(TagRepository tagRepository, TarefaRepository tarefaRepository, AuthenticationService authService) {
+        return new RemoverTagDaTarefaUseCase(tagRepository, tarefaRepository, authService);
     }
 
     @Bean

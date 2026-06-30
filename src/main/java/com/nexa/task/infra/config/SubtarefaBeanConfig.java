@@ -8,6 +8,7 @@ import com.nexa.task.infra.persistence.adapter.JpaSubtarefaRepository;
 import com.nexa.task.infra.persistence.mapper.SubtarefaPersistenceMapper;
 import com.nexa.task.infra.persistence.mapper.TarefaPersistenceMapper;
 import com.nexa.task.infra.persistence.repository.SpringDataSubtarefaRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,8 +29,9 @@ public class SubtarefaBeanConfig {
     @Bean
     ListarSubtarefasPorIdTarefaUseCase listarSubtarefasPorIdTarefaUseCase(SubtarefaRepository subtarefaRepository,
                                                                           TarefaRepository tarefaRepository,
-                                                                          SubtarefaControllerMapper mapper) {
-        return new ListarSubtarefasPorIdTarefaUseCase(subtarefaRepository, tarefaRepository, mapper);
+                                                                          SubtarefaControllerMapper mapper,
+                                                                          AuthenticationService authService) {
+        return new ListarSubtarefasPorIdTarefaUseCase(subtarefaRepository, tarefaRepository, mapper, authService);
     }
 
     @Bean

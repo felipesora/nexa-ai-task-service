@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 
 public class TarefaControllerMapper {
 
-    public Tarefa toDomain(TarefaCreateDTO request, Workspace workspace) {
+    public Tarefa toDomain(TarefaCreateDTO request, Workspace workspace, Long idUsuario) {
 
         return new Tarefa(
                 null,
-                request.idUsuario(),
+                idUsuario,
                 request.titulo(),
                 request.descricao(),
                 request.prioridade(),

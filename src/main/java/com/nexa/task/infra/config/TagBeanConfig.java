@@ -17,6 +17,7 @@ import com.nexa.task.infra.persistence.adapter.JpaTagRepository;
 import com.nexa.task.infra.persistence.mapper.CorTagPersistenceMapper;
 import com.nexa.task.infra.persistence.mapper.TagPersistenceMapper;
 import com.nexa.task.infra.persistence.repository.SpringDataTagRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -46,8 +47,9 @@ public class TagBeanConfig {
     }
 
     @Bean
-    ListarTagsPorIdTarefaUseCase listarTagsPorIdTarefaUseCase(TagRepository repository, TarefaRepository tarefaRepository, TagControllerMapper mapper) {
-        return new ListarTagsPorIdTarefaUseCase(repository, tarefaRepository, mapper);
+    ListarTagsPorIdTarefaUseCase listarTagsPorIdTarefaUseCase(TagRepository repository, TarefaRepository tarefaRepository, TagControllerMapper mapper,
+                                                              AuthenticationService authService) {
+        return new ListarTagsPorIdTarefaUseCase(repository, tarefaRepository, mapper, authService);
     }
 
     @Bean

@@ -9,6 +9,7 @@ import com.nexa.task.domain.entity.tag.Tag;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.repository.TagRepository;
 import com.nexa.task.domain.repository.TarefaRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,10 +26,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ListarTagsPorIdTarefaUseCaseTest {
@@ -42,6 +42,9 @@ class ListarTagsPorIdTarefaUseCaseTest {
     @Mock
     private TagControllerMapper mapper;
 
+    @Mock
+    private AuthenticationService authService;
+
     @InjectMocks
     private ListarTagsPorIdTarefaUseCase useCase;
 
@@ -53,6 +56,7 @@ class ListarTagsPorIdTarefaUseCaseTest {
 
         Tarefa tarefa = new TarefaBuilder()
                 .comId(idTarefa)
+                .comIdUsuario(10L)
                 .build();
 
         Tag tag1 = new TagBuilder()
@@ -90,6 +94,8 @@ class ListarTagsPorIdTarefaUseCaseTest {
         when(tarefaRepository.findById(idTarefa))
                 .thenReturn(Optional.of(tarefa));
 
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
+
         when(tagRepository.findByIdTarefa(idTarefa, pageable))
                 .thenReturn(pageEntity);
 
@@ -108,6 +114,7 @@ class ListarTagsPorIdTarefaUseCaseTest {
         assertEquals("Backend", resultado.getContent().get(1).nome());
 
         verify(tarefaRepository).findById(idTarefa);
+        verify(authService).validateOwnerOrAdmin(10L);
         verify(tagRepository).findByIdTarefa(idTarefa, pageable);
         verify(mapper).toResponse(tag1);
         verify(mapper).toResponse(tag2);
@@ -133,6 +140,7 @@ class ListarTagsPorIdTarefaUseCaseTest {
         );
 
         verify(tarefaRepository).findById(idTarefa);
+        verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verify(tagRepository, never()).findByIdTarefa(any(), any());
     }
 }

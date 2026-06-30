@@ -13,6 +13,7 @@ import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.entity.workspace.Workspace;
 import com.nexa.task.domain.repository.TarefaRepository;
 import com.nexa.task.domain.repository.WorkspaceRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,6 +39,9 @@ class CadastrarTarefaUseCaseTest {
     @Mock
     private TarefaControllerMapper mapper;
 
+    @Mock
+    private AuthenticationService authService;
+
     @InjectMocks
     private CadastrarTarefaUseCase useCase;
 
@@ -44,7 +49,6 @@ class CadastrarTarefaUseCaseTest {
     void deveCadastrarTarefaComSucesso() {
 
         TarefaCreateDTO request = new TarefaCreateDTO(
-                1L,
                 "Minha tarefa",
                 "Descrição da tarefa",
                 PrioridadeTarefa.ALTA,
@@ -55,18 +59,20 @@ class CadastrarTarefaUseCaseTest {
 
         Workspace workspace = new WorkspaceBuilder()
                 .comId(1L)
+                .comIdUsuario(10L)
                 .comNome("Workspace Teste")
                 .build();
 
         Tarefa tarefa = new TarefaBuilder()
                 .comId(1L)
+                .comIdUsuario(10L)
                 .comTitulo("Minha tarefa")
                 .comDescricao("Descrição da tarefa")
                 .build();
 
         TarefaResponseDTO response = new TarefaResponseDTO(
                 1L,
-                1L,
+                10L,
                 "Minha tarefa",
                 "Descrição da tarefa",
                 PrioridadeTarefa.ALTA,
@@ -83,7 +89,9 @@ class CadastrarTarefaUseCaseTest {
         when(workspaceRepository.findById(1L))
                 .thenReturn(Optional.of(workspace));
 
-        when(mapper.toDomain(request, workspace))
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
+
+        when(mapper.toDomain(request, workspace, 10L))
                 .thenReturn(tarefa);
 
         when(tarefaRepository.save(tarefa))
@@ -99,7 +107,8 @@ class CadastrarTarefaUseCaseTest {
         assertEquals("Minha tarefa", resultado.titulo());
 
         verify(workspaceRepository).findById(1L);
-        verify(mapper).toDomain(request, workspace);
+        verify(authService).validateOwnerOrAdmin(10L);
+        verify(mapper).toDomain(request, workspace, 10L);
         verify(tarefaRepository).save(tarefa);
         verify(mapper).toResponse(tarefa);
     }
@@ -108,7 +117,6 @@ class CadastrarTarefaUseCaseTest {
     void deveLancarExcecaoQuandoWorkspaceNaoEncontrado() {
 
         TarefaCreateDTO request = new TarefaCreateDTO(
-                1L,
                 "Minha tarefa",
                 "Descrição da tarefa",
                 PrioridadeTarefa.ALTA,
@@ -131,6 +139,7 @@ class CadastrarTarefaUseCaseTest {
         );
 
         verify(workspaceRepository).findById(999L);
+        verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verifyNoInteractions(tarefaRepository);
         verifyNoInteractions(mapper);
     }

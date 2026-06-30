@@ -102,7 +102,6 @@ class TarefaControllerTest {
         LocalDateTime dataLimite = LocalDateTime.now().plusDays(1);
 
         request = new TarefaCreateDTO(
-                1L,
                 "Minha tarefa",
                 "Descrição da tarefa",
                 PrioridadeTarefa.ALTA,
@@ -199,7 +198,6 @@ class TarefaControllerTest {
     void deveRetornar400QuandoRequestForInvalido() throws Exception {
 
         TarefaCreateDTO requestInvalido = new TarefaCreateDTO(
-                null,
                 "",
                 "",
                 null,

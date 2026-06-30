@@ -8,6 +8,7 @@ import com.nexa.task.domain.entity.tag.Tag;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.repository.TagRepository;
 import com.nexa.task.domain.repository.TarefaRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +31,9 @@ class RemoverTagDaTarefaUseCaseTest {
 
     @Mock
     private TarefaRepository tarefaRepository;
+
+    @Mock
+    private AuthenticationService authService;
 
     @InjectMocks
     private RemoverTagDaTarefaUseCase useCase;
@@ -56,6 +61,7 @@ class RemoverTagDaTarefaUseCaseTest {
 
         when(tarefaRepository.findById(1L))
                 .thenReturn(Optional.of(tarefa));
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
         when(tagRepository.findById(2L))
                 .thenReturn(Optional.of(tag));
 
@@ -63,6 +69,7 @@ class RemoverTagDaTarefaUseCaseTest {
 
         assertTrue(tarefa.getTags().isEmpty());
 
+        verify(authService).validateOwnerOrAdmin(10L);
         verify(tarefaRepository).save(tarefa);
     }
 
@@ -80,6 +87,7 @@ class RemoverTagDaTarefaUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verify(tagRepository, never()).findById(anyLong());
         verify(tarefaRepository, never()).save(any());
     }
@@ -88,6 +96,8 @@ class RemoverTagDaTarefaUseCaseTest {
     void deveLancarExcecaoQuandoTagNaoEncontrada() {
         when(tarefaRepository.findById(1L))
                 .thenReturn(Optional.of(tarefa));
+
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
 
         when(tagRepository.findById(2L))
                 .thenReturn(Optional.empty());
@@ -101,6 +111,7 @@ class RemoverTagDaTarefaUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(authService).validateOwnerOrAdmin(10L);
         verify(tarefaRepository, never()).save(any());
     }
 
@@ -110,6 +121,7 @@ class RemoverTagDaTarefaUseCaseTest {
 
         when(tarefaRepository.findById(1L))
                 .thenReturn(Optional.of(tarefa));
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
         when(tagRepository.findById(2L))
                 .thenReturn(Optional.of(tag));
 
@@ -122,6 +134,7 @@ class RemoverTagDaTarefaUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(authService).validateOwnerOrAdmin(10L);
         verify(tarefaRepository, never()).save(any());
     }
 
@@ -129,6 +142,7 @@ class RemoverTagDaTarefaUseCaseTest {
     void deveLancarExcecaoQuandoTagNaoEstaVinculadaATarefa() {
         when(tarefaRepository.findById(1L))
                 .thenReturn(Optional.of(tarefa));
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
         when(tagRepository.findById(2L))
                 .thenReturn(Optional.of(tag));
 
@@ -141,6 +155,7 @@ class RemoverTagDaTarefaUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(authService).validateOwnerOrAdmin(10L);
         verify(tarefaRepository, never()).save(any());
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -83,6 +84,7 @@ public class TarefaController {
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<TarefaResponseDTO> cadastrarTarefa(@RequestBody @Valid TarefaCreateDTO request,
                                                                    UriComponentsBuilder uriBuilder) {
@@ -107,6 +109,7 @@ public class TarefaController {
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<Page<TarefaResponseDTO>> listarTodasTarefas(@PageableDefault(size = 10) Pageable pageable) {
         Page<TarefaResponseDTO> tarefas = listarTodasTarefasUseCase.execute(pageable);
@@ -133,6 +136,7 @@ public class TarefaController {
             @ApiResponse(responseCode = "404", description = "Tarefa não encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<TarefaResponseDTO> buscarTarefaPorId(@PathVariable Long id) {
         TarefaResponseDTO tarefa = buscarTarefaPorIdUseCase.execute(id);
@@ -157,6 +161,7 @@ public class TarefaController {
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{idTarefa}/subtarefas")
     public ResponseEntity<Page<SubtarefaResponseDTO>> listarSubtarefasPelaTarefa(@PathVariable Long idTarefa,
                                                                                  @PageableDefault(size = 10) Pageable pageable) {
@@ -182,6 +187,7 @@ public class TarefaController {
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{idTarefa}/tags")
     public ResponseEntity<Page<TagResponseDTO>> listarTagsPelaTarefa(@PathVariable Long idTarefa,
                                                                            @PageableDefault(size = 10) Pageable pageable) {
@@ -212,6 +218,7 @@ public class TarefaController {
             @ApiResponse(responseCode = "404", description = "Tarefa ou tag não encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/{idTarefa}/tags/{idTag}")
     public ResponseEntity<Void> adicionarTag(@PathVariable Long idTarefa, @PathVariable Long idTag) {
         adicionarTagNaTarefaUseCase.execute(idTarefa, idTag);
@@ -241,6 +248,7 @@ public class TarefaController {
             @ApiResponse(responseCode = "404", description = "Tarefa ou tag não encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{idTarefa}/tags/{idTag}")
     public ResponseEntity<Void> removerTag(@PathVariable Long idTarefa, @PathVariable Long idTag) {
         removerTagDaTarefaUseCase.execute(idTarefa, idTag);
@@ -266,6 +274,7 @@ public class TarefaController {
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<Page<TarefaResponseDTO>> listarTarefasPorIdUsuario(@PathVariable Long idUsuario,
                                                                                    @RequestParam(required = false) String titulo,
@@ -295,6 +304,7 @@ public class TarefaController {
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Tarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
     public ResponseEntity<Void> atualizarTarefa(@PathVariable Long id, @RequestBody @Valid TarefaUpdateDTO dto) {
         atualizarTarefaUseCase.execute(id, dto);
@@ -318,6 +328,7 @@ public class TarefaController {
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Tarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/{id}/concluir")
     public ResponseEntity<Void> concluirTarefa(@PathVariable Long id) {
         concluirTarefaUseCase.execute(id);
@@ -342,6 +353,7 @@ public class TarefaController {
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Tarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/{id}/iniciar")
     public ResponseEntity<Void> iniciarTarefa(@PathVariable Long id) {
         iniciarTarefaUseCase.execute(id);
@@ -367,6 +379,7 @@ public class TarefaController {
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Tarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/{id}/reabrir")
     public ResponseEntity<Void> reabrirTarefa(@PathVariable Long id) {
         reabrirTarefaUseCase.execute(id);
@@ -388,6 +401,7 @@ public class TarefaController {
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Tarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> desativarTarefa(@PathVariable Long id) {
         desativarTarefaUseCase.execute(id);
@@ -408,6 +422,7 @@ public class TarefaController {
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Tarefa não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/ativar/{id}")
     public ResponseEntity<Void> ativarTarefa(@PathVariable Long id) {
         ativarTarefaUseCase.execute(id);

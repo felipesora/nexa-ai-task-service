@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
+import com.nexa.task.application.dto.workspace.WorkspaceUpdateDTO;
 import com.nexa.task.application.exception.BadRequestException;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.usecase.tarefa.ListarTarefasPorIdWorkspaceUseCase;
@@ -68,6 +69,7 @@ class WorkspaceControllerTest {
     private ObjectMapper objectMapper;
 
     private WorkspaceRequestDTO request;
+    private WorkspaceUpdateDTO updateDTO;
     private WorkspaceResponseDTO response;
     private TarefaResponseDTO tarefaResponse;
 
@@ -76,6 +78,13 @@ class WorkspaceControllerTest {
 
         request = new WorkspaceRequestDTO(
                 1L,
+                "Meu Workspace",
+                "Descrição",
+                1L,
+                1L
+        );
+
+        updateDTO = new WorkspaceUpdateDTO(
                 "Meu Workspace",
                 "Descrição",
                 1L,
@@ -324,12 +333,12 @@ class WorkspaceControllerTest {
     void deveAtualizarWorkspaceComSucesso() throws Exception {
 
         doNothing().when(atualizarWorkspaceUseCase)
-                .execute(1L, request);
+                .execute(1L, updateDTO);
 
         mockMvc.perform(
                         put("/v1/workspaces/1")
                                 .contentType(APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request))
+                                .content(objectMapper.writeValueAsString(updateDTO))
                 )
                 .andExpect(status().isNoContent());
     }
@@ -341,7 +350,7 @@ class WorkspaceControllerTest {
                 "Workspace com id: 999 não encontrado"
         ))
                 .when(atualizarWorkspaceUseCase)
-                .execute(eq(999L), any(WorkspaceRequestDTO.class));
+                .execute(eq(999L), any(WorkspaceUpdateDTO.class));
 
         mockMvc.perform(
                         put("/v1/workspaces/999")
@@ -361,7 +370,7 @@ class WorkspaceControllerTest {
                 "Cor com id: 1 não encontrada"
         ))
                 .when(atualizarWorkspaceUseCase)
-                .execute(eq(1L), any(WorkspaceRequestDTO.class));
+                .execute(eq(1L), any(WorkspaceUpdateDTO.class));
 
         mockMvc.perform(
                         put("/v1/workspaces/1")
@@ -381,7 +390,7 @@ class WorkspaceControllerTest {
                 "Ícone com id: 1 não encontrado"
         ))
                 .when(atualizarWorkspaceUseCase)
-                .execute(eq(1L), any(WorkspaceRequestDTO.class));
+                .execute(eq(1L), any(WorkspaceUpdateDTO.class));
 
         mockMvc.perform(
                         put("/v1/workspaces/1")
@@ -401,7 +410,7 @@ class WorkspaceControllerTest {
                 "Já existe um workspace com esse nome para este usuário"
         ))
                 .when(atualizarWorkspaceUseCase)
-                .execute(eq(1L), any(WorkspaceRequestDTO.class));
+                .execute(eq(1L), any(WorkspaceUpdateDTO.class));
 
         mockMvc.perform(
                         put("/v1/workspaces/1")
