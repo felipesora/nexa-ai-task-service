@@ -10,6 +10,7 @@ import com.nexa.task.infra.persistence.mapper.CorWorkspacePersistenceMapper;
 import com.nexa.task.infra.persistence.mapper.IconeWorkspacePersistenceMapper;
 import com.nexa.task.infra.persistence.mapper.WorkspacePersistenceMapper;
 import com.nexa.task.infra.persistence.repository.SpringDataWorkspaceRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,8 +19,9 @@ public class WorkspaceBeanConfig {
 
     @Bean
     CadastrarWorkspaceUseCase cadastrarWorkspaceUseCase(WorkspaceRepository workspaceRepository, CorWorkspaceRepository corWorkspaceRepository,
-                                                        IconeWorkspaceRepository iconeWorkspaceRepository, WorkspaceControllerMapper mapper) {
-        return new CadastrarWorkspaceUseCase(workspaceRepository, corWorkspaceRepository, iconeWorkspaceRepository, mapper);
+                                                        IconeWorkspaceRepository iconeWorkspaceRepository, WorkspaceControllerMapper mapper,
+                                                        AuthenticationService authService) {
+        return new CadastrarWorkspaceUseCase(workspaceRepository, corWorkspaceRepository, iconeWorkspaceRepository, mapper, authService);
     }
 
     @Bean
@@ -28,31 +30,32 @@ public class WorkspaceBeanConfig {
     }
 
     @Bean
-    BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase(WorkspaceRepository workspaceRepository, WorkspaceControllerMapper mapper) {
-        return new BuscarWorkspacePorIdUseCase(workspaceRepository, mapper);
+    BuscarWorkspacePorIdUseCase buscarWorkspacePorIdUseCase(WorkspaceRepository workspaceRepository, WorkspaceControllerMapper mapper, AuthenticationService authService) {
+        return new BuscarWorkspacePorIdUseCase(workspaceRepository, mapper, authService);
     }
 
     @Bean
-    ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase(WorkspaceRepository workspaceRepository, WorkspaceControllerMapper mapper) {
-        return new ListarWorkspacesPorIdUsuarioUseCase(workspaceRepository, mapper);
+    ListarWorkspacesPorIdUsuarioUseCase listarWorkspacesPorIdUsuarioUseCase(WorkspaceRepository workspaceRepository, WorkspaceControllerMapper mapper, AuthenticationService authService) {
+        return new ListarWorkspacesPorIdUsuarioUseCase(workspaceRepository, mapper, authService);
     }
 
     @Bean
-    ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase(WorkspaceRepository workspaceRepository, WorkspaceControllerMapper mapper) {
-        return new ListarWorkspacesPorIdUsuarioENomeUseCase(workspaceRepository, mapper);
+    ListarWorkspacesPorIdUsuarioENomeUseCase listarWorkspacesPorIdUsuarioENomeUseCase(WorkspaceRepository workspaceRepository, WorkspaceControllerMapper mapper, AuthenticationService authService) {
+        return new ListarWorkspacesPorIdUsuarioENomeUseCase(workspaceRepository, mapper, authService);
     }
 
     @Bean
     AtualizarWorkspaceUseCase atualizarWorkspaceUseCase(WorkspaceRepository workspaceRepository, CorWorkspaceRepository corWorkspaceRepository,
-                                                        IconeWorkspaceRepository iconeWorkspaceRepository) {
-        return new AtualizarWorkspaceUseCase(workspaceRepository, corWorkspaceRepository, iconeWorkspaceRepository);
+                                                        IconeWorkspaceRepository iconeWorkspaceRepository, AuthenticationService authService) {
+        return new AtualizarWorkspaceUseCase(workspaceRepository, corWorkspaceRepository, iconeWorkspaceRepository, authService);
     }
 
     @Bean
     DesativarWorkspaceUseCase desativarWorkspaceUseCase(WorkspaceRepository workspaceRepository,
                                                         TarefaRepository tarefaRepository,
-                                                        SubtarefaRepository subtarefaRepository) {
-        return new DesativarWorkspaceUseCase(workspaceRepository, tarefaRepository, subtarefaRepository);
+                                                        SubtarefaRepository subtarefaRepository,
+                                                        AuthenticationService authService) {
+        return new DesativarWorkspaceUseCase(workspaceRepository, tarefaRepository, subtarefaRepository, authService);
     }
 
     @Bean

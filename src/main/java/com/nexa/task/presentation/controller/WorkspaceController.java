@@ -3,6 +3,7 @@ package com.nexa.task.presentation.controller;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
+import com.nexa.task.application.dto.workspace.WorkspaceUpdateDTO;
 import com.nexa.task.application.usecase.tarefa.ListarTarefasPorIdWorkspaceUseCase;
 import com.nexa.task.application.usecase.workspace.*;
 import com.nexa.task.presentation.exception.ErrorResponse;
@@ -69,7 +70,7 @@ public class WorkspaceController
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PreAuthorize("#request.idUsuario == authentication.principal.id or hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<WorkspaceResponseDTO> cadastrarWorkspace(@RequestBody @Valid WorkspaceRequestDTO request,
                                                                    UriComponentsBuilder uriBuilder) {
@@ -94,6 +95,7 @@ public class WorkspaceController
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<Page<WorkspaceResponseDTO>> listarTodosWorkspaces(@PageableDefault(size = 10) Pageable pageable) {
         Page<WorkspaceResponseDTO> workspaces = listarTodosWorkspacesUseCase.execute(pageable);
@@ -120,6 +122,7 @@ public class WorkspaceController
             @ApiResponse(responseCode = "404", description = "Workspace não encontrado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<WorkspaceResponseDTO> buscarWorkspacePorId(@PathVariable Long id) {
         WorkspaceResponseDTO workspace = buscarWorkspacePorIdUseCase.execute(id);
@@ -145,6 +148,7 @@ public class WorkspaceController
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<Page<WorkspaceResponseDTO>> listarWorkspacesPorIdUsuario(@PathVariable Long idUsuario,
                                                                                    @RequestParam(required = false) String nome,
@@ -176,6 +180,7 @@ public class WorkspaceController
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{idWorkspace}/tarefas")
     public ResponseEntity<Page<TarefaResponseDTO>> listarTarefasPeloWorkspace(@PathVariable Long idWorkspace,
                                                                               @PageableDefault(size = 10) Pageable pageable) {
@@ -199,8 +204,9 @@ public class WorkspaceController
             @ApiResponse(responseCode = "403", description = "Sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Workspace não encontrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
-    public ResponseEntity<Void> atualizarWorkspace(@PathVariable Long id, @RequestBody @Valid WorkspaceRequestDTO request) {
+    public ResponseEntity<Void> atualizarWorkspace(@PathVariable Long id, @RequestBody @Valid WorkspaceUpdateDTO request) {
         atualizarWorkspaceUseCase.execute(id, request);
         return ResponseEntity.noContent().build();
     }
@@ -220,6 +226,7 @@ public class WorkspaceController
             @ApiResponse(responseCode = "403", description = "Usuário Sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Workspace não encontrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> desativarWorkspace(@PathVariable Long id) {
         desativarWorkspaceUseCase.execute(id);
@@ -240,6 +247,7 @@ public class WorkspaceController
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Workspace não encontrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/ativar/{id}")
     public ResponseEntity<Void> ativarUsuario(@PathVariable Long id) {
         ativarWorkspaceUseCase.execute(id);

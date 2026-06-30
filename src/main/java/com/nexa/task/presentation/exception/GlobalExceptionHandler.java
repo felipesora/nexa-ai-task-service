@@ -2,6 +2,7 @@ package com.nexa.task.presentation.exception;
 
 import com.nexa.task.application.exception.BadRequestException;
 import com.nexa.task.application.exception.EntityNotFoundException;
+import com.nexa.task.infra.security.ForbiddenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -83,6 +84,16 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(
+                        HttpStatus.FORBIDDEN.value(),
+                        ex.getMessage(),
+                        null
+                ));
     }
 
     @ExceptionHandler(Exception.class)

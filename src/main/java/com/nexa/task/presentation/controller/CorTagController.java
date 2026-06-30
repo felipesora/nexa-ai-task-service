@@ -75,7 +75,6 @@ public class CorTagController {
                 Retorna uma lista paginada de cores de tag.
 
                 Requer autenticação JWT.
-                Apenas usuários com ROLE_ADMIN podem acessar.
                 """
     )
     @ApiResponses({
@@ -97,7 +96,6 @@ public class CorTagController {
                 Retorna os dados de uma cor de tag.
 
                 Requer autenticação JWT.
-                Apenas usuários com ROLE_ADMIN podem acessar.
                 """
     )
     @ApiResponses({

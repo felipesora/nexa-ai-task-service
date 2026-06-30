@@ -10,6 +10,7 @@ import com.nexa.task.infra.persistence.mapper.TagPersistenceMapper;
 import com.nexa.task.infra.persistence.mapper.TarefaPersistenceMapper;
 import com.nexa.task.infra.persistence.mapper.WorkspacePersistenceMapper;
 import com.nexa.task.infra.persistence.repository.SpringDataTarefaRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,8 +39,9 @@ public class TarefaBeanConfig {
     @Bean
     ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase(TarefaRepository tarefaRepository,
                                                                           WorkspaceRepository workspaceRepository,
-                                                                          TarefaControllerMapper mapper) {
-        return new ListarTarefasPorIdWorkspaceUseCase(tarefaRepository, workspaceRepository, mapper);
+                                                                          TarefaControllerMapper mapper,
+                                                                          AuthenticationService authService) {
+        return new ListarTarefasPorIdWorkspaceUseCase(tarefaRepository, workspaceRepository, mapper, authService);
     }
 
     @Bean

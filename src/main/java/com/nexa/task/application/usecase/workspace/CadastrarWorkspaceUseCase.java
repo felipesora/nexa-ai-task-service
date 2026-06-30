@@ -11,6 +11,8 @@ import com.nexa.task.domain.entity.workspace.Workspace;
 import com.nexa.task.domain.repository.CorWorkspaceRepository;
 import com.nexa.task.domain.repository.IconeWorkspaceRepository;
 import com.nexa.task.domain.repository.WorkspaceRepository;
+import com.nexa.task.infra.security.AuthenticatedUser;
+import com.nexa.task.infra.security.AuthenticationService;
 import jakarta.transaction.Transactional;
 
 public class CadastrarWorkspaceUseCase {
@@ -19,16 +21,20 @@ public class CadastrarWorkspaceUseCase {
     private final CorWorkspaceRepository corWorkspaceRepository;
     private final IconeWorkspaceRepository iconeWorkspaceRepository;
     private final WorkspaceControllerMapper mapper;
+    private final AuthenticationService authService;
 
-    public CadastrarWorkspaceUseCase(WorkspaceRepository workspaceRepository, CorWorkspaceRepository corWorkspaceRepository, IconeWorkspaceRepository iconeWorkspaceRepository, WorkspaceControllerMapper mapper) {
+    public CadastrarWorkspaceUseCase(WorkspaceRepository workspaceRepository, CorWorkspaceRepository corWorkspaceRepository, IconeWorkspaceRepository iconeWorkspaceRepository, WorkspaceControllerMapper mapper, AuthenticationService authService) {
         this.workspaceRepository = workspaceRepository;
         this.corWorkspaceRepository = corWorkspaceRepository;
         this.iconeWorkspaceRepository = iconeWorkspaceRepository;
         this.mapper = mapper;
+        this.authService = authService;
     }
 
     @Transactional
     public WorkspaceResponseDTO execute(WorkspaceRequestDTO request) {
+
+        authService.validateOwnerOrAdmin(request.idUsuario());
 
         validarNomeUnicoDeWorkspace(request);
 

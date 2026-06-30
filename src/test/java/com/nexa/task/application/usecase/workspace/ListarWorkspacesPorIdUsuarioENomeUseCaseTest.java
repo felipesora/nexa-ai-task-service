@@ -5,6 +5,7 @@ import com.nexa.task.application.mapper.WorkspaceControllerMapper;
 import com.nexa.task.domain.builder.workspace.WorkspaceBuilder;
 import com.nexa.task.domain.entity.workspace.Workspace;
 import com.nexa.task.domain.repository.WorkspaceRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,6 +28,9 @@ class ListarWorkspacesPorIdUsuarioENomeUseCaseTest {
 
     @Mock
     private WorkspaceControllerMapper mapper;
+
+    @Mock
+    private AuthenticationService authService;
 
     @InjectMocks
     private ListarWorkspacesPorIdUsuarioENomeUseCase useCase;
@@ -64,6 +68,8 @@ class ListarWorkspacesPorIdUsuarioENomeUseCaseTest {
                 null
         );
 
+        doNothing().when(authService).validateOwnerOrAdmin(idUsuario);
+
         when(workspaceRepository.findByIdUsuarioAndNome(
                 idUsuario,
                 nome,
@@ -89,10 +95,8 @@ class ListarWorkspacesPorIdUsuarioENomeUseCaseTest {
         assertEquals(idUsuario, workspaceRetornado.idUsuario());
         assertEquals(nome, workspaceRetornado.nome());
 
-        verify(workspaceRepository)
-                .findByIdUsuarioAndNome(idUsuario, nome, pageable);
-
-        verify(mapper)
-                .toResponse(workspace);
+        verify(authService).validateOwnerOrAdmin(idUsuario);
+        verify(workspaceRepository).findByIdUsuarioAndNome(idUsuario, nome, pageable);
+        verify(mapper).toResponse(workspace);
     }
 }

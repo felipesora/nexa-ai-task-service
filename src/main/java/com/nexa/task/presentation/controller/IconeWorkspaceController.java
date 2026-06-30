@@ -75,7 +75,6 @@ public class IconeWorkspaceController {
                 Retorna uma lista paginada de ícones de workspace.
 
                 Requer autenticação JWT.
-                Apenas usuários com ROLE_ADMIN podem acessar.
                 """
     )
     @ApiResponses({
@@ -97,7 +96,6 @@ public class IconeWorkspaceController {
                 Retorna os dados de um ícone de workspace.
 
                 Requer autenticação JWT.
-                Apenas usuários com ROLE_ADMIN podem acessar.
                 """
     )
     @ApiResponses({

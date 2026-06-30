@@ -1,11 +1,14 @@
 package com.nexa.task.application.usecase.workspace;
 
+import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.mapper.WorkspaceControllerMapper;
 import com.nexa.task.domain.builder.workspace.WorkspaceBuilder;
 import com.nexa.task.domain.entity.workspace.Workspace;
 import com.nexa.task.domain.repository.WorkspaceRepository;
+import com.nexa.task.infra.security.AuthenticationService;
+import com.nexa.task.infra.security.ForbiddenException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,6 +29,9 @@ class BuscarWorkspacePorIdUseCaseTest {
 
     @Mock
     private WorkspaceControllerMapper mapper;
+
+    @Mock
+    private AuthenticationService authService;
 
     @InjectMocks
     private BuscarWorkspacePorIdUseCase useCase;
@@ -55,6 +61,8 @@ class BuscarWorkspacePorIdUseCaseTest {
                 null
         );
 
+        doNothing().when(authService).validateOwnerOrAdmin(workspace.getIdUsuario());
+
         when(workspaceRepository.findById(id))
                 .thenReturn(Optional.of(workspace));
 
@@ -68,6 +76,7 @@ class BuscarWorkspacePorIdUseCaseTest {
         assertEquals("Meu Workspace", resultado.nome());
         assertEquals("Descrição", resultado.descricao());
 
+        verify(authService).validateOwnerOrAdmin(workspace.getIdUsuario());
         verify(workspaceRepository).findById(id);
         verify(mapper).toResponse(workspace);
     }
@@ -91,6 +100,36 @@ class BuscarWorkspacePorIdUseCaseTest {
         );
 
         verify(workspaceRepository).findById(id);
+        verify(authService, never()).validateOwnerOrAdmin(anyLong());
+        verify(mapper, never()).toResponse(any());
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoUsuarioNaoTemPermissao() {
+
+        Long id = 1L;
+
+        Workspace workspace = new WorkspaceBuilder()
+                .comId(id)
+                .comIdUsuario(1L)
+                .build();
+
+        when(workspaceRepository.findById(id))
+                .thenReturn(Optional.of(workspace));
+
+        doThrow(new ForbiddenException("Acesso negado"))
+                .when(authService)
+                .validateOwnerOrAdmin(workspace.getIdUsuario());
+
+        ForbiddenException exception = assertThrows(
+                ForbiddenException.class,
+                () -> useCase.execute(id)
+        );
+
+        assertEquals("Acesso negado", exception.getMessage());
+
+        verify(workspaceRepository).findById(id);
+        verify(authService).validateOwnerOrAdmin(workspace.getIdUsuario());
         verify(mapper, never()).toResponse(any());
     }
 }

@@ -77,7 +77,6 @@ public class CorWorkspaceController {
                 Retorna uma lista paginada de cores de workspace.
 
                 Requer autenticação JWT.
-                Apenas usuários com ROLE_ADMIN podem acessar.
                 """
     )
     @ApiResponses({
@@ -99,7 +98,6 @@ public class CorWorkspaceController {
                 Retorna os dados de uma cor de workspace.
 
                 Requer autenticação JWT.
-                Apenas usuários com ROLE_ADMIN podem acessar.
                 """
     )
     @ApiResponses({

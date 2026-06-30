@@ -14,6 +14,8 @@ import com.nexa.task.domain.entity.workspace.Workspace;
 import com.nexa.task.domain.repository.CorWorkspaceRepository;
 import com.nexa.task.domain.repository.IconeWorkspaceRepository;
 import com.nexa.task.domain.repository.WorkspaceRepository;
+import com.nexa.task.infra.security.AuthenticationService;
+import com.nexa.task.infra.security.ForbiddenException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CadastrarWorkspaceUseCaseTest {
@@ -39,6 +41,9 @@ class CadastrarWorkspaceUseCaseTest {
 
     @Mock
     private WorkspaceControllerMapper mapper;
+
+    @Mock
+    private AuthenticationService authService;
 
     @InjectMocks
     private CadastrarWorkspaceUseCase useCase;
@@ -75,6 +80,7 @@ class CadastrarWorkspaceUseCaseTest {
                 null
         );
 
+        doNothing().when(authService).validateOwnerOrAdmin(request.idUsuario());
         when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), request.idUsuario())).thenReturn(false);
         when(mapper.toDomain(request, null, null)).thenReturn(workspace);
         when(workspaceRepository.save(workspace)).thenReturn(workspace);
@@ -197,5 +203,27 @@ class CadastrarWorkspaceUseCaseTest {
                 () -> useCase.execute(request));
 
         assertEquals("Ícone com id: 20 não encontrado", exception.getMessage());
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoUsuarioNaoTemPermissao() {
+        WorkspaceRequestDTO request = new WorkspaceRequestDTO(
+                1L,
+                "Workspace",
+                "Descrição",
+                null,
+                null
+        );
+
+        doThrow(new ForbiddenException("Acesso negado"))
+                .when(authService)
+                .validateOwnerOrAdmin(request.idUsuario());
+
+        ForbiddenException exception = assertThrows(
+                ForbiddenException.class,
+                () -> useCase.execute(request)
+        );
+
+        assertEquals("Acesso negado", exception.getMessage());
     }
 }
