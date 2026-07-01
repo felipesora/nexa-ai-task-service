@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface SpringDataCorWorkspaceRepository extends JpaRepository<CorWorkspaceEntity, Long> {
 
     Optional<CorWorkspaceEntity> findByCor(String cor);
+
+    Optional<CorWorkspaceEntity> findByIdAndAtivoTrue(Long id);
 }

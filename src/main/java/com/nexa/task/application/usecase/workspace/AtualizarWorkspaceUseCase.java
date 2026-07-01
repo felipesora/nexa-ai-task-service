@@ -41,12 +41,12 @@ public class AtualizarWorkspaceUseCase {
         IconeWorkspace iconeWorkspace = null;
 
         if (updateDTO.idCor() != null) {
-            corWorkspace = corWorkspaceRepository.findById(updateDTO.idCor())
+            corWorkspace = corWorkspaceRepository.findByIdAtivo(updateDTO.idCor())
                     .orElseThrow(() -> new EntityNotFoundException("Cor com id: " + updateDTO.idCor() + " não encontrada"));
         }
 
         if (updateDTO.idIcone() != null) {
-            iconeWorkspace = iconeWorkspaceRepository.findById(updateDTO.idIcone())
+            iconeWorkspace = iconeWorkspaceRepository.findByIdAtivo(updateDTO.idIcone())
                     .orElseThrow(() -> new EntityNotFoundException("Ícone com id: " + updateDTO.idIcone() + " não encontrado"));
         }
 

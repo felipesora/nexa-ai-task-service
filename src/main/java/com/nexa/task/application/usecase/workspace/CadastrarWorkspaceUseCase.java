@@ -42,12 +42,12 @@ public class CadastrarWorkspaceUseCase {
         IconeWorkspace iconeWorkspace = null;
 
         if (request.idCor() != null) {
-            corWorkspace = corWorkspaceRepository.findById(request.idCor())
+            corWorkspace = corWorkspaceRepository.findByIdAtivo(request.idCor())
                     .orElseThrow(() -> new EntityNotFoundException("Cor com id: " + request.idCor() + " não encontrada"));
         }
 
         if (request.idIcone() != null) {
-            iconeWorkspace = iconeWorkspaceRepository.findById(request.idIcone())
+            iconeWorkspace = iconeWorkspaceRepository.findByIdAtivo(request.idIcone())
                     .orElseThrow(() -> new EntityNotFoundException("Ícone com id: " + request.idIcone() + " não encontrado"));
         }
 

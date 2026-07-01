@@ -15,4 +15,6 @@ public interface CorWorkspaceRepository {
     Optional<CorWorkspace> findById(Long id);
 
     Optional<CorWorkspace> findByCor(String cor);
+
+    Optional<CorWorkspace> findByIdAtivo(Long id);
 }

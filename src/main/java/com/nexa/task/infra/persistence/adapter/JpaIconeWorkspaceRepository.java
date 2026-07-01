@@ -50,4 +50,10 @@ public class JpaIconeWorkspaceRepository implements IconeWorkspaceRepository {
         return iconeWorkspaceRepository.findByCaminho(caminho)
                 .map(mapper::toDomain);
     }
+
+    @Override
+    public Optional<IconeWorkspace> findByIdAtivo(Long id) {
+        return iconeWorkspaceRepository.findByIdAndAtivoTrue(id)
+                .map(mapper::toDomain);
+    }
 }

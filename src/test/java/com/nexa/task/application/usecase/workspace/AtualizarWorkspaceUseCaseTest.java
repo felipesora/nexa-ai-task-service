@@ -23,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,10 +81,10 @@ class AtualizarWorkspaceUseCaseTest {
                 workspace.getId()))
                 .thenReturn(false);
 
-        when(corWorkspaceRepository.findById(1L))
+        when(corWorkspaceRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(cor));
 
-        when(iconeWorkspaceRepository.findById(1L))
+        when(iconeWorkspaceRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(icone));
 
         useCase.execute(idWorkspace, updateDTO);
@@ -94,7 +95,14 @@ class AtualizarWorkspaceUseCaseTest {
         assertEquals(icone, workspace.getIconeWorkspace());
         assertNotNull(workspace.getAtualizadoEm());
 
+        verify(workspaceRepository).findById(idWorkspace);
         verify(authService).validateOwnerOrAdmin(1L);
+        verify(workspaceRepository).existsByNomeAndIdUsuarioAndIdNot(
+                updateDTO.nome(),
+                workspace.getIdUsuario(),
+                workspace.getId());
+        verify(corWorkspaceRepository).findByIdAtivo(1L);
+        verify(iconeWorkspaceRepository).findByIdAtivo(1L);
         verify(workspaceRepository).save(workspace);
     }
 
@@ -123,8 +131,11 @@ class AtualizarWorkspaceUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(workspaceRepository, never()).save(any());
+        verify(workspaceRepository).findById(idWorkspace);
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
+        verify(workspaceRepository, never()).save(any());
+        verifyNoInteractions(corWorkspaceRepository);
+        verifyNoInteractions(iconeWorkspaceRepository);
     }
 
     @Test
@@ -147,6 +158,8 @@ class AtualizarWorkspaceUseCaseTest {
         when(workspaceRepository.findById(idWorkspace))
                 .thenReturn(Optional.of(workspace));
 
+        doNothing().when(authService).validateOwnerOrAdmin(1L);
+
         when(workspaceRepository.existsByNomeAndIdUsuarioAndIdNot(
                 updateDTO.nome(),
                 workspace.getIdUsuario(),
@@ -163,8 +176,16 @@ class AtualizarWorkspaceUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(workspaceRepository).findById(idWorkspace);
         verify(authService).validateOwnerOrAdmin(1L);
+        verify(workspaceRepository).existsByNomeAndIdUsuarioAndIdNot(
+                updateDTO.nome(),
+                workspace.getIdUsuario(),
+                workspace.getId());
+
         verify(workspaceRepository, never()).save(any());
+        verifyNoInteractions(corWorkspaceRepository);
+        verifyNoInteractions(iconeWorkspaceRepository);
     }
 
     @Test
@@ -187,13 +208,15 @@ class AtualizarWorkspaceUseCaseTest {
         when(workspaceRepository.findById(idWorkspace))
                 .thenReturn(Optional.of(workspace));
 
+        doNothing().when(authService).validateOwnerOrAdmin(1L);
+
         when(workspaceRepository.existsByNomeAndIdUsuarioAndIdNot(
                 updateDTO.nome(),
                 workspace.getIdUsuario(),
                 workspace.getId()))
                 .thenReturn(false);
 
-        when(corWorkspaceRepository.findById(99L))
+        when(corWorkspaceRepository.findByIdAtivo(99L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
@@ -206,7 +229,15 @@ class AtualizarWorkspaceUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(workspaceRepository).findById(idWorkspace);
         verify(authService).validateOwnerOrAdmin(1L);
+        verify(workspaceRepository).existsByNomeAndIdUsuarioAndIdNot(
+                updateDTO.nome(),
+                workspace.getIdUsuario(),
+                workspace.getId());
+        verify(corWorkspaceRepository).findByIdAtivo(99L);
+
+        verify(iconeWorkspaceRepository, never()).findByIdAtivo(anyLong());
         verify(workspaceRepository, never()).save(any());
     }
 
@@ -234,16 +265,18 @@ class AtualizarWorkspaceUseCaseTest {
         when(workspaceRepository.findById(idWorkspace))
                 .thenReturn(Optional.of(workspace));
 
+        doNothing().when(authService).validateOwnerOrAdmin(1L);
+
         when(workspaceRepository.existsByNomeAndIdUsuarioAndIdNot(
                 updateDTO.nome(),
                 workspace.getIdUsuario(),
                 workspace.getId()))
                 .thenReturn(false);
 
-        when(corWorkspaceRepository.findById(1L))
+        when(corWorkspaceRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(cor));
 
-        when(iconeWorkspaceRepository.findById(99L))
+        when(iconeWorkspaceRepository.findByIdAtivo(99L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
@@ -256,7 +289,15 @@ class AtualizarWorkspaceUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(workspaceRepository).findById(idWorkspace);
         verify(authService).validateOwnerOrAdmin(1L);
+        verify(workspaceRepository).existsByNomeAndIdUsuarioAndIdNot(
+                updateDTO.nome(),
+                workspace.getIdUsuario(),
+                workspace.getId());
+        verify(corWorkspaceRepository).findByIdAtivo(1L);
+        verify(iconeWorkspaceRepository).findByIdAtivo(99L);
+
         verify(workspaceRepository, never()).save(any());
     }
 
@@ -294,6 +335,7 @@ class AtualizarWorkspaceUseCaseTest {
 
         verify(workspaceRepository, never()).existsByNomeAndIdUsuarioAndIdNot(any(), any(), any());
         verify(workspaceRepository, never()).save(any());
+
         verifyNoInteractions(corWorkspaceRepository);
         verifyNoInteractions(iconeWorkspaceRepository);
     }

@@ -100,7 +100,10 @@ class CadastrarWorkspaceUseCaseTest {
         assertEquals(response, resultado);
 
         verify(authService).getAuthenticatedUser();
+        verify(workspaceRepository).existsByNomeAndIdUsuario(request.nome(), 1L);
         verify(mapper).toDomain(request, null, null, 1L);
+        verify(workspaceRepository).save(workspace);
+        verify(mapper).toResponse(workspace);
     }
 
     @Test
@@ -113,13 +116,19 @@ class CadastrarWorkspaceUseCaseTest {
                 1L
         );
 
-        CorWorkspace cor = new CorWorkspaceBuilder().comId(1L).build();
-        IconeWorkspace icone = new IconeWorkspaceBuilder().comId(1L).build();
+        CorWorkspace cor = new CorWorkspaceBuilder()
+                .comId(1L)
+                .build();
+
+        IconeWorkspace icone = new IconeWorkspaceBuilder()
+                .comId(1L)
+                .build();
 
         Workspace workspace = new WorkspaceBuilder()
                 .comId(1L)
                 .comIdUsuario(1L)
                 .comNome("Workspace")
+                .comDescricao("Descrição")
                 .comCor(cor)
                 .comIcone(icone)
                 .build();
@@ -138,8 +147,8 @@ class CadastrarWorkspaceUseCaseTest {
 
         when(authService.getAuthenticatedUser()).thenReturn(user);
         when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), 1L)).thenReturn(false);
-        when(corWorkspaceRepository.findById(1L)).thenReturn(Optional.of(cor));
-        when(iconeWorkspaceRepository.findById(1L)).thenReturn(Optional.of(icone));
+        when(corWorkspaceRepository.findByIdAtivo(1L)).thenReturn(Optional.of(cor));
+        when(iconeWorkspaceRepository.findByIdAtivo(1L)).thenReturn(Optional.of(icone));
         when(mapper.toDomain(request, cor, icone, 1L)).thenReturn(workspace);
         when(workspaceRepository.save(workspace)).thenReturn(workspace);
         when(mapper.toResponse(workspace)).thenReturn(response);
@@ -150,7 +159,12 @@ class CadastrarWorkspaceUseCaseTest {
         assertEquals(response, resultado);
 
         verify(authService).getAuthenticatedUser();
+        verify(workspaceRepository).existsByNomeAndIdUsuario(request.nome(), 1L);
+        verify(corWorkspaceRepository).findByIdAtivo(1L);
+        verify(iconeWorkspaceRepository).findByIdAtivo(1L);
         verify(mapper).toDomain(request, cor, icone, 1L);
+        verify(workspaceRepository).save(workspace);
+        verify(mapper).toResponse(workspace);
     }
 
     @Test
@@ -177,9 +191,13 @@ class CadastrarWorkspaceUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(corWorkspaceRepository, never()).findById(anyLong());
+        verify(authService).getAuthenticatedUser();
+        verify(workspaceRepository).existsByNomeAndIdUsuario(request.nome(), 1L);
+        verify(corWorkspaceRepository, never()).findByIdAtivo(anyLong());
+        verify(iconeWorkspaceRepository, never()).findByIdAtivo(anyLong());
         verify(workspaceRepository, never()).save(any());
         verify(mapper, never()).toDomain(any(), any(), any(), anyLong());
+        verify(mapper, never()).toResponse(any());
     }
 
     @Test
@@ -195,7 +213,7 @@ class CadastrarWorkspaceUseCaseTest {
         when(authService.getAuthenticatedUser()).thenReturn(user);
         when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), 1L))
                 .thenReturn(false);
-        when(corWorkspaceRepository.findById(10L))
+        when(corWorkspaceRepository.findByIdAtivo(10L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
@@ -208,7 +226,12 @@ class CadastrarWorkspaceUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(authService).getAuthenticatedUser();
+        verify(workspaceRepository).existsByNomeAndIdUsuario(request.nome(), 1L);
+        verify(corWorkspaceRepository).findByIdAtivo(10L);
+        verify(iconeWorkspaceRepository, never()).findByIdAtivo(anyLong());
         verify(workspaceRepository, never()).save(any());
+        verify(mapper, never()).toDomain(any(), any(), any(), anyLong());
     }
 
     @Test
@@ -224,7 +247,7 @@ class CadastrarWorkspaceUseCaseTest {
         when(authService.getAuthenticatedUser()).thenReturn(user);
         when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), 1L))
                 .thenReturn(false);
-        when(iconeWorkspaceRepository.findById(20L))
+        when(iconeWorkspaceRepository.findByIdAtivo(20L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
@@ -237,6 +260,11 @@ class CadastrarWorkspaceUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(authService).getAuthenticatedUser();
+        verify(workspaceRepository).existsByNomeAndIdUsuario(request.nome(), 1L);
+        verify(corWorkspaceRepository, never()).findByIdAtivo(anyLong());
+        verify(iconeWorkspaceRepository).findByIdAtivo(20L);
         verify(workspaceRepository, never()).save(any());
+        verify(mapper, never()).toDomain(any(), any(), any(), anyLong());
     }
 }

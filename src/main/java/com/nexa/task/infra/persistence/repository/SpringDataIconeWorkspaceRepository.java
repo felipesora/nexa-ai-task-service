@@ -12,4 +12,6 @@ public interface SpringDataIconeWorkspaceRepository extends JpaRepository<IconeW
     Optional<IconeWorkspaceEntity> findByNome(String nome);
 
     Optional<IconeWorkspaceEntity> findByCaminho(String caminho);
+
+    Optional<IconeWorkspaceEntity> findByIdAndAtivoTrue(Long id);
 }
