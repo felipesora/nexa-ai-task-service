@@ -13,10 +13,10 @@ public class TagControllerMapper {
         this.corTagMapper = corTagMapper;
     }
 
-    public Tag toDomain(TagCreateDTO request, CorTag corTag) {
+    public Tag toDomain(TagCreateDTO request, CorTag corTag, Long idUsuario) {
         return new Tag(
                 null,
-                request.idUsuario(),
+                idUsuario,
                 request.nome(),
                 true,
                 corTag

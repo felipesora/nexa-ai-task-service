@@ -6,6 +6,7 @@ import com.nexa.task.application.dto.tag.TagUpdateDTO;
 import com.nexa.task.application.usecase.tag.*;
 import com.nexa.task.presentation.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -25,7 +27,7 @@ import java.net.URI;
 @RestController
 @RequestMapping("/v1/tags")
 @SecurityRequirement(name = "bearerAuth")
-@Tag(name = "Tags", description = "Operações para gerenciamento das tags.")
+@Tag(name = "Tags", description = "Operacoes para gerenciamento das tags.")
 public class TagController {
 
     private final CadastrarTagUseCase cadastrarTagUseCase;
@@ -36,7 +38,13 @@ public class TagController {
     private final AtivarTagUseCase ativarTagUseCase;
     private final DesativarTagUseCase desativarTagUseCase;
 
-    public TagController(CadastrarTagUseCase cadastrarTagUseCase, ListarTodasTagsUseCase listarTodasTagsUseCase, ListarTagsPorIdUsuarioUseCase listarTagsPorIdUsuarioUseCase, BuscarTagPorIdUseCase buscarTagPorIdUseCase, AtualizarTagUseCase atualizarTagUseCase, AtivarTagUseCase ativarTagUseCase, DesativarTagUseCase desativarTagUseCase) {
+    public TagController(CadastrarTagUseCase cadastrarTagUseCase,
+                         ListarTodasTagsUseCase listarTodasTagsUseCase,
+                         ListarTagsPorIdUsuarioUseCase listarTagsPorIdUsuarioUseCase,
+                         BuscarTagPorIdUseCase buscarTagPorIdUseCase,
+                         AtualizarTagUseCase atualizarTagUseCase,
+                         AtivarTagUseCase ativarTagUseCase,
+                         DesativarTagUseCase desativarTagUseCase) {
         this.cadastrarTagUseCase = cadastrarTagUseCase;
         this.listarTodasTagsUseCase = listarTodasTagsUseCase;
         this.listarTagsPorIdUsuarioUseCase = listarTagsPorIdUsuarioUseCase;
@@ -46,25 +54,32 @@ public class TagController {
         this.desativarTagUseCase = desativarTagUseCase;
     }
 
-    @Operation(summary = "Cadastrar tag",
+    @Operation(
+            summary = "Cadastrar tag",
             description = """
-                Cria uma nova tag.
+                Cria uma nova tag para o usuario autenticado.
 
-                Requer autenticação JWT.
+                Regras de negocio:
+                - O nome da tag deve ter entre 3 e 100 caracteres.
+                - O nome da tag deve ser unico por usuario.
+                - A cor informada em `id_cor`, quando enviada, deve existir.
+
+                Requer autenticacao JWT.
                 """
     )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Tag cadastrada com sucesso",
                     content = @Content(schema = @Schema(implementation = TagResponseDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos",
+            @ApiResponse(responseCode = "400", description = "Dados invalidos ou nome de tag ja cadastrado para o usuario",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado",
+            @ApiResponse(responseCode = "401", description = "Usuario nao autenticado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
+            @ApiResponse(responseCode = "403", description = "Usuario sem permissao",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Cor não encontrada",
+            @ApiResponse(responseCode = "404", description = "Cor nao encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<TagResponseDTO> cadastrarTag(@RequestBody @Valid TagCreateDTO request,
                                                           UriComponentsBuilder uriBuilder) {
@@ -73,75 +88,86 @@ public class TagController {
         return ResponseEntity.created(endereco).body(response);
     }
 
-    @Operation(summary = "Listar tags",
+    @Operation(
+            summary = "Listar tags",
             description = """
                 Retorna uma lista paginada de tags.
 
-                Requer autenticação JWT.
-                Apenas usuários com ROLE_ADMIN podem acessar.
+                Regras de negocio:
+                - Endpoint restrito a usuarios com ROLE_ADMIN.
+
+                Requer autenticacao JWT.
                 """
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Tags retornadas com sucesso",
                     content = @Content(schema = @Schema(implementation = Page.class))),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado",
+            @ApiResponse(responseCode = "401", description = "Usuario nao autenticado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
+            @ApiResponse(responseCode = "403", description = "Usuario sem permissao",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<Page<TagResponseDTO>> listarTodasTags(@PageableDefault(size = 10) Pageable pageable) {
         Page<TagResponseDTO> tags = listarTodasTagsUseCase.execute(pageable);
         return ResponseEntity.ok(tags);
     }
 
-    @Operation(summary = "Buscar tag por ID",
+    @Operation(
+            summary = "Buscar tag por ID",
             description = """
                 Retorna os dados de uma tag.
 
-                Requer autenticação JWT.
-                O acesso é permitido para:
-                - Usuários com ROLE_ADMIN.
-                - O proprietário da tag solicitada.
+                Regras de negocio:
+                - A tag deve existir.
+                - O acesso e permitido para administradores ou para o proprietario da tag.
+
+                Requer autenticacao JWT.
                 """
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Tag encontrada com sucesso",
                     content = @Content(schema = @Schema(implementation = TagResponseDTO.class))),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado",
+            @ApiResponse(responseCode = "401", description = "Usuario nao autenticado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
+            @ApiResponse(responseCode = "403", description = "Usuario sem permissao",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Tag não encontrada",
+            @ApiResponse(responseCode = "404", description = "Tag nao encontrada",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
-    public ResponseEntity<TagResponseDTO> buscarTagPorId(@PathVariable Long id) {
+    public ResponseEntity<TagResponseDTO> buscarTagPorId(
+            @Parameter(description = "Identificador da tag") @PathVariable Long id) {
         TagResponseDTO tag = buscarTagPorIdUseCase.execute(id);
         return ResponseEntity.ok(tag);
     }
 
-    @Operation(summary = "Listar tags por ID do usuário",
+    @Operation(
+            summary = "Listar tags por usuario",
             description = """
-                Retorna uma lista paginada de tags de um usuário.
+                Retorna uma lista paginada das tags de um usuario.
 
-                Requer autenticação JWT.
-                O acesso é permitido para:
-                - Usuários com ROLE_ADMIN.
-                - O proprietário das tags solicitadas.
+                Regras de negocio:
+                - Apenas administradores ou o proprio usuario podem consultar a lista.
+
+                Requer autenticacao JWT.
                 """
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Tags retornadas com sucesso",
                     content = @Content(schema = @Schema(implementation = Page.class))),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado",
+            @ApiResponse(responseCode = "401", description = "Usuario nao autenticado",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "Usuário sem permissão",
+            @ApiResponse(responseCode = "403", description = "Usuario sem permissao",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/usuario/{idUsuario}")
-    public ResponseEntity<Page<TagResponseDTO>> listarTagsPorIdUsuario(@PathVariable Long idUsuario,
-                                                                                   @PageableDefault(size = 10) Pageable pageable) {
+    public ResponseEntity<Page<TagResponseDTO>> listarTagsPorIdUsuario(
+            @Parameter(description = "Identificador do usuario proprietario das tags") @PathVariable Long idUsuario,
+            @PageableDefault(size = 10) Pageable pageable) {
         Page<TagResponseDTO> tags = listarTagsPorIdUsuarioUseCase.execute(idUsuario, pageable);
         return ResponseEntity.ok(tags);
     }
@@ -149,21 +175,30 @@ public class TagController {
     @Operation(
             summary = "Atualizar tag",
             description = """
-            Atualiza os dados de uma tag.
+            Atualiza os dados editaveis de uma tag.
 
-            Apenas o dono da tag pode atualizar os dados,
-            exceto administradores.
+            Regras de negocio:
+            - A tag deve existir.
+            - Apenas o proprietario da tag ou usuarios com ROLE_ADMIN podem atualizar.
+            - O nome da tag deve ter entre 3 e 100 caracteres.
+            - O nome da tag deve continuar unico por usuario.
+            - A cor informada em `id_cor`, quando enviada, deve existir.
+
+            Requer autenticacao JWT.
             """
     )
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Tag atualizada com sucesso", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Tag ou cor não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "400", description = "Dados invalidos ou nome de tag ja cadastrado para o usuario", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Usuario nao autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuario sem permissao", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Tag ou cor nao encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
-    public ResponseEntity<Void> atualizarTag(@PathVariable Long id, @RequestBody @Valid TagUpdateDTO dto) {
+    public ResponseEntity<Void> atualizarTag(
+            @Parameter(description = "Identificador da tag") @PathVariable Long id,
+            @RequestBody @Valid TagUpdateDTO dto) {
         atualizarTagUseCase.execute(id, dto);
         return ResponseEntity.noContent().build();
     }
@@ -171,20 +206,26 @@ public class TagController {
     @Operation(
             summary = "Desativar tag",
             description = """
-            Realiza a desativação lógica de uma tag.
+            Realiza a desativacao logica de uma tag.
 
-            Apenas o dono da tag pode desativá-la,
-            exceto administradores.
+            Regras de negocio:
+            - A tag deve existir.
+            - Apenas o proprietario da tag ou usuarios com ROLE_ADMIN podem desativar.
+            - A operacao realiza exclusao logica; a tag nao e removida fisicamente.
+
+            Requer autenticacao JWT.
             """
     )
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Tag desativada com sucesso", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Tag não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "401", description = "Usuario nao autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuario sem permissao", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Tag nao encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> desativarTag(@PathVariable Long id) {
+    public ResponseEntity<Void> desativarTag(
+            @Parameter(description = "Identificador da tag") @PathVariable Long id) {
         desativarTagUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }
@@ -194,17 +235,24 @@ public class TagController {
             description = """
             Reativa uma tag previamente desativada.
 
-            Apenas administradores podem executar esta operação.
+            Regras de negocio:
+            - A tag deve existir.
+            - Apenas usuarios com ROLE_ADMIN podem executar esta operacao.
+            - A operacao remove a marcacao de desativacao logica da tag.
+
+            Requer autenticacao JWT.
             """
     )
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Tag ativada com sucesso", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "Usuário sem permissão", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Tag não encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "401", description = "Usuario nao autenticado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuario sem permissao", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Tag nao encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/ativar/{id}")
-    public ResponseEntity<Void> ativarTag(@PathVariable Long id) {
+    public ResponseEntity<Void> ativarTag(
+            @Parameter(description = "Identificador da tag") @PathVariable Long id) {
         ativarTagUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }

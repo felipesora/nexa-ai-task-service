@@ -66,7 +66,6 @@ class TagControllerTest {
     void setUp() {
 
         request = new TagCreateDTO(
-                1L,
                 "Urgente",
                 10L
         );
@@ -134,7 +133,6 @@ class TagControllerTest {
     void deveRetornar400QuandoRequestForInvalido() throws Exception {
 
         TagCreateDTO requestInvalido = new TagCreateDTO(
-                null,
                 "",
                 10L
         );

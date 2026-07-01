@@ -5,6 +5,7 @@ import com.nexa.task.application.mapper.TagControllerMapper;
 import com.nexa.task.domain.builder.tag.TagBuilder;
 import com.nexa.task.domain.entity.tag.Tag;
 import com.nexa.task.domain.repository.TagRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,8 +20,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ListarTagsPorIdUsuarioUseCaseTest {
@@ -30,6 +31,9 @@ class ListarTagsPorIdUsuarioUseCaseTest {
 
     @Mock
     private TagControllerMapper mapper;
+
+    @Mock
+    private AuthenticationService authService;
 
     @InjectMocks
     private ListarTagsPorIdUsuarioUseCase useCase;
@@ -74,6 +78,8 @@ class ListarTagsPorIdUsuarioUseCaseTest {
                 null
         );
 
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
+
         when(tagRepository.findByIdUsuario(idUsuario, pageable))
                 .thenReturn(pageEntity);
 
@@ -91,6 +97,7 @@ class ListarTagsPorIdUsuarioUseCaseTest {
         assertEquals("Urgente", resultado.getContent().get(0).nome());
         assertEquals("Estudo", resultado.getContent().get(1).nome());
 
+        verify(authService).validateOwnerOrAdmin(idUsuario);
         verify(tagRepository).findByIdUsuario(idUsuario, pageable);
         verify(mapper).toResponse(tag1);
         verify(mapper).toResponse(tag2);

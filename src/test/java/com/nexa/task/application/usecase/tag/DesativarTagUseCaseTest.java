@@ -4,6 +4,7 @@ import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.domain.builder.tag.TagBuilder;
 import com.nexa.task.domain.entity.tag.Tag;
 import com.nexa.task.domain.repository.TagRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,16 +16,18 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DesativarTagUseCaseTest {
 
     @Mock
     private TagRepository tagRepository;
+
+    @Mock
+    private AuthenticationService authService;
 
     @InjectMocks
     private DesativarTagUseCase useCase;
@@ -34,6 +37,7 @@ class DesativarTagUseCaseTest {
 
         Tag tag = new TagBuilder()
                 .comId(1L)
+                .comIdUsuario(1L)
                 .comNome("Tag Teste")
                 .comAtivo(true)
                 .build();
@@ -41,11 +45,14 @@ class DesativarTagUseCaseTest {
         when(tagRepository.findById(1L))
                 .thenReturn(Optional.of(tag));
 
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
+
         useCase.execute(1L);
 
         assertFalse(tag.getAtivo());
 
         verify(tagRepository).findById(1L);
+        verify(authService).validateOwnerOrAdmin(1L);
         verify(tagRepository).save(tag);
     }
 
@@ -56,8 +63,10 @@ class DesativarTagUseCaseTest {
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
-                assertThrows(EntityNotFoundException.class,
-                        () -> useCase.execute(999L));
+                assertThrows(
+                        EntityNotFoundException.class,
+                        () -> useCase.execute(999L)
+                );
 
         assertEquals(
                 "Tag com id: 999 não encontrada.",
@@ -65,6 +74,7 @@ class DesativarTagUseCaseTest {
         );
 
         verify(tagRepository).findById(999L);
+        verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verify(tagRepository, never()).save(any());
     }
 }
