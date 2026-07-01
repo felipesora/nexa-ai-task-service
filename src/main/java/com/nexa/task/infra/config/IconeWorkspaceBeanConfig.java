@@ -3,6 +3,7 @@ package com.nexa.task.infra.config;
 import com.nexa.task.application.mapper.IconeWorkspaceControllerMapper;
 import com.nexa.task.application.usecase.iconeWorkspace.*;
 import com.nexa.task.domain.repository.IconeWorkspaceRepository;
+import com.nexa.task.domain.repository.WorkspaceRepository;
 import com.nexa.task.infra.persistence.adapter.JpaIconeWorkspaceRepository;
 import com.nexa.task.infra.persistence.mapper.IconeWorkspacePersistenceMapper;
 import com.nexa.task.infra.persistence.repository.SpringDataIconeWorkspaceRepository;
@@ -28,8 +29,8 @@ public class IconeWorkspaceBeanConfig {
     }
 
     @Bean
-    DesativarIconeWorkspaceUseCase DesativarIconeWorkspaceUseCase(IconeWorkspaceRepository repository) {
-        return new DesativarIconeWorkspaceUseCase(repository);
+    DesativarIconeWorkspaceUseCase DesativarIconeWorkspaceUseCase(IconeWorkspaceRepository repository, WorkspaceRepository workspaceRepository) {
+        return new DesativarIconeWorkspaceUseCase(repository, workspaceRepository);
     }
 
     @Bean

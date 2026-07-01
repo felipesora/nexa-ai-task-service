@@ -4,6 +4,7 @@ import com.nexa.task.domain.entity.workspace.Workspace;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface WorkspaceRepository {
@@ -16,9 +17,17 @@ public interface WorkspaceRepository {
 
     Page<Workspace> findByIdUsuarioAndNome(Long idUsuario, String nome, Pageable pageable);
 
+    List<Workspace> findAllByIdIconeWorkspace(Long idIconeWorkspace);
+
+    List<Workspace> findAllByIdCorWorkspace(Long idCorWorkspace);
+
     Optional<Workspace> findById(Long id);
 
     boolean existsByNomeAndIdUsuario(String nome, Long idUsuario);
 
     boolean existsByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id);
+
+    void removerIconeDosWorkspaces(Long idIcone);
+
+    void removerCorDosWorkspaces(Long idCor);
 }

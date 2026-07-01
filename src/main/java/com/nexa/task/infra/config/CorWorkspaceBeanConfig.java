@@ -3,6 +3,7 @@ package com.nexa.task.infra.config;
 import com.nexa.task.application.mapper.CorWorkspaceControllerMapper;
 import com.nexa.task.application.usecase.corWorkspace.*;
 import com.nexa.task.domain.repository.CorWorkspaceRepository;
+import com.nexa.task.domain.repository.WorkspaceRepository;
 import com.nexa.task.infra.persistence.adapter.JpaCorWorkspaceRepository;
 import com.nexa.task.infra.persistence.mapper.CorWorkspacePersistenceMapper;
 import com.nexa.task.infra.persistence.repository.SpringDataCorWorkspaceRepository;
@@ -28,8 +29,8 @@ public class CorWorkspaceBeanConfig {
     }
 
     @Bean
-    DesativarCorWorkspaceUseCase desativarCorWorkspaceUseCase(CorWorkspaceRepository repository) {
-        return new DesativarCorWorkspaceUseCase(repository);
+    DesativarCorWorkspaceUseCase desativarCorWorkspaceUseCase(CorWorkspaceRepository repository, WorkspaceRepository workspaceRepository) {
+        return new DesativarCorWorkspaceUseCase(repository, workspaceRepository);
     }
 
     @Bean
