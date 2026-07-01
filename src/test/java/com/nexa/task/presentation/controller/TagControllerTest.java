@@ -7,13 +7,17 @@ import com.nexa.task.application.dto.tag.TagResponseDTO;
 import com.nexa.task.application.dto.tag.TagUpdateDTO;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.usecase.tag.*;
+import com.nexa.task.infra.security.JwtAuthenticationFilter;
+import com.nexa.task.infra.security.TokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,6 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TagController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class TagControllerTest {
 
     @Autowired
@@ -57,6 +62,12 @@ class TagControllerTest {
 
     @MockitoBean
     private DesativarTagUseCase desativarTagUseCase;
+
+    @MockitoBean
+    private TokenProvider tokenProvider;
+
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     private TagCreateDTO request;
     private TagUpdateDTO updateDto;
@@ -91,6 +102,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveCadastrarTagComSucesso() throws Exception {
 
         when(cadastrarTagUseCase.execute(request))
@@ -113,6 +125,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoCorNaoForEncontradaAoCadastrar() throws Exception {
 
         when(cadastrarTagUseCase.execute(request))
@@ -130,6 +143,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoRequestForInvalido() throws Exception {
 
         TagCreateDTO requestInvalido = new TagCreateDTO(
@@ -147,6 +161,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveListarTodasAsTags() throws Exception {
 
         Page<TagResponseDTO> page =
@@ -168,6 +183,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveBuscarTagPorIdComSucesso() throws Exception {
 
         when(buscarTagPorIdUseCase.execute(1L))
@@ -185,6 +201,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoTagNaoForEncontrada() throws Exception {
 
         when(buscarTagPorIdUseCase.execute(999L))
@@ -200,6 +217,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveListarTagsPorIdUsuario() throws Exception {
 
         Page<TagResponseDTO> page =
@@ -222,6 +240,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveAtualizarTagComSucesso() throws Exception {
 
         doNothing().when(atualizarTagUseCase)
@@ -236,6 +255,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoTagNaoForEncontradaAoAtualizar() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -256,6 +276,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoCorNaoForEncontradaAoAtualizar() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -276,6 +297,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoRequestDeAtualizacaoForInvalido() throws Exception {
 
         TagUpdateDTO dtoInvalido = new TagUpdateDTO(
@@ -295,6 +317,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveDesativarTagComSucesso() throws Exception {
 
         doNothing().when(desativarTagUseCase)
@@ -305,6 +328,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoTagNaoForEncontradaAoDesativar() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -321,6 +345,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveAtivarTagComSucesso() throws Exception {
 
         doNothing().when(ativarTagUseCase)
@@ -331,6 +356,7 @@ class TagControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoTagNaoForEncontradaAoAtivar() throws Exception {
 
         doThrow(new EntityNotFoundException(

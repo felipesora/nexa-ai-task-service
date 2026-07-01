@@ -8,13 +8,17 @@ import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.usecase.iconeWorkspace.*;
 import com.nexa.task.domain.builder.workspace.IconeWorkspaceBuilder;
 import com.nexa.task.domain.entity.workspace.IconeWorkspace;
+import com.nexa.task.infra.security.JwtAuthenticationFilter;
+import com.nexa.task.infra.security.TokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -28,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(IconeWorkspaceController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class IconeWorkspaceControllerTest {
 
     @Autowired
@@ -47,6 +52,12 @@ class IconeWorkspaceControllerTest {
 
     @MockitoBean
     private AtivarIconeWorkspaceUseCase ativarIconeWorkspaceUseCase;
+
+    @MockitoBean
+    private TokenProvider tokenProvider;
+
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -79,6 +90,7 @@ class IconeWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveCadastrarIconeComSucesso() throws Exception {
 
         when(cadastrarIconeWorkspaceUseCase.execute(request)).thenReturn(response);
@@ -96,6 +108,7 @@ class IconeWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoNomeJaExistir() throws Exception {
 
         when(cadastrarIconeWorkspaceUseCase.execute(request))
@@ -111,6 +124,7 @@ class IconeWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoCaminhoJaExistir() throws Exception {
 
         when(cadastrarIconeWorkspaceUseCase.execute(request))
@@ -126,6 +140,7 @@ class IconeWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoNomeForInvalido() throws Exception {
 
         IconeWorkspaceRequestDTO requestInvalido =
@@ -140,6 +155,7 @@ class IconeWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveListarTodosOsIcones() throws Exception {
 
         Page<IconeWorkspaceResponseDTO> page = new PageImpl<>(List.of(response));
@@ -156,6 +172,7 @@ class IconeWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveBuscarIconePorIdComSucesso() throws Exception {
 
         when(buscarIconeWorkspacePorIdUserCase.execute(1L))
@@ -170,6 +187,7 @@ class IconeWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoIconeNaoForEncontrado() throws Exception {
 
         when(buscarIconeWorkspacePorIdUserCase.execute(999L))
@@ -183,6 +201,7 @@ class IconeWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveDesativarIconeComSucesso() throws Exception {
 
         doNothing().when(desativarIconeWorkspaceUseCase)
@@ -193,6 +212,7 @@ class IconeWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404AoDesativarIconeNaoEncontrado() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -208,6 +228,7 @@ class IconeWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveAtivarIconeComSucesso() throws Exception {
 
         doNothing().when(ativarIconeWorkspaceUseCase)
@@ -218,6 +239,7 @@ class IconeWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404AoAtivarIconeNaoEncontrado() throws Exception {
 
         doThrow(new EntityNotFoundException(

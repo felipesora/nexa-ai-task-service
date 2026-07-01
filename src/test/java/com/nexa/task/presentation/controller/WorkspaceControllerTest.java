@@ -12,13 +12,17 @@ import com.nexa.task.application.usecase.workspace.*;
 import com.nexa.task.domain.entity.tarefa.DificuldadeTarefa;
 import com.nexa.task.domain.entity.tarefa.PrioridadeTarefa;
 import com.nexa.task.domain.entity.tarefa.StatusTarefa;
+import com.nexa.task.infra.security.JwtAuthenticationFilter;
+import com.nexa.task.infra.security.TokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -33,6 +37,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(WorkspaceController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class WorkspaceControllerTest {
 
     @Autowired
@@ -65,6 +70,12 @@ class WorkspaceControllerTest {
     @MockitoBean
     private AtivarWorkspaceUseCase ativarWorkspaceUseCase;
 
+    @MockitoBean
+    private TokenProvider tokenProvider;
+
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -77,7 +88,6 @@ class WorkspaceControllerTest {
     void setUp() {
 
         request = new WorkspaceRequestDTO(
-                1L,
                 "Meu Workspace",
                 "Descrição",
                 1L,
@@ -121,6 +131,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveCadastrarWorkspaceComSucesso() throws Exception {
 
         when(cadastrarWorkspaceUseCase.execute(request))
@@ -138,6 +149,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoNomeJaExistir() throws Exception {
 
         when(cadastrarWorkspaceUseCase.execute(request))
@@ -155,6 +167,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoCorNaoForEncontrada() throws Exception {
 
         when(cadastrarWorkspaceUseCase.execute(request))
@@ -172,6 +185,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoIconeNaoForEncontrado() throws Exception {
 
         when(cadastrarWorkspaceUseCase.execute(request))
@@ -189,6 +203,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveListarTodosOsWorkspaces() throws Exception {
 
         Page<WorkspaceResponseDTO> page =
@@ -208,6 +223,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveBuscarWorkspacePorIdComSucesso() throws Exception {
 
         when(buscarWorkspacePorIdUseCase.execute(1L))
@@ -223,6 +239,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoWorkspaceNaoForEncontrado() throws Exception {
 
         when(buscarWorkspacePorIdUseCase.execute(999L))
@@ -238,6 +255,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveListarWorkspacesPorIdUsuario() throws Exception {
 
         Page<WorkspaceResponseDTO> page =
@@ -258,6 +276,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveListarWorkspacesPorIdUsuarioENome() throws Exception {
 
         Page<WorkspaceResponseDTO> page =
@@ -281,6 +300,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveListarTarefasPeloWorkspace() throws Exception {
 
         Page<TarefaResponseDTO> page =
@@ -311,6 +331,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoWorkspaceNaoForEncontradoAoListarTarefas()
             throws Exception {
 
@@ -330,6 +351,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveAtualizarWorkspaceComSucesso() throws Exception {
 
         doNothing().when(atualizarWorkspaceUseCase)
@@ -344,6 +366,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoWorkspaceNaoForEncontradoAoAtualizar() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -364,6 +387,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoCorNaoForEncontradaAoAtualizar() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -384,6 +408,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoIconeNaoForEncontradoAoAtualizar() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -404,6 +429,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoNomeJaExistirAoAtualizar() throws Exception {
 
         doThrow(new BadRequestException(
@@ -424,6 +450,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveDesativarWorkspaceComSucesso() throws Exception {
 
         doNothing().when(desativarWorkspaceUseCase)
@@ -434,6 +461,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoWorkspaceNaoForEncontradoAoDesativar() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -450,6 +478,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveAtivarWorkspaceComSucesso() throws Exception {
 
         doNothing().when(ativarWorkspaceUseCase)
@@ -460,6 +489,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoWorkspaceNaoForEncontradoAoAtivar() throws Exception {
 
         doThrow(new EntityNotFoundException(

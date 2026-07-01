@@ -14,13 +14,17 @@ import com.nexa.task.application.usecase.tarefa.*;
 import com.nexa.task.domain.entity.tarefa.DificuldadeTarefa;
 import com.nexa.task.domain.entity.tarefa.PrioridadeTarefa;
 import com.nexa.task.domain.entity.tarefa.StatusTarefa;
+import com.nexa.task.infra.security.JwtAuthenticationFilter;
+import com.nexa.task.infra.security.TokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -37,6 +41,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TarefaController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class TarefaControllerTest {
 
     @Autowired
@@ -86,6 +91,12 @@ class TarefaControllerTest {
 
     @MockitoBean
     private RemoverTagDaTarefaUseCase removerTagDaTarefaUseCase;
+
+    @MockitoBean
+    private TokenProvider tokenProvider;
+
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -155,6 +166,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveCadastrarTarefaComSucesso() throws Exception {
 
         when(cadastrarTarefaUseCase.execute(request))
@@ -179,6 +191,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoWorkspaceNaoForEncontrado() throws Exception {
 
         when(cadastrarTarefaUseCase.execute(request))
@@ -196,6 +209,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoRequestForInvalido() throws Exception {
 
         TarefaCreateDTO requestInvalido = new TarefaCreateDTO(
@@ -217,6 +231,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveListarTodasAsTarefas() throws Exception {
 
         Page<TarefaResponseDTO> page =
@@ -240,6 +255,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveBuscarTarefaPorIdComSucesso() throws Exception {
 
         when(buscarTarefaPorIdUseCase.execute(1L))
@@ -259,6 +275,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoTarefaNaoForEncontrada() throws Exception {
 
         when(buscarTarefaPorIdUseCase.execute(999L))
@@ -276,6 +293,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveListarTarefasPorIdUsuario() throws Exception {
 
         Page<TarefaResponseDTO> page =
@@ -300,6 +318,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveListarTarefasPorIdUsuarioENome() throws Exception {
 
         Page<TarefaResponseDTO> page =
@@ -327,6 +346,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveListarSubtarefasPelaTarefa() throws Exception {
 
         Page<SubtarefaResponseDTO> page =
@@ -351,6 +371,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoTarefaNaoForEncontradaAoListarSubtarefas()
             throws Exception {
 
@@ -370,6 +391,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveListarTagsPelaTarefa() throws Exception {
 
         Page<TagResponseDTO> page =
@@ -394,6 +416,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoTarefaNaoForEncontradaAoListarTags()
             throws Exception {
 
@@ -414,6 +437,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveAtualizarTarefaComSucesso() throws Exception {
 
         doNothing().when(atualizarTarefaUseCase)
@@ -428,6 +452,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoTarefaNaoForEncontradaAoAtualizar() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -448,6 +473,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoRequestDeAtualizacaoForInvalido() throws Exception {
 
         TarefaUpdateDTO dtoInvalido = new TarefaUpdateDTO(
@@ -470,6 +496,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveConcluirTarefaComSucesso() throws Exception {
 
         doNothing().when(concluirTarefaUseCase)
@@ -482,6 +509,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoTarefaNaoForEncontradaAoConcluir() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -500,6 +528,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoTarefaJaEstiverConcluida() throws Exception {
 
         doThrow(new BadRequestException(
@@ -518,6 +547,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveIniciarTarefaComSucesso() throws Exception {
 
         doNothing().when(iniciarTarefaUseCase)
@@ -530,6 +560,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoTarefaNaoForEncontradaAoIniciar() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -548,6 +579,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoTarefaJaEstiverEmAndamento() throws Exception {
 
         doThrow(new BadRequestException(
@@ -566,6 +598,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoTarefaEstiverConcluidaAoIniciar() throws Exception {
 
         doThrow(new BadRequestException(
@@ -584,6 +617,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveReabrirTarefaComSucesso() throws Exception {
 
         doNothing().when(reabrirTarefaUseCase)
@@ -596,6 +630,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoTarefaNaoForEncontradaAoReabrir() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -614,6 +649,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoTarefaNaoPuderSerReaberta() throws Exception {
 
         doThrow(new BadRequestException(
@@ -632,6 +668,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveDesativarTarefaComSucesso() throws Exception {
 
         doNothing().when(desativarTarefaUseCase)
@@ -642,6 +679,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoTarefaNaoForEncontradaAoDesativar() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -658,6 +696,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveAtivarTarefaComSucesso() throws Exception {
 
         doNothing().when(ativarTarefaUseCase)
@@ -668,6 +707,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoTarefaNaoForEncontradaAoAtivar() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -684,6 +724,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveAdicionarTagNaTarefaComSucesso() throws Exception {
 
         doNothing()
@@ -695,6 +736,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoAdicionarTagETarefaNaoForEncontrada()
             throws Exception {
 
@@ -712,6 +754,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoTagJaEstiverVinculada()
             throws Exception {
 
@@ -729,6 +772,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoRemoverTagETarefaNaoForEncontrada()
             throws Exception {
 
@@ -746,6 +790,7 @@ class TarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoTagNaoEstiverVinculada()
             throws Exception {
 

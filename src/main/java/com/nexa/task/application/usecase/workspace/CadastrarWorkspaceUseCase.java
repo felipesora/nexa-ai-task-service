@@ -34,9 +34,9 @@ public class CadastrarWorkspaceUseCase {
     @Transactional
     public WorkspaceResponseDTO execute(WorkspaceRequestDTO request) {
 
-        authService.validateOwnerOrAdmin(request.idUsuario());
+        AuthenticatedUser user = authService.getAuthenticatedUser();
 
-        validarNomeUnicoDeWorkspace(request);
+        validarNomeUnicoDeWorkspace(request.nome(), user.id());
 
         CorWorkspace corWorkspace = null;
         IconeWorkspace iconeWorkspace = null;
@@ -51,12 +51,14 @@ public class CadastrarWorkspaceUseCase {
                     .orElseThrow(() -> new EntityNotFoundException("Ícone com id: " + request.idIcone() + " não encontrado"));
         }
 
-        Workspace salvo = workspaceRepository.save(mapper.toDomain(request, corWorkspace, iconeWorkspace));
+        Workspace workspace = mapper.toDomain(request, corWorkspace, iconeWorkspace, user.id());
+
+        Workspace salvo = workspaceRepository.save(workspace);
         return mapper.toResponse(salvo);
     }
 
-    private void validarNomeUnicoDeWorkspace(WorkspaceRequestDTO request) {
-        if (workspaceRepository.existsByNomeAndIdUsuario(request.nome(), request.idUsuario())) {
+    private void validarNomeUnicoDeWorkspace(String nome, Long idUsuario) {
+        if (workspaceRepository.existsByNomeAndIdUsuario(nome, idUsuario)) {
             throw new BadRequestException("Já existe um workspace com esse nome para este usuário");
         }
     }

@@ -14,8 +14,8 @@ import com.nexa.task.domain.entity.workspace.Workspace;
 import com.nexa.task.domain.repository.CorWorkspaceRepository;
 import com.nexa.task.domain.repository.IconeWorkspaceRepository;
 import com.nexa.task.domain.repository.WorkspaceRepository;
+import com.nexa.task.infra.security.AuthenticatedUser;
 import com.nexa.task.infra.security.AuthenticationService;
-import com.nexa.task.infra.security.ForbiddenException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,15 +49,22 @@ class CadastrarWorkspaceUseCaseTest {
     @InjectMocks
     private CadastrarWorkspaceUseCase useCase;
 
+    private final AuthenticatedUser user =
+            new AuthenticatedUser(
+                    1L,
+                    "admin@email.com",
+                    "ADMIN"
+            );
+
     @Test
     void deveCadastrarWorkspaceComSucessoSemCorEIcone() {
-        // Arrange
+
         WorkspaceRequestDTO request = new WorkspaceRequestDTO(
-                1L,
                 "Nome Workspace",
                 "Descrição Workspace",
                 null,
-                null);
+                null
+        );
 
         Workspace workspace = new WorkspaceBuilder()
                 .comId(1L)
@@ -80,24 +88,25 @@ class CadastrarWorkspaceUseCaseTest {
                 null
         );
 
-        doNothing().when(authService).validateOwnerOrAdmin(request.idUsuario());
-        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), request.idUsuario())).thenReturn(false);
-        when(mapper.toDomain(request, null, null)).thenReturn(workspace);
+        when(authService.getAuthenticatedUser()).thenReturn(user);
+        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), 1L)).thenReturn(false);
+        when(mapper.toDomain(request, null, null, 1L)).thenReturn(workspace);
         when(workspaceRepository.save(workspace)).thenReturn(workspace);
         when(mapper.toResponse(workspace)).thenReturn(response);
 
-        // Act
         WorkspaceResponseDTO resultado = useCase.execute(request);
 
-        // Assert
         assertNotNull(resultado);
         assertEquals(response, resultado);
+
+        verify(authService).getAuthenticatedUser();
+        verify(mapper).toDomain(request, null, null, 1L);
     }
 
     @Test
     void deveCadastrarWorkspaceComSucessoComCorEIcone() {
+
         WorkspaceRequestDTO request = new WorkspaceRequestDTO(
-                1L,
                 "Workspace",
                 "Descrição",
                 1L,
@@ -127,103 +136,107 @@ class CadastrarWorkspaceUseCaseTest {
                 null
         );
 
-        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), request.idUsuario())).thenReturn(false);
-
+        when(authService.getAuthenticatedUser()).thenReturn(user);
+        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), 1L)).thenReturn(false);
         when(corWorkspaceRepository.findById(1L)).thenReturn(Optional.of(cor));
-
         when(iconeWorkspaceRepository.findById(1L)).thenReturn(Optional.of(icone));
-
-        when(mapper.toDomain(request, cor, icone)).thenReturn(workspace);
-
+        when(mapper.toDomain(request, cor, icone, 1L)).thenReturn(workspace);
         when(workspaceRepository.save(workspace)).thenReturn(workspace);
-
         when(mapper.toResponse(workspace)).thenReturn(response);
 
         WorkspaceResponseDTO resultado = useCase.execute(request);
 
         assertNotNull(resultado);
         assertEquals(response, resultado);
+
+        verify(authService).getAuthenticatedUser();
+        verify(mapper).toDomain(request, cor, icone, 1L);
     }
 
     @Test
     void deveLancarExcecaoQuandoNomeDoWorkspaceJaEstaCadastradoParaEsseUsuario() {
+
         WorkspaceRequestDTO request = new WorkspaceRequestDTO(
-                1L,
                 "Workspace",
                 "Descrição",
                 null,
                 null
         );
 
-        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), request.idUsuario()))
+        when(authService.getAuthenticatedUser()).thenReturn(user);
+        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), 1L))
                 .thenReturn(true);
 
-        BadRequestException exception = assertThrows(BadRequestException.class,
-                () -> useCase.execute(request));
+        BadRequestException exception = assertThrows(
+                BadRequestException.class,
+                () -> useCase.execute(request)
+        );
 
-        assertEquals("Já existe um workspace com esse nome para este usuário", exception.getMessage());
+        assertEquals(
+                "Já existe um workspace com esse nome para este usuário",
+                exception.getMessage()
+        );
+
+        verify(corWorkspaceRepository, never()).findById(anyLong());
+        verify(workspaceRepository, never()).save(any());
+        verify(mapper, never()).toDomain(any(), any(), any(), anyLong());
     }
 
     @Test
     void deveLancarExcecaoQuandoCorNaoForEncontrada() {
+
         WorkspaceRequestDTO request = new WorkspaceRequestDTO(
-                1L,
                 "Workspace",
                 "Descrição",
                 10L,
                 null
         );
 
-        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), request.idUsuario()))
+        when(authService.getAuthenticatedUser()).thenReturn(user);
+        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), 1L))
                 .thenReturn(false);
+        when(corWorkspaceRepository.findById(10L))
+                .thenReturn(Optional.empty());
 
-        when(corWorkspaceRepository.findById(10L)).thenReturn(Optional.empty());
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> useCase.execute(request)
+        );
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> useCase.execute(request));
+        assertEquals(
+                "Cor com id: 10 não encontrada",
+                exception.getMessage()
+        );
 
-        assertEquals("Cor com id: 10 não encontrada", exception.getMessage());
+        verify(workspaceRepository, never()).save(any());
     }
 
     @Test
     void deveLancarExcecaoQuandoIconeNaoForEncontrado() {
+
         WorkspaceRequestDTO request = new WorkspaceRequestDTO(
-                1L,
                 "Workspace",
                 "Descrição",
                 null,
                 20L
         );
 
-        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), request.idUsuario())).thenReturn(false);
+        when(authService.getAuthenticatedUser()).thenReturn(user);
+        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), 1L))
+                .thenReturn(false);
+        when(iconeWorkspaceRepository.findById(20L))
+                .thenReturn(Optional.empty());
 
-        when(iconeWorkspaceRepository.findById(20L)).thenReturn(Optional.empty());
-
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> useCase.execute(request));
-
-        assertEquals("Ícone com id: 20 não encontrado", exception.getMessage());
-    }
-
-    @Test
-    void deveLancarExcecaoQuandoUsuarioNaoTemPermissao() {
-        WorkspaceRequestDTO request = new WorkspaceRequestDTO(
-                1L,
-                "Workspace",
-                "Descrição",
-                null,
-                null
-        );
-
-        doThrow(new ForbiddenException("Acesso negado"))
-                .when(authService)
-                .validateOwnerOrAdmin(request.idUsuario());
-
-        ForbiddenException exception = assertThrows(
-                ForbiddenException.class,
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
                 () -> useCase.execute(request)
         );
 
-        assertEquals("Acesso negado", exception.getMessage());
+        assertEquals(
+                "Ícone com id: 20 não encontrado",
+                exception.getMessage()
+        );
+
+        verify(workspaceRepository, never()).save(any());
     }
 }
