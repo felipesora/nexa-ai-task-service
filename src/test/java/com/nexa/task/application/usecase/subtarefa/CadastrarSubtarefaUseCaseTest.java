@@ -10,6 +10,7 @@ import com.nexa.task.domain.entity.subtarefa.Subtarefa;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.repository.SubtarefaRepository;
 import com.nexa.task.domain.repository.TarefaRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,6 +36,9 @@ class CadastrarSubtarefaUseCaseTest {
     @Mock
     private SubtarefaControllerMapper mapper;
 
+    @Mock
+    private AuthenticationService authService;
+
     @InjectMocks
     private CadastrarSubtarefaUseCase useCase;
 
@@ -47,15 +52,18 @@ class CadastrarSubtarefaUseCaseTest {
 
         Tarefa tarefa = new TarefaBuilder()
                 .comId(1L)
+                .comIdUsuario(10L)
                 .comTitulo("Minha tarefa")
                 .build();
 
         Subtarefa subtarefa = new SubtarefaBuilder()
                 .comId(1L)
+                .comIdUsuario(10L)
                 .comTitulo("Minha subtarefa")
                 .build();
 
         SubtarefaResponseDTO response = new SubtarefaResponseDTO(
+                1L,
                 1L,
                 "Minha subtarefa",
                 false,
@@ -68,7 +76,9 @@ class CadastrarSubtarefaUseCaseTest {
         when(tarefaRepository.findById(1L))
                 .thenReturn(Optional.of(tarefa));
 
-        when(mapper.toDomain(request, tarefa))
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
+
+        when(mapper.toDomain(request, tarefa, 10L))
                 .thenReturn(subtarefa);
 
         when(subtarefaRepository.save(subtarefa))
@@ -87,7 +97,8 @@ class CadastrarSubtarefaUseCaseTest {
         assertEquals(1L, resultado.idTarefa());
 
         verify(tarefaRepository).findById(1L);
-        verify(mapper).toDomain(request, tarefa);
+        verify(authService).validateOwnerOrAdmin(10L);
+        verify(mapper).toDomain(request, tarefa, 10L);
         verify(subtarefaRepository).save(subtarefa);
         verify(mapper).toResponse(subtarefa);
     }
@@ -115,6 +126,7 @@ class CadastrarSubtarefaUseCaseTest {
         );
 
         verify(tarefaRepository).findById(999L);
+        verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verifyNoInteractions(subtarefaRepository);
         verifyNoInteractions(mapper);
     }

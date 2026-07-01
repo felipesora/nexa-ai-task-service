@@ -17,8 +17,8 @@ public class SubtarefaBeanConfig {
 
     @Bean
     CadastrarSubtarefaUseCase cadastrarSubtarefaUseCase(SubtarefaRepository subtarefaRepository, TarefaRepository tarefaRepository,
-                                                        SubtarefaControllerMapper mapper) {
-        return new CadastrarSubtarefaUseCase(subtarefaRepository, tarefaRepository, mapper);
+                                                        SubtarefaControllerMapper mapper, AuthenticationService authService) {
+        return new CadastrarSubtarefaUseCase(subtarefaRepository, tarefaRepository, mapper, authService);
     }
 
     @Bean
@@ -35,18 +35,19 @@ public class SubtarefaBeanConfig {
     }
 
     @Bean
-    BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase(SubtarefaRepository subtarefaRepository, SubtarefaControllerMapper mapper) {
-        return new BuscarSubtarefaPorIdUseCase(subtarefaRepository, mapper);
+    BuscarSubtarefaPorIdUseCase buscarSubtarefaPorIdUseCase(SubtarefaRepository subtarefaRepository, SubtarefaControllerMapper mapper,
+                                                            AuthenticationService authService) {
+        return new BuscarSubtarefaPorIdUseCase(subtarefaRepository, mapper, authService);
     }
 
     @Bean
-    AtualizarSubtarefaUseCase atualizarSubtarefaUseCase(SubtarefaRepository subtarefaRepository) {
-        return new AtualizarSubtarefaUseCase(subtarefaRepository);
+    AtualizarSubtarefaUseCase atualizarSubtarefaUseCase(SubtarefaRepository subtarefaRepository, AuthenticationService authService) {
+        return new AtualizarSubtarefaUseCase(subtarefaRepository, authService);
     }
 
     @Bean
-    DesativarSubtarefaUseCase desativarSubtarefaUseCase(SubtarefaRepository subtarefaRepository) {
-        return new DesativarSubtarefaUseCase(subtarefaRepository);
+    DesativarSubtarefaUseCase desativarSubtarefaUseCase(SubtarefaRepository subtarefaRepository, AuthenticationService authService) {
+        return new DesativarSubtarefaUseCase(subtarefaRepository, authService);
     }
 
     @Bean
@@ -55,13 +56,13 @@ public class SubtarefaBeanConfig {
     }
 
     @Bean
-    ConcluirSubtarefaUseCase concluirSubtarefaUseCase(SubtarefaRepository subtarefaRepository) {
-        return new ConcluirSubtarefaUseCase(subtarefaRepository);
+    ConcluirSubtarefaUseCase concluirSubtarefaUseCase(SubtarefaRepository subtarefaRepository, AuthenticationService authService) {
+        return new ConcluirSubtarefaUseCase(subtarefaRepository, authService);
     }
 
     @Bean
-    DesmarcarSubtarefaConcluidaUseCase desmarcarSubtarefaConcluidaUseCase(SubtarefaRepository subtarefaRepository) {
-        return new DesmarcarSubtarefaConcluidaUseCase(subtarefaRepository);
+    DesmarcarSubtarefaConcluidaUseCase desmarcarSubtarefaConcluidaUseCase(SubtarefaRepository subtarefaRepository, AuthenticationService authService) {
+        return new DesmarcarSubtarefaConcluidaUseCase(subtarefaRepository, authService);
     }
 
     @Bean

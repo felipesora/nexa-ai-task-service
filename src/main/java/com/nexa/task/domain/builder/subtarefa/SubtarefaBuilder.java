@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public class SubtarefaBuilder {
 
     private Long id = 1L;
+    private Long idUsuario = 1L;
     private String titulo = "Título da subtarefa";
     private Boolean concluida = false;
     private LocalDateTime criadoEm = LocalDateTime.now();
@@ -18,6 +19,11 @@ public class SubtarefaBuilder {
 
     public SubtarefaBuilder comId(Long id) {
         this.id = id;
+        return this;
+    }
+
+    public SubtarefaBuilder comIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
         return this;
     }
 
@@ -54,6 +60,7 @@ public class SubtarefaBuilder {
     public Subtarefa build() {
         return new Subtarefa(
                 id,
+                idUsuario,
                 titulo,
                 concluida,
                 criadoEm,

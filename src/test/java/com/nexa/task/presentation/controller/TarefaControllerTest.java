@@ -136,6 +136,7 @@ class TarefaControllerTest {
 
         subtarefaResponse = new SubtarefaResponseDTO(
                 1L,
+                1L,
                 "Minha subtarefa",
                 false,
                 LocalDateTime.now(),
