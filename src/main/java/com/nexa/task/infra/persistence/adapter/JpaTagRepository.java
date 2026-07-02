@@ -60,4 +60,9 @@ public class JpaTagRepository implements TagRepository {
     public boolean existsByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id) {
         return repository.existsByNomeAndIdUsuarioAndIdNot(nome, idUsuario, id);
     }
+
+    @Override
+    public void removerCorDasTags(Long idCor) {
+        repository.removerCorDasTags(idCor);
+    }
 }

@@ -34,7 +34,7 @@ public class AtualizarTagUseCase {
         CorTag corTag = null;
 
         if (updateDTO.idCor() != null) {
-            corTag = corTagRepository.findById(updateDTO.idCor())
+            corTag = corTagRepository.findByIdAtivo(updateDTO.idCor())
                     .orElseThrow(() -> new EntityNotFoundException("Cor com id: " + updateDTO.idCor() + " não encontrada"));
         }
 

@@ -32,7 +32,7 @@ public interface SpringDataWorkspaceRepository extends JpaRepository<WorkspaceEn
     UPDATE WorkspaceEntity w
        SET w.iconeWorkspace = null
      WHERE w.iconeWorkspace.id = :idIcone
-""")
+    """)
     void removerIconeDosWorkspaces(Long idIcone);
 
     @Modifying
@@ -41,6 +41,6 @@ public interface SpringDataWorkspaceRepository extends JpaRepository<WorkspaceEn
     UPDATE WorkspaceEntity w
        SET w.corWorkspace = null
      WHERE w.corWorkspace.id = :idCor
-""")
+    """)
     void removerCorDosWorkspaces(Long idCor);
 }

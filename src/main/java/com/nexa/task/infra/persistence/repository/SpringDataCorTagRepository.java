@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface SpringDataCorTagRepository extends JpaRepository<CorTagEntity, Long> {
 
     Optional<CorTagEntity> findByCor(String cor);
+
+    Optional<CorTagEntity> findByIdAndAtivoTrue(Long id);
 }

@@ -21,4 +21,6 @@ public interface TagRepository {
     boolean existsByNomeAndIdUsuario(String nome, Long idUsuario);
 
     boolean existsByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id);
+
+    void removerCorDasTags(Long idCor);
 }

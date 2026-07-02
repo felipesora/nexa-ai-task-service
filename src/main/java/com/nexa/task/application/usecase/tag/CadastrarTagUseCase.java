@@ -36,7 +36,7 @@ public class CadastrarTagUseCase {
         CorTag corTag = null;
 
         if (request.idCor() != null) {
-            corTag = corTagRepository.findById(request.idCor())
+            corTag = corTagRepository.findByIdAtivo(request.idCor())
                     .orElseThrow(() -> new EntityNotFoundException("Cor com id: " + request.idCor() + " não encontrada"));
         }
 

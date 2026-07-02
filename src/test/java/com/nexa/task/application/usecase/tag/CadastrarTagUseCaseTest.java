@@ -130,7 +130,7 @@ class CadastrarTagUseCaseTest {
 
         when(authService.getAuthenticatedUser()).thenReturn(user);
         when(tagRepository.existsByNomeAndIdUsuario("Estudo", 1L)).thenReturn(false);
-        when(corTagRepository.findById(10L)).thenReturn(Optional.of(corTag));
+        when(corTagRepository.findByIdAtivo(10L)).thenReturn(Optional.of(corTag));
         when(mapper.toDomain(request, corTag, 1L)).thenReturn(tag);
         when(tagRepository.save(tag)).thenReturn(tag);
         when(mapper.toResponse(tag)).thenReturn(response);
@@ -142,7 +142,7 @@ class CadastrarTagUseCaseTest {
 
         verify(authService).getAuthenticatedUser();
         verify(tagRepository).existsByNomeAndIdUsuario("Estudo", 1L);
-        verify(corTagRepository).findById(10L);
+        verify(corTagRepository).findByIdAtivo(10L);
         verify(mapper).toDomain(request, corTag, 1L);
         verify(tagRepository).save(tag);
         verify(mapper).toResponse(tag);
@@ -165,7 +165,7 @@ class CadastrarTagUseCaseTest {
 
         when(authService.getAuthenticatedUser()).thenReturn(user);
         when(tagRepository.existsByNomeAndIdUsuario("Importante", 1L)).thenReturn(false);
-        when(corTagRepository.findById(99L)).thenReturn(Optional.empty());
+        when(corTagRepository.findByIdAtivo(99L)).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
                 EntityNotFoundException.class,
@@ -207,7 +207,7 @@ class CadastrarTagUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(corTagRepository, never()).findById(anyLong());
+        verify(corTagRepository, never()).findByIdAtivo(anyLong());
         verify(tagRepository, never()).save(any());
         verify(mapper, never()).toDomain(any(), any(), anyLong());
     }

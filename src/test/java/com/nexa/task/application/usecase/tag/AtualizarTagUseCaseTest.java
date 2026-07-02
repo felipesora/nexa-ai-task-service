@@ -56,6 +56,11 @@ class AtualizarTagUseCaseTest {
                 .build();
 
         when(tagRepository.findById(idTag)).thenReturn(Optional.of(tag));
+        when(tagRepository.existsByNomeAndIdUsuarioAndIdNot(
+                "Tag Atualizada",
+                1L,
+                idTag
+        )).thenReturn(false);
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
 
@@ -90,7 +95,12 @@ class AtualizarTagUseCaseTest {
                 .build();
 
         when(tagRepository.findById(idTag)).thenReturn(Optional.of(tag));
-        when(corTagRepository.findById(10L)).thenReturn(Optional.of(corTag));
+        when(tagRepository.existsByNomeAndIdUsuarioAndIdNot(
+                "Tag Atualizada",
+                1L,
+                idTag
+        )).thenReturn(false);
+        when(corTagRepository.findByIdAtivo(10L)).thenReturn(Optional.of(corTag));
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
 
@@ -140,7 +150,12 @@ class AtualizarTagUseCaseTest {
                 .build();
 
         when(tagRepository.findById(idTag)).thenReturn(Optional.of(tag));
-        when(corTagRepository.findById(99L)).thenReturn(Optional.empty());
+        when(tagRepository.existsByNomeAndIdUsuarioAndIdNot(
+                "Tag Atualizada",
+                1L,
+                idTag
+        )).thenReturn(false);
+        when(corTagRepository.findByIdAtivo(99L)).thenReturn(Optional.empty());
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
 
@@ -188,7 +203,7 @@ class AtualizarTagUseCaseTest {
         assertEquals("Já existe uma tag com esse nome para este usuário", exception.getMessage());
 
         verify(authService).validateOwnerOrAdmin(1L);
-        verify(corTagRepository, never()).findById(any());
+        verify(corTagRepository, never()).findByIdAtivo(anyLong());
         verify(tagRepository, never()).save(any());
     }
 }
