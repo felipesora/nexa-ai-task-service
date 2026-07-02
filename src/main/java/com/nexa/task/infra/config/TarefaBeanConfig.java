@@ -2,6 +2,7 @@ package com.nexa.task.infra.config;
 
 import com.nexa.task.application.mapper.TarefaControllerMapper;
 import com.nexa.task.application.usecase.tarefa.*;
+import com.nexa.task.domain.repository.SubtarefaRepository;
 import com.nexa.task.domain.repository.TagRepository;
 import com.nexa.task.domain.repository.TarefaRepository;
 import com.nexa.task.domain.repository.WorkspaceRepository;
@@ -82,8 +83,10 @@ public class TarefaBeanConfig {
     }
 
     @Bean
-    DesativarTarefaUseCase desativarTarefaUseCase(TarefaRepository tarefaRepository, AuthenticationService authService) {
-        return new DesativarTarefaUseCase(tarefaRepository, authService);
+    DesativarTarefaUseCase desativarTarefaUseCase(TarefaRepository tarefaRepository,
+                                                  SubtarefaRepository subtarefaRepository,
+                                                  AuthenticationService authService) {
+        return new DesativarTarefaUseCase(tarefaRepository, subtarefaRepository, authService);
     }
 
     @Bean
