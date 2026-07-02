@@ -73,7 +73,7 @@ class CadastrarSubtarefaUseCaseTest {
                 1L
         );
 
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
@@ -96,7 +96,7 @@ class CadastrarSubtarefaUseCaseTest {
         assertTrue(resultado.ativo());
         assertEquals(1L, resultado.idTarefa());
 
-        verify(tarefaRepository).findById(1L);
+        verify(tarefaRepository).findByIdAtivo(1L);
         verify(authService).validateOwnerOrAdmin(10L);
         verify(mapper).toDomain(request, tarefa, 10L);
         verify(subtarefaRepository).save(subtarefa);
@@ -111,7 +111,7 @@ class CadastrarSubtarefaUseCaseTest {
                 999L
         );
 
-        when(tarefaRepository.findById(999L))
+        when(tarefaRepository.findByIdAtivo(999L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
@@ -125,7 +125,7 @@ class CadastrarSubtarefaUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(tarefaRepository).findById(999L);
+        verify(tarefaRepository).findByIdAtivo(999L);
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verifyNoInteractions(subtarefaRepository);
         verifyNoInteractions(mapper);

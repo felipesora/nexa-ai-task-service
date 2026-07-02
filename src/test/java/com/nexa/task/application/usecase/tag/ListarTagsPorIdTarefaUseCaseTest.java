@@ -91,7 +91,7 @@ class ListarTagsPorIdTarefaUseCaseTest {
                 null
         );
 
-        when(tarefaRepository.findById(idTarefa))
+        when(tarefaRepository.findByIdAtivo(idTarefa))
                 .thenReturn(Optional.of(tarefa));
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
@@ -113,7 +113,7 @@ class ListarTagsPorIdTarefaUseCaseTest {
         assertEquals("Urgente", resultado.getContent().get(0).nome());
         assertEquals("Backend", resultado.getContent().get(1).nome());
 
-        verify(tarefaRepository).findById(idTarefa);
+        verify(tarefaRepository).findByIdAtivo(idTarefa);
         verify(authService).validateOwnerOrAdmin(10L);
         verify(tagRepository).findByIdTarefa(idTarefa, pageable);
         verify(mapper).toResponse(tag1);
@@ -126,7 +126,7 @@ class ListarTagsPorIdTarefaUseCaseTest {
         Long idTarefa = 999L;
         Pageable pageable = PageRequest.of(0, 10);
 
-        when(tarefaRepository.findById(idTarefa))
+        when(tarefaRepository.findByIdAtivo(idTarefa))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
@@ -139,7 +139,7 @@ class ListarTagsPorIdTarefaUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(tarefaRepository).findById(idTarefa);
+        verify(tarefaRepository).findByIdAtivo(idTarefa);
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verify(tagRepository, never()).findByIdTarefa(any(), any());
     }

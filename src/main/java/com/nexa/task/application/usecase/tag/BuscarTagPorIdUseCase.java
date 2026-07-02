@@ -20,7 +20,7 @@ public class BuscarTagPorIdUseCase {
     }
 
     public TagResponseDTO execute(Long id) {
-        Tag tag = tagRepository.findById(id)
+        Tag tag = tagRepository.findByIdAtivo(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tag com id: " + id + " não encontrada."));
 
         authService.validateOwnerOrAdmin(tag.getIdUsuario());

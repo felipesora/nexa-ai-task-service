@@ -53,4 +53,10 @@ public class JpaSubtarefaRepository implements SubtarefaRepository {
         return repository.findById(id)
                 .map(mapper::toDomain);
     }
+
+    @Override
+    public Optional<Subtarefa> findByIdAtivo(Long id) {
+        return repository.findByIdAndAtivoTrue(id)
+                .map(mapper::toDomain);
+    }
 }

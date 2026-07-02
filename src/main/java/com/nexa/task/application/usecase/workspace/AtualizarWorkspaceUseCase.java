@@ -30,7 +30,7 @@ public class AtualizarWorkspaceUseCase {
 
     @Transactional
     public void execute(Long idWorkspace, WorkspaceUpdateDTO updateDTO) {
-        Workspace workspace = workspaceRepository.findById(idWorkspace)
+        Workspace workspace = workspaceRepository.findByIdAtivo(idWorkspace)
                 .orElseThrow(() -> new EntityNotFoundException("Workspace com id: " + idWorkspace + " não encontrado"));
 
         authService.validateOwnerOrAdmin(workspace.getIdUsuario());

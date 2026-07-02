@@ -25,7 +25,7 @@ public class ListarTagsPorIdTarefaUseCase {
     }
 
     public Page<TagResponseDTO> execute(Long idTarefa, Pageable pageable) {
-        Tarefa tarefa = tarefaRepository.findById(idTarefa)
+        Tarefa tarefa = tarefaRepository.findByIdAtivo(idTarefa)
                 .orElseThrow(() -> new EntityNotFoundException("Tarefa com id: " + idTarefa + " não encontrada."));
 
         authService.validateOwnerOrAdmin(tarefa.getIdUsuario());

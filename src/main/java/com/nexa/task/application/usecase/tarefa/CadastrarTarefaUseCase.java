@@ -26,7 +26,7 @@ public class CadastrarTarefaUseCase {
     }
 
     public TarefaResponseDTO execute(TarefaCreateDTO dto) {
-        Workspace workspace = workspaceRepository.findById(dto.idWorkspace())
+        Workspace workspace = workspaceRepository.findByIdAtivo(dto.idWorkspace())
                 .orElseThrow(() -> new EntityNotFoundException("Workspace com id: " + dto.idWorkspace() + " não encontrado"));
 
         authService.validateOwnerOrAdmin(workspace.getIdUsuario());

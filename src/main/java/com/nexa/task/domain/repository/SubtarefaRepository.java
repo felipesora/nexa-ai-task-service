@@ -18,4 +18,6 @@ public interface SubtarefaRepository {
     List<Subtarefa> findAllByTarefa(Long idTarefa);
 
     Optional<Subtarefa> findById(Long id);
+
+    Optional<Subtarefa> findByIdAtivo(Long id);
 }

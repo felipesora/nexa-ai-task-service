@@ -20,7 +20,7 @@ public class BuscarWorkspacePorIdUseCase {
     }
 
     public WorkspaceResponseDTO execute(Long id) {
-        Workspace workspace = workspaceRepository.findById(id)
+        Workspace workspace = workspaceRepository.findByIdAtivo(id)
                 .orElseThrow(() -> new EntityNotFoundException("Workspace com id: " + id + " não encontrado."));
 
         authService.validateOwnerOrAdmin(workspace.getIdUsuario());

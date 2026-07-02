@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -57,10 +58,12 @@ class AdicionarTagNaTarefaUseCaseTest {
 
     @Test
     void deveAdicionarTagNaTarefaComSucesso() {
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
+
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
-        when(tagRepository.findById(2L))
+
+        when(tagRepository.findByIdAtivo(2L))
                 .thenReturn(Optional.of(tag));
 
         useCase.execute(1L, 2L);
@@ -74,7 +77,7 @@ class AdicionarTagNaTarefaUseCaseTest {
 
     @Test
     void deveLancarExcecaoQuandoTarefaNaoEncontrada() {
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
@@ -87,18 +90,18 @@ class AdicionarTagNaTarefaUseCaseTest {
         );
 
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
-        verify(tagRepository, never()).findById(anyLong());
+        verify(tagRepository, never()).findByIdAtivo(anyLong());
         verify(tarefaRepository, never()).save(any());
     }
 
     @Test
     void deveLancarExcecaoQuandoTagNaoEncontrada() {
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
 
-        when(tagRepository.findById(2L))
+        when(tagRepository.findByIdAtivo(2L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
@@ -118,10 +121,12 @@ class AdicionarTagNaTarefaUseCaseTest {
     void deveLancarExcecaoQuandoTagPertenceAOutroUsuario() {
         tag.setIdUsuario(20L);
 
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
+
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
-        when(tagRepository.findById(2L))
+
+        when(tagRepository.findByIdAtivo(2L))
                 .thenReturn(Optional.of(tag));
 
         BadRequestException exception =
@@ -141,10 +146,12 @@ class AdicionarTagNaTarefaUseCaseTest {
     void deveLancarExcecaoQuandoTagJaEstaVinculada() {
         tarefa.getTags().add(tag);
 
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
+
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
-        when(tagRepository.findById(2L))
+
+        when(tagRepository.findByIdAtivo(2L))
                 .thenReturn(Optional.of(tag));
 
         BadRequestException exception =

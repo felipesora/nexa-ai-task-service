@@ -21,7 +21,7 @@ public class AtualizarTarefaUseCase {
 
     @Transactional
     public void execute(Long idTarefa, TarefaUpdateDTO dto) {
-        Tarefa tarefa = tarefaRepository.findById(idTarefa)
+        Tarefa tarefa = tarefaRepository.findByIdAtivo(idTarefa)
                 .orElseThrow(() -> new EntityNotFoundException("Tarefa com id: " + idTarefa + " não encontrada"));
 
         authService.validateOwnerOrAdmin(tarefa.getIdUsuario());

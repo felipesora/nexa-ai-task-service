@@ -86,7 +86,7 @@ class CadastrarTarefaUseCaseTest {
                 1L
         );
 
-        when(workspaceRepository.findById(1L))
+        when(workspaceRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(workspace));
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
@@ -106,7 +106,7 @@ class CadastrarTarefaUseCaseTest {
         assertEquals(1L, resultado.id());
         assertEquals("Minha tarefa", resultado.titulo());
 
-        verify(workspaceRepository).findById(1L);
+        verify(workspaceRepository).findByIdAtivo(1L);
         verify(authService).validateOwnerOrAdmin(10L);
         verify(mapper).toDomain(request, workspace, 10L);
         verify(tarefaRepository).save(tarefa);
@@ -125,7 +125,7 @@ class CadastrarTarefaUseCaseTest {
                 999L
         );
 
-        when(workspaceRepository.findById(999L))
+        when(workspaceRepository.findByIdAtivo(999L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
@@ -138,7 +138,7 @@ class CadastrarTarefaUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(workspaceRepository).findById(999L);
+        verify(workspaceRepository).findByIdAtivo(999L);
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verifyNoInteractions(tarefaRepository);
         verifyNoInteractions(mapper);

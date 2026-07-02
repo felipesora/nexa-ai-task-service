@@ -57,7 +57,7 @@ class BuscarTagPorIdUseCaseTest {
                 null
         );
 
-        when(tagRepository.findById(id))
+        when(tagRepository.findByIdAtivo(id))
                 .thenReturn(Optional.of(tag));
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
@@ -71,7 +71,7 @@ class BuscarTagPorIdUseCaseTest {
         assertEquals(id, resultado.id());
         assertEquals("Urgente", resultado.nome());
 
-        verify(tagRepository).findById(id);
+        verify(tagRepository).findByIdAtivo(id);
         verify(authService).validateOwnerOrAdmin(1L);
         verify(mapper).toResponse(tag);
     }
@@ -81,7 +81,7 @@ class BuscarTagPorIdUseCaseTest {
 
         Long id = 999L;
 
-        when(tagRepository.findById(id))
+        when(tagRepository.findByIdAtivo(id))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
@@ -94,7 +94,7 @@ class BuscarTagPorIdUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(tagRepository).findById(id);
+        verify(tagRepository).findByIdAtivo(id);
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verify(mapper, never()).toResponse(any());
     }

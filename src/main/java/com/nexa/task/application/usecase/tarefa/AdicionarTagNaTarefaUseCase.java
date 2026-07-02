@@ -25,12 +25,12 @@ public class AdicionarTagNaTarefaUseCase {
 
     @Transactional
     public void execute(Long idTarefa, Long idTag) {
-        Tarefa tarefa = tarefaRepository.findById(idTarefa)
+        Tarefa tarefa = tarefaRepository.findByIdAtivo(idTarefa)
                 .orElseThrow(() -> new EntityNotFoundException("Tarefa com id: " + idTarefa + " não encontrada."));
 
         authService.validateOwnerOrAdmin(tarefa.getIdUsuario());
 
-        Tag tag = tagRepository.findById(idTag)
+        Tag tag = tagRepository.findByIdAtivo(idTag)
                 .orElseThrow(() -> new EntityNotFoundException("Tag com id: " + idTag + " não encontrada."));
 
         if (!Objects.equals(tarefa.getIdUsuario(), tag.getIdUsuario())) {

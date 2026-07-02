@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface SpringDataTagRepository extends JpaRepository<TagEntity, Long> {
 
@@ -35,4 +37,6 @@ public interface SpringDataTagRepository extends JpaRepository<TagEntity, Long> 
      WHERE w.corTag.id = :idCor
     """)
     void removerCorDasTags(Long idCor);
+
+    Optional<TagEntity> findByIdAndAtivoTrue(Long id);
 }

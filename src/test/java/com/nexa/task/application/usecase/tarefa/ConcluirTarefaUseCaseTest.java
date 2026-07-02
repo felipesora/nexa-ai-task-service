@@ -41,7 +41,7 @@ class ConcluirTarefaUseCaseTest {
 
         tarefa.setStatus(StatusTarefa.PENDENTE);
 
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
@@ -55,7 +55,7 @@ class ConcluirTarefaUseCaseTest {
         assertNotNull(tarefa.getDataConclusao());
         assertNotNull(tarefa.getAtualizadoEm());
 
-        verify(tarefaRepository).findById(1L);
+        verify(tarefaRepository).findByIdAtivo(1L);
         verify(authService).validateOwnerOrAdmin(10L);
         verify(tarefaRepository).save(tarefa);
     }
@@ -70,7 +70,7 @@ class ConcluirTarefaUseCaseTest {
 
         tarefa.setStatus(StatusTarefa.CONCLUIDA);
 
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
@@ -86,7 +86,7 @@ class ConcluirTarefaUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(tarefaRepository).findById(1L);
+        verify(tarefaRepository).findByIdAtivo(1L);
         verify(authService).validateOwnerOrAdmin(10L);
         verify(tarefaRepository, never()).save(any());
     }
@@ -94,7 +94,7 @@ class ConcluirTarefaUseCaseTest {
     @Test
     void deveLancarExcecaoQuandoTarefaNaoForEncontrada() {
 
-        when(tarefaRepository.findById(999L))
+        when(tarefaRepository.findByIdAtivo(999L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
@@ -108,7 +108,7 @@ class ConcluirTarefaUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(tarefaRepository).findById(999L);
+        verify(tarefaRepository).findByIdAtivo(999L);
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verify(tarefaRepository, never()).save(any());
     }

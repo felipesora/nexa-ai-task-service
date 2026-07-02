@@ -24,7 +24,7 @@ public class AtualizarTagUseCase {
 
     @Transactional
     public void execute(Long idTag, TagUpdateDTO updateDTO) {
-        Tag tag = tagRepository.findById(idTag)
+        Tag tag = tagRepository.findByIdAtivo(idTag)
                 .orElseThrow(() -> new EntityNotFoundException("Tag com id: " + idTag + " não encontrada."));
 
         authService.validateOwnerOrAdmin(tag.getIdUsuario());

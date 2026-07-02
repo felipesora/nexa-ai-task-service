@@ -27,7 +27,7 @@ public class CadastrarSubtarefaUseCase {
 
     @Transactional
     public SubtarefaResponseDTO execute(SubtarefaCreateDTO dto) {
-        Tarefa tarefa = tarefaRepository.findById(dto.idTarefa())
+        Tarefa tarefa = tarefaRepository.findByIdAtivo(dto.idTarefa())
                 .orElseThrow(() -> new EntityNotFoundException("Tarefa com id: " + dto.idTarefa() + " não encontrada"));
 
         authService.validateOwnerOrAdmin(tarefa.getIdUsuario());

@@ -14,7 +14,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -43,7 +46,7 @@ class AtualizarSubtarefaUseCaseTest {
                 .comTitulo("Subtarefa antiga")
                 .build();
 
-        when(repository.findById(1L))
+        when(repository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(subtarefa));
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
@@ -57,7 +60,7 @@ class AtualizarSubtarefaUseCaseTest {
 
         assertNotNull(subtarefa.getAtualizadoEm());
 
-        verify(repository).findById(1L);
+        verify(repository).findByIdAtivo(1L);
         verify(authService).validateOwnerOrAdmin(10L);
         verify(repository).save(subtarefa);
     }
@@ -69,7 +72,7 @@ class AtualizarSubtarefaUseCaseTest {
                 "Subtarefa atualizada"
         );
 
-        when(repository.findById(999L))
+        when(repository.findByIdAtivo(999L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
@@ -83,7 +86,7 @@ class AtualizarSubtarefaUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(repository).findById(999L);
+        verify(repository).findByIdAtivo(999L);
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verify(repository, never()).save(any());
     }

@@ -69,6 +69,12 @@ public class JpaWorkspaceRepository implements WorkspaceRepository {
     }
 
     @Override
+    public Optional<Workspace> findByIdAtivo(Long id) {
+        return repository.findByIdAndAtivoTrue(id)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public boolean existsByNomeAndIdUsuario(String nome, Long idUsuario) {
         return repository.existsByNomeAndIdUsuario(nome, idUsuario);
     }

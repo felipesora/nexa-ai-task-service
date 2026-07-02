@@ -65,7 +65,7 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
         Page<Tarefa> page =
                 new PageImpl<>(List.of(tarefa));
 
-        when(workspaceRepository.findById(1L))
+        when(workspaceRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(workspace));
 
         when(workspace.getIdUsuario()).thenReturn(1L);
@@ -82,7 +82,7 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
 
         assertEquals(1, resultado.getTotalElements());
 
-        verify(workspaceRepository).findById(1L);
+        verify(workspaceRepository).findByIdAtivo(1L);
         verify(authService).validateOwnerOrAdmin(1L);
         verify(tarefaRepository).findByIdWorkspace(1L, pageable);
         verify(mapper).toResponse(tarefa);
@@ -91,7 +91,7 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
     @Test
     void deveLancarExcecaoQuandoWorkspaceNaoForEncontrado() {
 
-        when(workspaceRepository.findById(999L))
+        when(workspaceRepository.findByIdAtivo(999L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
@@ -112,7 +112,7 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
     @Test
     void deveLancarExcecaoQuandoUsuarioNaoTemPermissao() {
 
-        when(workspaceRepository.findById(1L))
+        when(workspaceRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(workspace));
 
         when(workspace.getIdUsuario()).thenReturn(1L);

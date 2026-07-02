@@ -25,7 +25,7 @@ public class ListarTarefasPorIdWorkspaceUseCase {
     }
 
     public Page<TarefaResponseDTO> execute(Long idWorkspace, Pageable pageable) {
-        Workspace workspace = workspaceRepository.findById(idWorkspace)
+        Workspace workspace = workspaceRepository.findByIdAtivo(idWorkspace)
                 .orElseThrow(() -> new EntityNotFoundException("Workspace com id: " + idWorkspace + " não encontrado."));
 
         authService.validateOwnerOrAdmin(workspace.getIdUsuario());

@@ -52,6 +52,12 @@ public class JpaTagRepository implements TagRepository {
     }
 
     @Override
+    public Optional<Tag> findByIdAtivo(Long id) {
+        return repository.findByIdAndAtivoTrue(id)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public boolean existsByNomeAndIdUsuario(String nome, Long idUsuario) {
         return repository.existsByNomeAndIdUsuario(nome, idUsuario);
     }

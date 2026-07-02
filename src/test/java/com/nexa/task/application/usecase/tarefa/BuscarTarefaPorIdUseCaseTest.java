@@ -45,7 +45,7 @@ class BuscarTarefaPorIdUseCaseTest {
 
         TarefaResponseDTO response = mock(TarefaResponseDTO.class);
 
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
 
         when(mapper.toResponse(tarefa))
@@ -57,7 +57,7 @@ class BuscarTarefaPorIdUseCaseTest {
 
         assertNotNull(resultado);
 
-        verify(tarefaRepository).findById(1L);
+        verify(tarefaRepository).findByIdAtivo(1L);
         verify(authService).validateOwnerOrAdmin(10L);
         verify(mapper).toResponse(tarefa);
     }
@@ -65,7 +65,7 @@ class BuscarTarefaPorIdUseCaseTest {
     @Test
     void deveLancarExcecaoQuandoTarefaNaoEncontrada() {
 
-        when(tarefaRepository.findById(999L))
+        when(tarefaRepository.findByIdAtivo(999L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
@@ -79,7 +79,7 @@ class BuscarTarefaPorIdUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(tarefaRepository).findById(999L);
+        verify(tarefaRepository).findByIdAtivo(999L);
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verifyNoInteractions(mapper);
     }

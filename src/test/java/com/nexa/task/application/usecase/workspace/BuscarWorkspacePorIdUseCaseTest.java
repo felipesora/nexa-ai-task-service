@@ -63,7 +63,7 @@ class BuscarWorkspacePorIdUseCaseTest {
 
         doNothing().when(authService).validateOwnerOrAdmin(workspace.getIdUsuario());
 
-        when(workspaceRepository.findById(id))
+        when(workspaceRepository.findByIdAtivo(id))
                 .thenReturn(Optional.of(workspace));
 
         when(mapper.toResponse(workspace))
@@ -77,7 +77,7 @@ class BuscarWorkspacePorIdUseCaseTest {
         assertEquals("Descrição", resultado.descricao());
 
         verify(authService).validateOwnerOrAdmin(workspace.getIdUsuario());
-        verify(workspaceRepository).findById(id);
+        verify(workspaceRepository).findByIdAtivo(id);
         verify(mapper).toResponse(workspace);
     }
 
@@ -86,7 +86,7 @@ class BuscarWorkspacePorIdUseCaseTest {
 
         Long id = 999L;
 
-        when(workspaceRepository.findById(id))
+        when(workspaceRepository.findByIdAtivo(id))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
@@ -99,7 +99,7 @@ class BuscarWorkspacePorIdUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(workspaceRepository).findById(id);
+        verify(workspaceRepository).findByIdAtivo(id);
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verify(mapper, never()).toResponse(any());
     }
@@ -114,7 +114,7 @@ class BuscarWorkspacePorIdUseCaseTest {
                 .comIdUsuario(1L)
                 .build();
 
-        when(workspaceRepository.findById(id))
+        when(workspaceRepository.findByIdAtivo(id))
                 .thenReturn(Optional.of(workspace));
 
         doThrow(new ForbiddenException("Acesso negado"))
@@ -128,7 +128,7 @@ class BuscarWorkspacePorIdUseCaseTest {
 
         assertEquals("Acesso negado", exception.getMessage());
 
-        verify(workspaceRepository).findById(id);
+        verify(workspaceRepository).findByIdAtivo(id);
         verify(authService).validateOwnerOrAdmin(workspace.getIdUsuario());
         verify(mapper, never()).toResponse(any());
     }

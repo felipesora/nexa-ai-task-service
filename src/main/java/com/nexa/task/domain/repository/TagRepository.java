@@ -18,6 +18,8 @@ public interface TagRepository {
 
     Optional<Tag> findById(Long id);
 
+    Optional<Tag> findByIdAtivo(Long id);
+
     boolean existsByNomeAndIdUsuario(String nome, Long idUsuario);
 
     boolean existsByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id);

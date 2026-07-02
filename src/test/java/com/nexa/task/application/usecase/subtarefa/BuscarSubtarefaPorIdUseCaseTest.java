@@ -14,7 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -39,7 +41,7 @@ class BuscarSubtarefaPorIdUseCaseTest {
         Subtarefa subtarefa = mock(Subtarefa.class);
         SubtarefaResponseDTO response = mock(SubtarefaResponseDTO.class);
 
-        when(subtarefaRepository.findById(1L))
+        when(subtarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(subtarefa));
 
         when(subtarefa.getIdUsuario())
@@ -54,7 +56,7 @@ class BuscarSubtarefaPorIdUseCaseTest {
 
         assertNotNull(resultado);
 
-        verify(subtarefaRepository).findById(1L);
+        verify(subtarefaRepository).findByIdAtivo(1L);
         verify(authService).validateOwnerOrAdmin(10L);
         verify(mapper).toResponse(subtarefa);
     }
@@ -62,7 +64,7 @@ class BuscarSubtarefaPorIdUseCaseTest {
     @Test
     void deveLancarExcecaoQuandoSubtarefaNaoEncontrada() {
 
-        when(subtarefaRepository.findById(999L))
+        when(subtarefaRepository.findByIdAtivo(999L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
@@ -76,7 +78,7 @@ class BuscarSubtarefaPorIdUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(subtarefaRepository).findById(999L);
+        verify(subtarefaRepository).findByIdAtivo(999L);
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verifyNoInteractions(mapper);
     }

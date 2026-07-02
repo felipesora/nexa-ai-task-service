@@ -22,4 +22,6 @@ public interface TarefaRepository {
     Page<Tarefa> findByIdUsuarioAndTitulo(Long idUsuario, String titulo, Pageable pageable);
 
     Optional<Tarefa> findById(Long id);
+
+    Optional<Tarefa> findByIdAtivo(Long id);
 }

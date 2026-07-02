@@ -43,7 +43,7 @@ class ReabrirTarefaUseCaseTest {
 
         tarefa.setDataConclusao(LocalDateTime.now());
 
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
@@ -54,7 +54,7 @@ class ReabrirTarefaUseCaseTest {
         assertNull(tarefa.getDataConclusao());
         assertNotNull(tarefa.getAtualizadoEm());
 
-        verify(tarefaRepository).findById(1L);
+        verify(tarefaRepository).findByIdAtivo(1L);
         verify(authService).validateOwnerOrAdmin(10L);
         verify(tarefaRepository).save(tarefa);
     }
@@ -62,7 +62,7 @@ class ReabrirTarefaUseCaseTest {
     @Test
     void deveLancarExcecaoQuandoTarefaNaoEncontrada() {
 
-        when(tarefaRepository.findById(999L))
+        when(tarefaRepository.findByIdAtivo(999L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
@@ -76,7 +76,7 @@ class ReabrirTarefaUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(tarefaRepository).findById(999L);
+        verify(tarefaRepository).findByIdAtivo(999L);
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verify(tarefaRepository, never()).save(any());
     }
@@ -90,7 +90,7 @@ class ReabrirTarefaUseCaseTest {
                 .comStatus(StatusTarefa.PENDENTE)
                 .build();
 
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
@@ -106,7 +106,7 @@ class ReabrirTarefaUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(tarefaRepository).findById(1L);
+        verify(tarefaRepository).findByIdAtivo(1L);
         verify(authService).validateOwnerOrAdmin(10L);
         verify(tarefaRepository, never()).save(any());
     }

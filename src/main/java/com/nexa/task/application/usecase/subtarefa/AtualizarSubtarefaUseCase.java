@@ -21,7 +21,7 @@ public class AtualizarSubtarefaUseCase {
 
     @Transactional
     public void execute(Long idSubtarefa, SubtarefaUpdateDTO dto) {
-        Subtarefa subtarefa = repository.findById(idSubtarefa)
+        Subtarefa subtarefa = repository.findByIdAtivo(idSubtarefa)
                 .orElseThrow(() -> new EntityNotFoundException("Subtarefa com id: " + idSubtarefa + " não encontrada."));
 
         authService.validateOwnerOrAdmin(subtarefa.getIdUsuario());

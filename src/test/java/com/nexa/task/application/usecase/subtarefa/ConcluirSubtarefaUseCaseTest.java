@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -34,7 +35,7 @@ class ConcluirSubtarefaUseCaseTest {
 
     @BeforeEach
     void setUp() {
-        lenient().when(subtarefaRepository.findById(1L))
+        lenient().when(subtarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(subtarefa));
 
         lenient().when(subtarefa.getIdUsuario())
@@ -56,7 +57,7 @@ class ConcluirSubtarefaUseCaseTest {
     @Test
     void deveLancarExcecaoQuandoSubtarefaNaoForEncontrada() {
 
-        when(subtarefaRepository.findById(999L))
+        when(subtarefaRepository.findByIdAtivo(999L))
                 .thenReturn(Optional.empty());
 
         assertThrows(

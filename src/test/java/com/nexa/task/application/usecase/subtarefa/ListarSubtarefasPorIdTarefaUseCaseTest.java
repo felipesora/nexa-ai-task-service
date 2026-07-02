@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -67,7 +68,7 @@ class ListarSubtarefasPorIdTarefaUseCaseTest {
         Page<Subtarefa> page =
                 new PageImpl<>(List.of(subtarefa));
 
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
 
         when(tarefa.getIdUsuario())
@@ -86,7 +87,7 @@ class ListarSubtarefasPorIdTarefaUseCaseTest {
 
         assertEquals(1, resultado.getTotalElements());
 
-        verify(tarefaRepository).findById(1L);
+        verify(tarefaRepository).findByIdAtivo(1L);
         verify(authService).validateOwnerOrAdmin(10L);
         verify(subtarefaRepository).findByIdTarefa(1L, pageable);
         verify(mapper).toResponse(subtarefa);
@@ -95,7 +96,7 @@ class ListarSubtarefasPorIdTarefaUseCaseTest {
     @Test
     void deveLancarExcecaoQuandoTarefaNaoForEncontrada() {
 
-        when(tarefaRepository.findById(999L))
+        when(tarefaRepository.findByIdAtivo(999L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =

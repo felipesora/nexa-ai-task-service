@@ -16,7 +16,7 @@ public class DesmarcarSubtarefaConcluidaUseCase {
     }
 
     public void execute(Long idSubtarefa) {
-        Subtarefa subtarefa = subtarefaRepository.findById(idSubtarefa)
+        Subtarefa subtarefa = subtarefaRepository.findByIdAtivo(idSubtarefa)
                 .orElseThrow(() -> new EntityNotFoundException("Subtarefa com id: " + idSubtarefa + " não encontrada"));
 
         authService.validateOwnerOrAdmin(subtarefa.getIdUsuario());
