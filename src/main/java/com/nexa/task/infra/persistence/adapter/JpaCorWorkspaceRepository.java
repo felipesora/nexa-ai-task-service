@@ -44,4 +44,10 @@ public class JpaCorWorkspaceRepository implements CorWorkspaceRepository {
         return corWorkspaceRepository.findByCor(cor)
                 .map(mapper::toDomain);
     }
+
+    @Override
+    public Optional<CorWorkspace> findByIdAtivo(Long id) {
+        return corWorkspaceRepository.findByIdAndAtivoTrue(id)
+                .map(mapper::toDomain);
+    }
 }

@@ -44,4 +44,10 @@ public class JpaCorTagRepository implements CorTagRepository {
         return corTagRepository.findByCor(cor)
                 .map(mapper::toDomain);
     }
+
+    @Override
+    public Optional<CorTag> findByIdAtivo(Long id) {
+        return corTagRepository.findByIdAndAtivoTrue(id)
+                .map(mapper::toDomain);
+    }
 }

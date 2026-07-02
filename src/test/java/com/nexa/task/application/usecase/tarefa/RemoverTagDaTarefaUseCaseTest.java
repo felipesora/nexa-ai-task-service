@@ -8,6 +8,7 @@ import com.nexa.task.domain.entity.tag.Tag;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.repository.TagRepository;
 import com.nexa.task.domain.repository.TarefaRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +31,9 @@ class RemoverTagDaTarefaUseCaseTest {
 
     @Mock
     private TarefaRepository tarefaRepository;
+
+    @Mock
+    private AuthenticationService authService;
 
     @InjectMocks
     private RemoverTagDaTarefaUseCase useCase;
@@ -54,21 +59,23 @@ class RemoverTagDaTarefaUseCaseTest {
     void deveRemoverTagDaTarefaComSucesso() {
         tarefa.getTags().add(tag);
 
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
-        when(tagRepository.findById(2L))
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
+        when(tagRepository.findByIdAtivo(2L))
                 .thenReturn(Optional.of(tag));
 
         useCase.execute(1L, 2L);
 
         assertTrue(tarefa.getTags().isEmpty());
 
+        verify(authService).validateOwnerOrAdmin(10L);
         verify(tarefaRepository).save(tarefa);
     }
 
     @Test
     void deveLancarExcecaoQuandoTarefaNaoEncontrada() {
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
@@ -80,16 +87,19 @@ class RemoverTagDaTarefaUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(tagRepository, never()).findById(anyLong());
+        verify(authService, never()).validateOwnerOrAdmin(anyLong());
+        verify(tagRepository, never()).findByIdAtivo(anyLong());
         verify(tarefaRepository, never()).save(any());
     }
 
     @Test
     void deveLancarExcecaoQuandoTagNaoEncontrada() {
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
 
-        when(tagRepository.findById(2L))
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
+
+        when(tagRepository.findByIdAtivo(2L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
@@ -101,6 +111,7 @@ class RemoverTagDaTarefaUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(authService).validateOwnerOrAdmin(10L);
         verify(tarefaRepository, never()).save(any());
     }
 
@@ -108,9 +119,10 @@ class RemoverTagDaTarefaUseCaseTest {
     void deveLancarExcecaoQuandoTagPertenceAOutroUsuario() {
         tag.setIdUsuario(20L);
 
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
-        when(tagRepository.findById(2L))
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
+        when(tagRepository.findByIdAtivo(2L))
                 .thenReturn(Optional.of(tag));
 
         BadRequestException exception =
@@ -122,14 +134,16 @@ class RemoverTagDaTarefaUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(authService).validateOwnerOrAdmin(10L);
         verify(tarefaRepository, never()).save(any());
     }
 
     @Test
     void deveLancarExcecaoQuandoTagNaoEstaVinculadaATarefa() {
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
-        when(tagRepository.findById(2L))
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
+        when(tagRepository.findByIdAtivo(2L))
                 .thenReturn(Optional.of(tag));
 
         BadRequestException exception =
@@ -141,6 +155,7 @@ class RemoverTagDaTarefaUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(authService).validateOwnerOrAdmin(10L);
         verify(tarefaRepository, never()).save(any());
     }
 }

@@ -18,10 +18,10 @@ public class WorkspaceControllerMapper {
         this.iconeWorkspaceMapper = iconeWorkspaceMapper;
     }
 
-    public Workspace toDomain(WorkspaceRequestDTO request, CorWorkspace cor, IconeWorkspace icone) {
+    public Workspace toDomain(WorkspaceRequestDTO request, CorWorkspace cor, IconeWorkspace icone, Long idUsuario) {
         return new Workspace(
              null,
-                request.idUsuario(),
+                idUsuario,
                 request.nome(),
                 request.descricao(),
                 LocalDateTime.now(),

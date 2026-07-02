@@ -17,4 +17,6 @@ public interface IconeWorkspaceRepository {
     Optional<IconeWorkspace> findByNome(String nome);
 
     Optional<IconeWorkspace> findByCaminho(String caminho);
+
+    Optional<IconeWorkspace> findByIdAtivo(Long id);
 }

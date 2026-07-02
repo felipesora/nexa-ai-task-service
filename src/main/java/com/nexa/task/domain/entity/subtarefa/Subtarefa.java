@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public class Subtarefa {
 
     private Long id;
+    private Long idUsuario;
     private String titulo;
     private Boolean concluida;
     private LocalDateTime criadoEm;
@@ -16,12 +17,14 @@ public class Subtarefa {
     private Boolean ativo;
     private Tarefa tarefa;
 
-    public Subtarefa(Long id, String titulo, Boolean concluida, LocalDateTime criadoEm,
+    public Subtarefa(Long id, Long idUsuario, String titulo, Boolean concluida, LocalDateTime criadoEm,
                      LocalDateTime atualizadoEm, Boolean ativo, Tarefa tarefa) {
+        validarIdUsuario(idUsuario);
         validarTitulo(titulo);
         validarTarefa(tarefa);
 
         this.id = id;
+        this.idUsuario = idUsuario;
         this.titulo = titulo;
         this.concluida = concluida;
         this.criadoEm = criadoEm;
@@ -46,6 +49,12 @@ public class Subtarefa {
         this.ativo = false;
     }
 
+    private void validarIdUsuario(Long idUsuario) {
+        if (idUsuario == null || idUsuario == 0L) {
+            throw new DomainException("Id do Usuário da subtarefa é obrigatório.");
+        }
+    }
+
     private void validarTitulo(String titulo) {
         if (titulo == null || titulo.isBlank()) {
             throw new DomainException("Título da subtarefa é obrigatório.");
@@ -64,6 +73,14 @@ public class Subtarefa {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public String getTitulo() {

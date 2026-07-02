@@ -8,13 +8,17 @@ import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.usecase.corWorkspace.*;
 import com.nexa.task.domain.builder.workspace.CorWorkspaceBuilder;
 import com.nexa.task.domain.entity.workspace.CorWorkspace;
+import com.nexa.task.infra.security.JwtAuthenticationFilter;
+import com.nexa.task.infra.security.TokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -27,6 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CorWorkspaceController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class CorWorkspaceControllerTest {
 
     @Autowired
@@ -46,6 +51,12 @@ class CorWorkspaceControllerTest {
 
     @MockitoBean
     private AtivarCorWorkspaceUseCase ativarCorWorkspaceUseCase;
+
+    @MockitoBean
+    private TokenProvider tokenProvider;
+
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -75,6 +86,7 @@ class CorWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveCadastrarCorComSucesso() throws Exception {
 
         when(cadastrarCorWorkspaceUseCase.execute(request))
@@ -93,6 +105,7 @@ class CorWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoCorJaExistir() throws Exception {
 
         when(cadastrarCorWorkspaceUseCase.execute(request))
@@ -110,6 +123,7 @@ class CorWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoCorForInvalida() throws Exception {
 
         CorWorkspaceRequestDTO requestInvalido =
@@ -125,6 +139,7 @@ class CorWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveListarTodasAsCores() throws Exception {
 
         Page<CorWorkspaceResponseDTO> page =
@@ -142,6 +157,7 @@ class CorWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveBuscarCorPorIdComSucesso() throws Exception {
 
         when(buscarCorWorkspacePorIdUserCase.execute(1L))
@@ -155,6 +171,7 @@ class CorWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoCorNaoForEncontrada() throws Exception {
 
         when(buscarCorWorkspacePorIdUserCase.execute(999L))
@@ -170,6 +187,7 @@ class CorWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveDesativarCorComSucesso() throws Exception {
 
         doNothing().when(desativarCorWorkspaceUseCase)
@@ -180,6 +198,7 @@ class CorWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404AoDesativarCorNaoEncontrada() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -195,6 +214,7 @@ class CorWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveAtivarCorComSucesso() throws Exception {
 
         doNothing().when(ativarCorWorkspaceUseCase)
@@ -205,6 +225,7 @@ class CorWorkspaceControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404AoAtivarCorNaoEncontrada() throws Exception {
 
         doThrow(new EntityNotFoundException(

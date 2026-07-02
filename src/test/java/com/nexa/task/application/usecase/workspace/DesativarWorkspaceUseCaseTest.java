@@ -10,6 +10,8 @@ import com.nexa.task.domain.entity.workspace.Workspace;
 import com.nexa.task.domain.repository.SubtarefaRepository;
 import com.nexa.task.domain.repository.TarefaRepository;
 import com.nexa.task.domain.repository.WorkspaceRepository;
+import com.nexa.task.infra.security.AuthenticationService;
+import com.nexa.task.infra.security.ForbiddenException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,6 +36,9 @@ class DesativarWorkspaceUseCaseTest {
     @Mock
     private SubtarefaRepository subtarefaRepository;
 
+    @Mock
+    private AuthenticationService authService;
+
     @InjectMocks
     private DesativarWorkspaceUseCase useCase;
 
@@ -42,6 +47,7 @@ class DesativarWorkspaceUseCaseTest {
 
         Workspace workspace = new WorkspaceBuilder()
                 .comId(1L)
+                .comIdUsuario(1L)
                 .comNome("Workspace Teste")
                 .comAtivo(true)
                 .build();
@@ -55,6 +61,8 @@ class DesativarWorkspaceUseCaseTest {
                 .comId(100L)
                 .comAtivo(true)
                 .build();
+
+        doNothing().when(authService).validateOwnerOrAdmin(1L);
 
         when(workspaceRepository.findById(1L))
                 .thenReturn(Optional.of(workspace));
@@ -72,6 +80,7 @@ class DesativarWorkspaceUseCaseTest {
         assertFalse(subtarefa.getAtivo());
 
         verify(workspaceRepository).findById(1L);
+        verify(authService).validateOwnerOrAdmin(1L);
         verify(tarefaRepository).findAllByWorkspace(1L);
         verify(subtarefaRepository).findAllByTarefa(10L);
 
@@ -96,6 +105,38 @@ class DesativarWorkspaceUseCaseTest {
         );
 
         verify(workspaceRepository).findById(999L);
+        verify(authService, never()).validateOwnerOrAdmin(anyLong());
+
+        verifyNoInteractions(tarefaRepository);
+        verifyNoInteractions(subtarefaRepository);
+
+        verify(workspaceRepository, never()).save(any());
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoUsuarioNaoTemPermissao() {
+
+        Workspace workspace = new WorkspaceBuilder()
+                .comId(1L)
+                .comIdUsuario(1L)
+                .build();
+
+        when(workspaceRepository.findById(1L))
+                .thenReturn(Optional.of(workspace));
+
+        doThrow(new ForbiddenException("Acesso negado"))
+                .when(authService)
+                .validateOwnerOrAdmin(1L);
+
+        ForbiddenException exception = assertThrows(
+                ForbiddenException.class,
+                () -> useCase.execute(1L)
+        );
+
+        assertEquals("Acesso negado", exception.getMessage());
+
+        verify(workspaceRepository).findById(1L);
+        verify(authService).validateOwnerOrAdmin(1L);
 
         verifyNoInteractions(tarefaRepository);
         verifyNoInteractions(subtarefaRepository);

@@ -4,6 +4,7 @@ import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.domain.builder.workspace.CorWorkspaceBuilder;
 import com.nexa.task.domain.entity.workspace.CorWorkspace;
 import com.nexa.task.domain.repository.CorWorkspaceRepository;
+import com.nexa.task.domain.repository.WorkspaceRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,6 +21,9 @@ class DesativarCorWorkspaceUseCaseTest {
 
     @Mock
     private CorWorkspaceRepository repository;
+
+    @Mock
+    private WorkspaceRepository workspaceRepository;
 
     @InjectMocks
     private DesativarCorWorkspaceUseCase useCase;
@@ -45,6 +49,7 @@ class DesativarCorWorkspaceUseCaseTest {
         assertFalse(cor.getAtivo());
 
         verify(repository).findById(id);
+        verify(workspaceRepository).removerCorDosWorkspaces(id);
         verify(repository).save(cor);
     }
 
@@ -67,6 +72,7 @@ class DesativarCorWorkspaceUseCaseTest {
         );
 
         verify(repository).findById(id);
+        verifyNoInteractions(workspaceRepository);
         verify(repository, never()).save(any());
     }
 }

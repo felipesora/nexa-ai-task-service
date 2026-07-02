@@ -5,11 +5,14 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.time.LocalDateTime;
 
-@JsonPropertyOrder({ "id_subtarefa", "titulo", "concluida", "criado_em", "atualizado_em",
+@JsonPropertyOrder({ "id_subtarefa", "id_usuario", "titulo", "concluida", "criado_em", "atualizado_em",
         "ativo", "id_tarefa" })
 public record SubtarefaResponseDTO(
         @JsonProperty("id_subtarefa")
         Long id,
+
+        @JsonProperty("id_usuario")
+        Long idUsuario,
 
         String titulo,
 

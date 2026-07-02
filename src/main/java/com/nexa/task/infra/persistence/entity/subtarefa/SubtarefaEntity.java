@@ -19,6 +19,9 @@ public class SubtarefaEntity {
     @Column(name = "id_subtarefa")
     private Long id;
 
+    @Column(nullable = false, name = "id_usuario")
+    private Long idUsuario;
+
     @Column(nullable = false, length = 200)
     private String titulo;
 
@@ -38,8 +41,9 @@ public class SubtarefaEntity {
     @JoinColumn(name = "id_tarefa", nullable = false)
     private TarefaEntity tarefa;
 
-    public SubtarefaEntity(Long id, String titulo, Boolean concluida, LocalDateTime criadoEm, LocalDateTime atualizadoEm, Boolean ativo, TarefaEntity tarefa) {
+    public SubtarefaEntity(Long id, Long idUsuario, String titulo, Boolean concluida, LocalDateTime criadoEm, LocalDateTime atualizadoEm, Boolean ativo, TarefaEntity tarefa) {
         this.id = id;
+        this.idUsuario = idUsuario;
         this.titulo = titulo;
         this.concluida = concluida;
         this.criadoEm = criadoEm;

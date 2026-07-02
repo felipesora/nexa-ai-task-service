@@ -7,15 +7,24 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SpringDataTarefaRepository extends JpaRepository<TarefaEntity, Long> {
 
     Page<TarefaEntity> findByWorkspace_Id(Long idWorkspace, Pageable pageable);
 
+    Page<TarefaEntity> findByWorkspace_IdAndAtivoTrue(Long idWorkspace, Pageable pageable);
+
     Page<TarefaEntity> findByIdUsuario(Long idUsuario, Pageable pageable);
+
+    Page<TarefaEntity> findByIdUsuarioAndAtivoTrue(Long idUsuario, Pageable pageable);
 
     Page<TarefaEntity> findByIdUsuarioAndTituloContainingIgnoreCase(Long idUsuario, String titulo, Pageable pageable);
 
+    Page<TarefaEntity> findByIdUsuarioAndTituloContainingIgnoreCaseAndAtivoTrue(Long idUsuario, String titulo, Pageable pageable);
+
     List<TarefaEntity> findAllByWorkspace_Id(Long idWorkspace);
+
+    Optional<TarefaEntity> findByIdAndAtivoTrue(Long id);
 }

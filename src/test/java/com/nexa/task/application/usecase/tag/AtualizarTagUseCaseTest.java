@@ -9,6 +9,7 @@ import com.nexa.task.domain.entity.tag.CorTag;
 import com.nexa.task.domain.entity.tag.Tag;
 import com.nexa.task.domain.repository.CorTagRepository;
 import com.nexa.task.domain.repository.TagRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,10 +21,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AtualizarTagUseCaseTest {
@@ -33,6 +33,9 @@ class AtualizarTagUseCaseTest {
 
     @Mock
     private CorTagRepository corTagRepository;
+
+    @Mock
+    private AuthenticationService authService;
 
     @InjectMocks
     private AtualizarTagUseCase useCase;
@@ -48,13 +51,22 @@ class AtualizarTagUseCaseTest {
 
         Tag tag = new TagBuilder()
                 .comId(idTag)
+                .comIdUsuario(1L)
                 .comNome("Tag Antiga")
                 .build();
 
-        when(tagRepository.findById(idTag)).thenReturn(Optional.of(tag));
+        when(tagRepository.findByIdAtivo(idTag)).thenReturn(Optional.of(tag));
+        when(tagRepository.existsByNomeAndIdUsuarioAndIdNot(
+                "Tag Atualizada",
+                1L,
+                idTag
+        )).thenReturn(false);
+
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
 
         useCase.execute(idTag, request);
 
+        verify(authService).validateOwnerOrAdmin(1L);
         verify(tagRepository).save(tag);
 
         assertEquals("Tag Atualizada", tag.getNome());
@@ -72,6 +84,7 @@ class AtualizarTagUseCaseTest {
 
         Tag tag = new TagBuilder()
                 .comId(idTag)
+                .comIdUsuario(1L)
                 .comNome("Tag Antiga")
                 .comCor(null)
                 .build();
@@ -81,11 +94,19 @@ class AtualizarTagUseCaseTest {
                 .comCor("#123456")
                 .build();
 
-        when(tagRepository.findById(idTag)).thenReturn(Optional.of(tag));
-        when(corTagRepository.findById(10L)).thenReturn(Optional.of(corTag));
+        when(tagRepository.findByIdAtivo(idTag)).thenReturn(Optional.of(tag));
+        when(tagRepository.existsByNomeAndIdUsuarioAndIdNot(
+                "Tag Atualizada",
+                1L,
+                idTag
+        )).thenReturn(false);
+        when(corTagRepository.findByIdAtivo(10L)).thenReturn(Optional.of(corTag));
+
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
 
         useCase.execute(idTag, request);
 
+        verify(authService).validateOwnerOrAdmin(1L);
         verify(tagRepository).save(tag);
 
         assertEquals("Tag Atualizada", tag.getNome());
@@ -101,7 +122,7 @@ class AtualizarTagUseCaseTest {
                 null
         );
 
-        when(tagRepository.findById(idTag)).thenReturn(Optional.empty());
+        when(tagRepository.findByIdAtivo(idTag)).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
                 EntityNotFoundException.class,
@@ -110,6 +131,7 @@ class AtualizarTagUseCaseTest {
 
         assertEquals("Tag com id: 999 não encontrada.", exception.getMessage());
 
+        verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verify(tagRepository, never()).save(any());
     }
 
@@ -124,10 +146,18 @@ class AtualizarTagUseCaseTest {
 
         Tag tag = new TagBuilder()
                 .comId(idTag)
+                .comIdUsuario(1L)
                 .build();
 
-        when(tagRepository.findById(idTag)).thenReturn(Optional.of(tag));
-        when(corTagRepository.findById(99L)).thenReturn(Optional.empty());
+        when(tagRepository.findByIdAtivo(idTag)).thenReturn(Optional.of(tag));
+        when(tagRepository.existsByNomeAndIdUsuarioAndIdNot(
+                "Tag Atualizada",
+                1L,
+                idTag
+        )).thenReturn(false);
+        when(corTagRepository.findByIdAtivo(99L)).thenReturn(Optional.empty());
+
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
 
         EntityNotFoundException exception = assertThrows(
                 EntityNotFoundException.class,
@@ -136,6 +166,7 @@ class AtualizarTagUseCaseTest {
 
         assertEquals("Cor com id: 99 não encontrada", exception.getMessage());
 
+        verify(authService).validateOwnerOrAdmin(1L);
         verify(tagRepository, never()).save(any());
     }
 
@@ -154,7 +185,10 @@ class AtualizarTagUseCaseTest {
                 .comNome("Tag Antiga")
                 .build();
 
-        when(tagRepository.findById(idTag)).thenReturn(Optional.of(tag));
+        when(tagRepository.findByIdAtivo(idTag)).thenReturn(Optional.of(tag));
+
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
+
         when(tagRepository.existsByNomeAndIdUsuarioAndIdNot(
                 "Tag Atualizada",
                 1L,
@@ -168,7 +202,8 @@ class AtualizarTagUseCaseTest {
 
         assertEquals("Já existe uma tag com esse nome para este usuário", exception.getMessage());
 
-        verify(corTagRepository, never()).findById(any());
+        verify(authService).validateOwnerOrAdmin(1L);
+        verify(corTagRepository, never()).findByIdAtivo(anyLong());
         verify(tagRepository, never()).save(any());
     }
 }

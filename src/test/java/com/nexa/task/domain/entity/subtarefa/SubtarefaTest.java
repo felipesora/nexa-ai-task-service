@@ -14,10 +14,19 @@ class SubtarefaTest {
 
         assertNotNull(subtarefa);
         assertEquals(1L, subtarefa.getId());
+        assertEquals(1L, subtarefa.getIdUsuario());
         assertEquals("Título da subtarefa", subtarefa.getTitulo());
         assertFalse(subtarefa.getConcluida());
         assertTrue(subtarefa.getAtivo());
         assertEquals(1L, subtarefa.getTarefa().getId());
+    }
+
+    @Test
+    void deveLancarDomainExceptionCasoIdUsuarioEstejaVazioOuIgualAZero() {
+        DomainException exception = assertThrows(DomainException.class,
+                () -> new SubtarefaBuilder().comIdUsuario(null).build());
+
+        assertEquals("Id do Usuário da subtarefa é obrigatório.", exception.getMessage());
     }
 
     @Test

@@ -11,10 +11,6 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 public record TarefaCreateDTO(
-        @NotNull(message = "ID do usuário é obrigatório")
-        @JsonProperty("id_usuario")
-        Long idUsuario,
-
         @NotBlank(message = "Título da tarefa é obrigatório")
         @Size(min = 3, max = 200, message = "O Título deve ter entre 3 e 200 caracteres")
         String titulo,

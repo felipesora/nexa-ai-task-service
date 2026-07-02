@@ -18,6 +18,7 @@ public class SubtarefaPersistenceMapper {
 
         return new SubtarefaEntity(
                 subtarefa.getId(),
+                subtarefa.getIdUsuario(),
                 subtarefa.getTitulo(),
                 subtarefa.getConcluida(),
                 subtarefa.getCriadoEm(),
@@ -34,6 +35,7 @@ public class SubtarefaPersistenceMapper {
 
         return new Subtarefa(
                 entity.getId(),
+                entity.getIdUsuario(),
                 entity.getTitulo(),
                 entity.getConcluida(),
                 entity.getCriadoEm(),

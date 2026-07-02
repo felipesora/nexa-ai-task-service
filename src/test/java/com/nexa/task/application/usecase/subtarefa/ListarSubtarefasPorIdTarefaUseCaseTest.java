@@ -7,6 +7,7 @@ import com.nexa.task.domain.entity.subtarefa.Subtarefa;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.repository.SubtarefaRepository;
 import com.nexa.task.domain.repository.TarefaRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +22,10 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,6 +39,9 @@ class ListarSubtarefasPorIdTarefaUseCaseTest {
 
     @Mock
     private SubtarefaControllerMapper mapper;
+
+    @Mock
+    private AuthenticationService authService;
 
     @InjectMocks
     private ListarSubtarefasPorIdTarefaUseCase useCase;
@@ -61,10 +68,15 @@ class ListarSubtarefasPorIdTarefaUseCaseTest {
         Page<Subtarefa> page =
                 new PageImpl<>(List.of(subtarefa));
 
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
 
-        when(subtarefaRepository.findByIdTarefa(1L, pageable))
+        when(tarefa.getIdUsuario())
+                .thenReturn(10L);
+
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
+
+        when(subtarefaRepository.findByIdTarefaAndAtivo(1L, pageable))
                 .thenReturn(page);
 
         when(mapper.toResponse(subtarefa))
@@ -75,20 +87,16 @@ class ListarSubtarefasPorIdTarefaUseCaseTest {
 
         assertEquals(1, resultado.getTotalElements());
 
-        verify(tarefaRepository)
-                .findById(1L);
-
-        verify(subtarefaRepository)
-                .findByIdTarefa(1L, pageable);
-
-        verify(mapper)
-                .toResponse(subtarefa);
+        verify(tarefaRepository).findByIdAtivo(1L);
+        verify(authService).validateOwnerOrAdmin(10L);
+        verify(subtarefaRepository).findByIdTarefaAndAtivo(1L, pageable);
+        verify(mapper).toResponse(subtarefa);
     }
 
     @Test
     void deveLancarExcecaoQuandoTarefaNaoForEncontrada() {
 
-        when(tarefaRepository.findById(999L))
+        when(tarefaRepository.findByIdAtivo(999L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
@@ -102,7 +110,8 @@ class ListarSubtarefasPorIdTarefaUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verify(subtarefaRepository, never())
-                .findByIdTarefa(anyLong(), any());
+                .findByIdTarefaAndAtivo(anyLong(), any());
     }
 }

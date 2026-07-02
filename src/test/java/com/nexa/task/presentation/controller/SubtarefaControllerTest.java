@@ -6,10 +6,14 @@ import com.nexa.task.application.dto.subtarefa.SubtarefaResponseDTO;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.usecase.subtarefa.*;
 import com.nexa.task.application.dto.subtarefa.SubtarefaUpdateDTO;
+import com.nexa.task.infra.security.JwtAuthenticationFilter;
+import com.nexa.task.infra.security.TokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.data.domain.Page;
@@ -32,6 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(SubtarefaController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class SubtarefaControllerTest {
 
     @Autowired
@@ -64,6 +69,12 @@ class SubtarefaControllerTest {
     @MockitoBean
     private DesmarcarSubtarefaConcluidaUseCase desmarcarSubtarefaConcluidaUseCase;
 
+    @MockitoBean
+    private TokenProvider tokenProvider;
+
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
     private SubtarefaCreateDTO request;
     private SubtarefaResponseDTO response;
     private SubtarefaUpdateDTO updateDto;
@@ -77,6 +88,7 @@ class SubtarefaControllerTest {
         );
 
         response = new SubtarefaResponseDTO(
+                1L,
                 1L,
                 "Minha subtarefa",
                 false,
@@ -92,6 +104,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveCadastrarSubtarefaComSucesso() throws Exception {
 
         when(cadastrarSubtarefaUseCase.execute(request))
@@ -116,6 +129,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoTarefaNaoForEncontrada() throws Exception {
 
         when(cadastrarSubtarefaUseCase.execute(request))
@@ -135,6 +149,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoRequestForInvalido() throws Exception {
 
         SubtarefaCreateDTO requestInvalido =
@@ -153,6 +168,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveListarTodasAsSubtarefas() throws Exception {
 
         Page<SubtarefaResponseDTO> page =
@@ -176,6 +192,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveBuscarSubtarefaPorIdComSucesso() throws Exception {
 
         when(buscarSubtarefaPorIdUseCase.execute(1L))
@@ -195,6 +212,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoSubtarefaNaoForEncontrada() throws Exception {
 
         when(buscarSubtarefaPorIdUseCase.execute(999L))
@@ -212,6 +230,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveAtualizarSubtarefaComSucesso() throws Exception {
 
         doNothing().when(atualizarSubtarefaUseCase)
@@ -226,6 +245,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoSubtarefaNaoForEncontradaAoAtualizar() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -246,6 +266,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar400QuandoRequestDeAtualizacaoForInvalido() throws Exception {
 
         SubtarefaUpdateDTO dtoInvalido =
@@ -263,6 +284,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveDesativarSubtarefaComSucesso() throws Exception {
 
         doNothing().when(desativarSubtarefaUseCase)
@@ -273,6 +295,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoSubtarefaNaoForEncontradaAoDesativar() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -289,6 +312,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveAtivarSubtarefaComSucesso() throws Exception {
 
         doNothing().when(ativarSubtarefaUseCase)
@@ -299,6 +323,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoSubtarefaNaoForEncontradaAoAtivar() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -315,6 +340,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveConcluirSubtarefaComSucesso() throws Exception {
 
         doNothing().when(concluirSubtarefaUseCase)
@@ -327,6 +353,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoSubtarefaNaoForEncontradaAoConcluir() throws Exception {
 
         doThrow(new EntityNotFoundException(
@@ -345,6 +372,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveDesmarcarConclusaoSubtarefaComSucesso() throws Exception {
 
         doNothing().when(desmarcarSubtarefaConcluidaUseCase)
@@ -357,6 +385,7 @@ class SubtarefaControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deveRetornar404QuandoSubtarefaNaoForEncontradaAoDesmarcarConclusao() throws Exception {
 
         doThrow(new EntityNotFoundException(

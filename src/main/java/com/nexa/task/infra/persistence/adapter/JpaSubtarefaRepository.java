@@ -41,6 +41,12 @@ public class JpaSubtarefaRepository implements SubtarefaRepository {
     }
 
     @Override
+    public Page<Subtarefa> findByIdTarefaAndAtivo(Long idTarefa, Pageable pageable) {
+        return repository.findByTarefa_IdAndAtivoTrue(idTarefa, pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public List<Subtarefa> findAllByTarefa(Long idTarefa) {
         return repository.findByTarefa_Id(idTarefa)
                 .stream()
@@ -51,6 +57,12 @@ public class JpaSubtarefaRepository implements SubtarefaRepository {
     @Override
     public Optional<Subtarefa> findById(Long id) {
         return repository.findById(id)
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public Optional<Subtarefa> findByIdAtivo(Long id) {
+        return repository.findByIdAndAtivoTrue(id)
                 .map(mapper::toDomain);
     }
 }

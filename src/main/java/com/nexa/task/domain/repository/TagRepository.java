@@ -14,11 +14,19 @@ public interface TagRepository {
 
     Page<Tag> findByIdTarefa(Long idTarefa, Pageable pageable);
 
+    Page<Tag> findByIdTarefaAndAtivo(Long idTarefa, Pageable pageable);
+
     Page<Tag> findByIdUsuario(Long idUsuario, Pageable pageable);
 
+    Page<Tag> findByIdUsuarioAndAtivo(Long idUsuario, Pageable pageable);
+
     Optional<Tag> findById(Long id);
+
+    Optional<Tag> findByIdAtivo(Long id);
 
     boolean existsByNomeAndIdUsuario(String nome, Long idUsuario);
 
     boolean existsByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id);
+
+    void removerCorDasTags(Long idCor);
 }

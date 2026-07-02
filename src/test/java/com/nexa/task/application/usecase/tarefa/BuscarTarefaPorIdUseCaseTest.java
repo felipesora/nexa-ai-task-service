@@ -6,6 +6,7 @@ import com.nexa.task.application.mapper.TarefaControllerMapper;
 import com.nexa.task.domain.builder.tarefa.TarefaBuilder;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.repository.TarefaRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,6 +28,9 @@ class BuscarTarefaPorIdUseCaseTest {
     @Mock
     private TarefaControllerMapper mapper;
 
+    @Mock
+    private AuthenticationService authService;
+
     @InjectMocks
     private BuscarTarefaPorIdUseCase useCase;
 
@@ -34,31 +39,33 @@ class BuscarTarefaPorIdUseCaseTest {
 
         Tarefa tarefa = new TarefaBuilder()
                 .comId(1L)
+                .comIdUsuario(10L)
                 .comTitulo("Minha tarefa")
                 .build();
 
-        TarefaResponseDTO response =
-                mock(TarefaResponseDTO.class);
+        TarefaResponseDTO response = mock(TarefaResponseDTO.class);
 
-        when(tarefaRepository.findById(1L))
+        when(tarefaRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(tarefa));
 
         when(mapper.toResponse(tarefa))
                 .thenReturn(response);
 
-        TarefaResponseDTO resultado =
-                useCase.execute(1L);
+        doNothing().when(authService).validateOwnerOrAdmin(anyLong());
+
+        TarefaResponseDTO resultado = useCase.execute(1L);
 
         assertNotNull(resultado);
 
-        verify(tarefaRepository).findById(1L);
+        verify(tarefaRepository).findByIdAtivo(1L);
+        verify(authService).validateOwnerOrAdmin(10L);
         verify(mapper).toResponse(tarefa);
     }
 
     @Test
     void deveLancarExcecaoQuandoTarefaNaoEncontrada() {
 
-        when(tarefaRepository.findById(999L))
+        when(tarefaRepository.findByIdAtivo(999L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
@@ -72,7 +79,8 @@ class BuscarTarefaPorIdUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(tarefaRepository).findById(999L);
+        verify(tarefaRepository).findByIdAtivo(999L);
+        verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verifyNoInteractions(mapper);
     }
 }

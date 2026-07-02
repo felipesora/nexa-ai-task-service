@@ -17,6 +17,7 @@ import com.nexa.task.infra.persistence.adapter.JpaTagRepository;
 import com.nexa.task.infra.persistence.mapper.CorTagPersistenceMapper;
 import com.nexa.task.infra.persistence.mapper.TagPersistenceMapper;
 import com.nexa.task.infra.persistence.repository.SpringDataTagRepository;
+import com.nexa.task.infra.security.AuthenticationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,8 +27,9 @@ public class TagBeanConfig {
     @Bean
     CadastrarTagUseCase cadastrarTagUseCase(TagRepository tagRepository,
                                             CorTagRepository corTagRepository,
-                                            TagControllerMapper mapper) {
-        return new CadastrarTagUseCase(tagRepository, corTagRepository, mapper);
+                                            TagControllerMapper mapper,
+                                            AuthenticationService authService) {
+        return new CadastrarTagUseCase(tagRepository, corTagRepository, mapper, authService);
     }
 
     @Bean
@@ -36,28 +38,32 @@ public class TagBeanConfig {
     }
 
     @Bean
-    BuscarTagPorIdUseCase buscarTagPorIdUseCase(TagRepository repository, TagControllerMapper mapper) {
-        return new BuscarTagPorIdUseCase(repository, mapper);
+    BuscarTagPorIdUseCase buscarTagPorIdUseCase(TagRepository repository, TagControllerMapper mapper,
+                                                AuthenticationService authService) {
+        return new BuscarTagPorIdUseCase(repository, mapper, authService);
     }
 
     @Bean
-    ListarTagsPorIdUsuarioUseCase listarTagsPorIdUsuarioUseCase(TagRepository repository, TagControllerMapper mapper) {
-        return new ListarTagsPorIdUsuarioUseCase(repository, mapper);
+    ListarTagsPorIdUsuarioUseCase listarTagsPorIdUsuarioUseCase(TagRepository repository, TagControllerMapper mapper,
+                                                                AuthenticationService authService) {
+        return new ListarTagsPorIdUsuarioUseCase(repository, mapper, authService);
     }
 
     @Bean
-    ListarTagsPorIdTarefaUseCase listarTagsPorIdTarefaUseCase(TagRepository repository, TarefaRepository tarefaRepository, TagControllerMapper mapper) {
-        return new ListarTagsPorIdTarefaUseCase(repository, tarefaRepository, mapper);
+    ListarTagsPorIdTarefaUseCase listarTagsPorIdTarefaUseCase(TagRepository repository, TarefaRepository tarefaRepository, TagControllerMapper mapper,
+                                                              AuthenticationService authService) {
+        return new ListarTagsPorIdTarefaUseCase(repository, tarefaRepository, mapper, authService);
     }
 
     @Bean
-    AtualizarTagUseCase atualizarTagUseCase(TagRepository tagRepository, CorTagRepository corTagRepository) {
-        return new AtualizarTagUseCase(tagRepository, corTagRepository);
+    AtualizarTagUseCase atualizarTagUseCase(TagRepository tagRepository, CorTagRepository corTagRepository,
+                                            AuthenticationService authService) {
+        return new AtualizarTagUseCase(tagRepository, corTagRepository, authService);
     }
 
     @Bean
-    DesativarTagUseCase desativarTagUseCase(TagRepository tagRepository) {
-        return new DesativarTagUseCase(tagRepository);
+    DesativarTagUseCase desativarTagUseCase(TagRepository tagRepository, AuthenticationService authService) {
+        return new DesativarTagUseCase(tagRepository, authService);
     }
 
     @Bean

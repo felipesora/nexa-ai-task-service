@@ -40,14 +40,32 @@ public class JpaTagRepository implements TagRepository {
     }
 
     @Override
+    public Page<Tag> findByIdTarefaAndAtivo(Long idTarefa, Pageable pageable) {
+        return repository.buscarTagsPorIdTarefaAndAtivo(idTarefa, pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public Page<Tag> findByIdUsuario(Long idUsuario, Pageable pageable) {
         return repository.findByIdUsuario(idUsuario, pageable)
                 .map(mapper::toDomain);
     }
 
     @Override
+    public Page<Tag> findByIdUsuarioAndAtivo(Long idUsuario, Pageable pageable) {
+        return repository.findByIdUsuarioAndAtivoTrue(idUsuario, pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public Optional<Tag> findById(Long id) {
         return repository.findById(id)
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public Optional<Tag> findByIdAtivo(Long id) {
+        return repository.findByIdAndAtivoTrue(id)
                 .map(mapper::toDomain);
     }
 
@@ -59,5 +77,10 @@ public class JpaTagRepository implements TagRepository {
     @Override
     public boolean existsByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id) {
         return repository.existsByNomeAndIdUsuarioAndIdNot(nome, idUsuario, id);
+    }
+
+    @Override
+    public void removerCorDasTags(Long idCor) {
+        repository.removerCorDasTags(idCor);
     }
 }

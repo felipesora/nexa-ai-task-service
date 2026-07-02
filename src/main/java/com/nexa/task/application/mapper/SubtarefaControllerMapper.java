@@ -9,9 +9,10 @@ import java.time.LocalDateTime;
 
 public class SubtarefaControllerMapper {
 
-    public Subtarefa toDomain(SubtarefaCreateDTO request, Tarefa tarefa) {
+    public Subtarefa toDomain(SubtarefaCreateDTO request, Tarefa tarefa, Long idUsuario) {
         return new Subtarefa(
                 null,
+                idUsuario,
                 request.titulo(),
                 false,
                 LocalDateTime.now(),
@@ -24,6 +25,7 @@ public class SubtarefaControllerMapper {
     public SubtarefaResponseDTO toResponse(Subtarefa subtarefa) {
         return new SubtarefaResponseDTO(
                 subtarefa.getId(),
+                subtarefa.getIdUsuario(),
                 subtarefa.getTitulo(),
                 subtarefa.getConcluida(),
                 subtarefa.getCriadoEm(),

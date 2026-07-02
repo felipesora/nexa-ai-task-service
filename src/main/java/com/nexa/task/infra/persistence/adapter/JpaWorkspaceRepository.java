@@ -8,6 +8,7 @@ import com.nexa.task.infra.persistence.repository.SpringDataWorkspaceRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public class JpaWorkspaceRepository implements WorkspaceRepository {
@@ -40,14 +41,48 @@ public class JpaWorkspaceRepository implements WorkspaceRepository {
     }
 
     @Override
+    public Page<Workspace> findByIdUsuarioAndAtivo(Long idUsuario, Pageable pageable) {
+        return repository.findByIdUsuarioAndAtivoTrue(idUsuario, pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public Page<Workspace> findByIdUsuarioAndNome(Long idUsuario, String nome, Pageable pageable) {
         return repository.findByIdUsuarioAndNomeContainingIgnoreCase(idUsuario, nome, pageable)
                 .map(mapper::toDomain);
     }
 
     @Override
+    public Page<Workspace> findByIdUsuarioAndNomeAndAtivo(Long idUsuario, String nome, Pageable pageable) {
+        return repository.findByIdUsuarioAndNomeContainingIgnoreCaseAndAtivoTrue(idUsuario, nome, pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public List<Workspace> findAllByIdIconeWorkspace(Long idIconeWorkspace) {
+        return repository.findAllByIconeWorkspaceId(idIconeWorkspace)
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Workspace> findAllByIdCorWorkspace(Long idCorWorkspace) {
+        return repository.findAllByCorWorkspaceId(idCorWorkspace)
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
     public Optional<Workspace> findById(Long id) {
         return repository.findById(id)
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public Optional<Workspace> findByIdAtivo(Long id) {
+        return repository.findByIdAndAtivoTrue(id)
                 .map(mapper::toDomain);
     }
 
@@ -59,5 +94,15 @@ public class JpaWorkspaceRepository implements WorkspaceRepository {
     @Override
     public boolean existsByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id) {
         return repository.existsByNomeAndIdUsuarioAndIdNot(nome, idUsuario, id);
+    }
+
+    @Override
+    public void removerIconeDosWorkspaces(Long idIcone) {
+        repository.removerIconeDosWorkspaces(idIcone);
+    }
+
+    @Override
+    public void removerCorDosWorkspaces(Long idCor) {
+        repository.removerCorDosWorkspaces(idCor);
     }
 }

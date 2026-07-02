@@ -6,6 +6,10 @@ import com.nexa.task.infra.persistence.entity.tag.CorTagEntity;
 public class CorTagPersistenceMapper {
 
     public CorTagEntity toEntity(CorTag cor) {
+        if (cor == null) {
+            return null;
+        }
+
         return new CorTagEntity(
                 cor.getId(),
                 cor.getCor(),
@@ -14,6 +18,10 @@ public class CorTagPersistenceMapper {
     }
 
     public CorTag toDomain(CorTagEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+
         return new CorTag(
                 entity.getId(),
                 entity.getCor(),

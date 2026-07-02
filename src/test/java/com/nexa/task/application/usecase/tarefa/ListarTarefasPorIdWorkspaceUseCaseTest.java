@@ -8,6 +8,8 @@ import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.entity.workspace.Workspace;
 import com.nexa.task.domain.repository.TarefaRepository;
 import com.nexa.task.domain.repository.WorkspaceRepository;
+import com.nexa.task.infra.security.AuthenticationService;
+import com.nexa.task.infra.security.ForbiddenException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +37,9 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
     @Mock
     private TarefaControllerMapper mapper;
 
+    @Mock
+    private AuthenticationService authService;
+
     @InjectMocks
     private ListarTarefasPorIdWorkspaceUseCase useCase;
 
@@ -60,10 +65,13 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
         Page<Tarefa> page =
                 new PageImpl<>(List.of(tarefa));
 
-        when(workspaceRepository.findById(1L))
+        when(workspaceRepository.findByIdAtivo(1L))
                 .thenReturn(Optional.of(workspace));
 
-        when(tarefaRepository.findByIdWorkspace(1L, pageable))
+        when(workspace.getIdUsuario()).thenReturn(1L);
+        doNothing().when(authService).validateOwnerOrAdmin(1L);
+
+        when(tarefaRepository.findByIdWorkspaceAndAtivo(1L, pageable))
                 .thenReturn(page);
 
         when(mapper.toResponse(tarefa))
@@ -74,20 +82,16 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
 
         assertEquals(1, resultado.getTotalElements());
 
-        verify(workspaceRepository)
-                .findById(1L);
-
-        verify(tarefaRepository)
-                .findByIdWorkspace(1L, pageable);
-
-        verify(mapper)
-                .toResponse(tarefa);
+        verify(workspaceRepository).findByIdAtivo(1L);
+        verify(authService).validateOwnerOrAdmin(1L);
+        verify(tarefaRepository).findByIdWorkspaceAndAtivo(1L, pageable);
+        verify(mapper).toResponse(tarefa);
     }
 
     @Test
     void deveLancarExcecaoQuandoWorkspaceNaoForEncontrado() {
 
-        when(workspaceRepository.findById(999L))
+        when(workspaceRepository.findByIdAtivo(999L))
                 .thenReturn(Optional.empty());
 
         EntityNotFoundException exception =
@@ -101,7 +105,31 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(authService, never()).validateOwnerOrAdmin(anyLong());
+        verify(tarefaRepository, never()).findByIdWorkspaceAndAtivo(anyLong(), any());
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoUsuarioNaoTemPermissao() {
+
+        when(workspaceRepository.findByIdAtivo(1L))
+                .thenReturn(Optional.of(workspace));
+
+        when(workspace.getIdUsuario()).thenReturn(1L);
+
+        doThrow(new ForbiddenException("Acesso negado"))
+                .when(authService)
+                .validateOwnerOrAdmin(1L);
+
+        assertThrows(
+                ForbiddenException.class,
+                () -> useCase.execute(1L, pageable)
+        );
+
         verify(tarefaRepository, never())
-                .findByIdWorkspace(anyLong(), any());
+                .findByIdWorkspaceAndAtivo(anyLong(), any());
+
+        verify(mapper, never())
+                .toResponse(any());
     }
 }
