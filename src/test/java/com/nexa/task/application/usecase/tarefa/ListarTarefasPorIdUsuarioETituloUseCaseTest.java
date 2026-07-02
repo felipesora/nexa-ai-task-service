@@ -51,7 +51,7 @@ class ListarTarefasPorIdUsuarioETituloUseCaseTest {
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
 
-        when(tarefaRepository.findByIdUsuarioAndTitulo(
+        when(tarefaRepository.findByIdUsuarioAndTituloAndAtivo(
                 1L,
                 "Minha tarefa",
                 pageable
@@ -72,7 +72,7 @@ class ListarTarefasPorIdUsuarioETituloUseCaseTest {
         verify(authService).validateOwnerOrAdmin(1L);
 
         verify(tarefaRepository)
-                .findByIdUsuarioAndTitulo(
+                .findByIdUsuarioAndTituloAndAtivo(
                         1L,
                         "Minha tarefa",
                         pageable

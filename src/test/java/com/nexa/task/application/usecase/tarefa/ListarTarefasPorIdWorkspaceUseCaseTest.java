@@ -71,7 +71,7 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
         when(workspace.getIdUsuario()).thenReturn(1L);
         doNothing().when(authService).validateOwnerOrAdmin(1L);
 
-        when(tarefaRepository.findByIdWorkspace(1L, pageable))
+        when(tarefaRepository.findByIdWorkspaceAndAtivo(1L, pageable))
                 .thenReturn(page);
 
         when(mapper.toResponse(tarefa))
@@ -84,7 +84,7 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
 
         verify(workspaceRepository).findByIdAtivo(1L);
         verify(authService).validateOwnerOrAdmin(1L);
-        verify(tarefaRepository).findByIdWorkspace(1L, pageable);
+        verify(tarefaRepository).findByIdWorkspaceAndAtivo(1L, pageable);
         verify(mapper).toResponse(tarefa);
     }
 
@@ -106,7 +106,7 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
         );
 
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
-        verify(tarefaRepository, never()).findByIdWorkspace(anyLong(), any());
+        verify(tarefaRepository, never()).findByIdWorkspaceAndAtivo(anyLong(), any());
     }
 
     @Test
@@ -127,7 +127,7 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
         );
 
         verify(tarefaRepository, never())
-                .findByIdWorkspace(anyLong(), any());
+                .findByIdWorkspaceAndAtivo(anyLong(), any());
 
         verify(mapper, never())
                 .toResponse(any());

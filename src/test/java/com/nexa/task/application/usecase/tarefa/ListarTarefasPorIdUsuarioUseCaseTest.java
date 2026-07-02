@@ -54,7 +54,7 @@ class ListarTarefasPorIdUsuarioUseCaseTest {
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
 
-        when(tarefaRepository.findByIdUsuario(1L, pageable))
+        when(tarefaRepository.findByIdUsuarioAndAtivo(1L, pageable))
                 .thenReturn(page);
 
         when(mapper.toResponse(tarefa))
@@ -66,7 +66,7 @@ class ListarTarefasPorIdUsuarioUseCaseTest {
         assertEquals(1, resultado.getTotalElements());
 
         verify(authService).validateOwnerOrAdmin(1L);
-        verify(tarefaRepository).findByIdUsuario(1L, pageable);
+        verify(tarefaRepository).findByIdUsuarioAndAtivo(1L, pageable);
         verify(mapper).toResponse(tarefa);
     }
 }

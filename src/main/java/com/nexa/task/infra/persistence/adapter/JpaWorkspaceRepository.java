@@ -41,8 +41,20 @@ public class JpaWorkspaceRepository implements WorkspaceRepository {
     }
 
     @Override
+    public Page<Workspace> findByIdUsuarioAndAtivo(Long idUsuario, Pageable pageable) {
+        return repository.findByIdUsuarioAndAtivoTrue(idUsuario, pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public Page<Workspace> findByIdUsuarioAndNome(Long idUsuario, String nome, Pageable pageable) {
         return repository.findByIdUsuarioAndNomeContainingIgnoreCase(idUsuario, nome, pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public Page<Workspace> findByIdUsuarioAndNomeAndAtivo(Long idUsuario, String nome, Pageable pageable) {
+        return repository.findByIdUsuarioAndNomeContainingIgnoreCaseAndAtivoTrue(idUsuario, nome, pageable)
                 .map(mapper::toDomain);
     }
 

@@ -76,7 +76,7 @@ class ListarSubtarefasPorIdTarefaUseCaseTest {
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
 
-        when(subtarefaRepository.findByIdTarefa(1L, pageable))
+        when(subtarefaRepository.findByIdTarefaAndAtivo(1L, pageable))
                 .thenReturn(page);
 
         when(mapper.toResponse(subtarefa))
@@ -89,7 +89,7 @@ class ListarSubtarefasPorIdTarefaUseCaseTest {
 
         verify(tarefaRepository).findByIdAtivo(1L);
         verify(authService).validateOwnerOrAdmin(10L);
-        verify(subtarefaRepository).findByIdTarefa(1L, pageable);
+        verify(subtarefaRepository).findByIdTarefaAndAtivo(1L, pageable);
         verify(mapper).toResponse(subtarefa);
     }
 
@@ -112,6 +112,6 @@ class ListarSubtarefasPorIdTarefaUseCaseTest {
 
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
         verify(subtarefaRepository, never())
-                .findByIdTarefa(anyLong(), any());
+                .findByIdTarefaAndAtivo(anyLong(), any());
     }
 }

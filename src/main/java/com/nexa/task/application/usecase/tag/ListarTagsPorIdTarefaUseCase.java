@@ -30,7 +30,7 @@ public class ListarTagsPorIdTarefaUseCase {
 
         authService.validateOwnerOrAdmin(tarefa.getIdUsuario());
 
-        return tagRepository.findByIdTarefa(idTarefa, pageable)
+        return tagRepository.findByIdTarefaAndAtivo(idTarefa, pageable)
                 .map(mapper::toResponse);
     }
 }

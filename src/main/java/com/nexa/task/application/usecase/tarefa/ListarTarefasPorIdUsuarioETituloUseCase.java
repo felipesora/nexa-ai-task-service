@@ -22,7 +22,7 @@ public class ListarTarefasPorIdUsuarioETituloUseCase {
     public Page<TarefaResponseDTO> execute(Long idUsuario, String titulo, Pageable pageable) {
         authService.validateOwnerOrAdmin(idUsuario);
 
-        return tarefaRepository.findByIdUsuarioAndTitulo(idUsuario, titulo, pageable)
+        return tarefaRepository.findByIdUsuarioAndTituloAndAtivo(idUsuario, titulo, pageable)
                 .map(mapper::toResponse);
     }
 }

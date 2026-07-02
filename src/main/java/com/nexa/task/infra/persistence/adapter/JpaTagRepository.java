@@ -40,8 +40,20 @@ public class JpaTagRepository implements TagRepository {
     }
 
     @Override
+    public Page<Tag> findByIdTarefaAndAtivo(Long idTarefa, Pageable pageable) {
+        return repository.buscarTagsPorIdTarefaAndAtivo(idTarefa, pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public Page<Tag> findByIdUsuario(Long idUsuario, Pageable pageable) {
         return repository.findByIdUsuario(idUsuario, pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public Page<Tag> findByIdUsuarioAndAtivo(Long idUsuario, Pageable pageable) {
+        return repository.findByIdUsuarioAndAtivoTrue(idUsuario, pageable)
                 .map(mapper::toDomain);
     }
 

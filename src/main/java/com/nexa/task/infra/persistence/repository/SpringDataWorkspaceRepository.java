@@ -21,7 +21,11 @@ public interface SpringDataWorkspaceRepository extends JpaRepository<WorkspaceEn
 
     Page<WorkspaceEntity> findByIdUsuario(Long idUsuario, Pageable pageable);
 
+    Page<WorkspaceEntity> findByIdUsuarioAndAtivoTrue(Long idUsuario, Pageable pageable);
+
     Page<WorkspaceEntity> findByIdUsuarioAndNomeContainingIgnoreCase(Long idUsuario, String nome, Pageable pageable);
+
+    Page<WorkspaceEntity> findByIdUsuarioAndNomeContainingIgnoreCaseAndAtivoTrue(Long idUsuario, String nome, Pageable pageable);
 
     List<WorkspaceEntity> findAllByIconeWorkspaceId(Long idIconeWorkspace);
 

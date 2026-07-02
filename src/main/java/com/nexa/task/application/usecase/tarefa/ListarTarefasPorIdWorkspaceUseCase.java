@@ -30,7 +30,7 @@ public class ListarTarefasPorIdWorkspaceUseCase {
 
         authService.validateOwnerOrAdmin(workspace.getIdUsuario());
 
-        return tarefaRepository.findByIdWorkspace(idWorkspace, pageable)
+        return tarefaRepository.findByIdWorkspaceAndAtivo(idWorkspace, pageable)
                 .map(mapper::toResponse);
     }
 }

@@ -15,6 +15,8 @@ public interface SubtarefaRepository {
 
     Page<Subtarefa> findByIdTarefa(Long idTarefa, Pageable pageable);
 
+    Page<Subtarefa> findByIdTarefaAndAtivo(Long idTarefa, Pageable pageable);
+
     List<Subtarefa> findAllByTarefa(Long idTarefa);
 
     Optional<Subtarefa> findById(Long id);

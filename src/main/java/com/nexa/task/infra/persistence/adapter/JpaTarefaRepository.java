@@ -41,6 +41,12 @@ public class JpaTarefaRepository implements TarefaRepository {
     }
 
     @Override
+    public Page<Tarefa> findByIdWorkspaceAndAtivo(Long idWorkspace, Pageable pageable) {
+        return repository.findByWorkspace_IdAndAtivoTrue(idWorkspace, pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public List<Tarefa> findAllByWorkspace(Long idWorkspace) {
         return repository.findAllByWorkspace_Id(idWorkspace)
                 .stream()
@@ -55,8 +61,20 @@ public class JpaTarefaRepository implements TarefaRepository {
     }
 
     @Override
+    public Page<Tarefa> findByIdUsuarioAndAtivo(Long idUsuario, Pageable pageable) {
+        return repository.findByIdUsuarioAndAtivoTrue(idUsuario, pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public Page<Tarefa> findByIdUsuarioAndTitulo(Long idUsuario, String titulo, Pageable pageable) {
         return repository.findByIdUsuarioAndTituloContainingIgnoreCase(idUsuario, titulo, pageable)
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public Page<Tarefa> findByIdUsuarioAndTituloAndAtivo(Long idUsuario, String titulo, Pageable pageable) {
+        return repository.findByIdUsuarioAndTituloContainingIgnoreCaseAndAtivoTrue(idUsuario, titulo, pageable)
                 .map(mapper::toDomain);
     }
 

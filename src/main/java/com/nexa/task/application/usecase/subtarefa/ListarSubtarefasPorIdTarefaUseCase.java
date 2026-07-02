@@ -30,7 +30,7 @@ public class ListarSubtarefasPorIdTarefaUseCase {
 
         authService.validateOwnerOrAdmin(tarefa.getIdUsuario());
 
-        return subtarefaRepository.findByIdTarefa(idTarefa, pageable)
+        return subtarefaRepository.findByIdTarefaAndAtivo(idTarefa, pageable)
                 .map(mapper::toResponse);
     }
 }

@@ -96,7 +96,7 @@ class ListarTagsPorIdTarefaUseCaseTest {
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
 
-        when(tagRepository.findByIdTarefa(idTarefa, pageable))
+        when(tagRepository.findByIdTarefaAndAtivo(idTarefa, pageable))
                 .thenReturn(pageEntity);
 
         when(mapper.toResponse(tag1))
@@ -115,7 +115,7 @@ class ListarTagsPorIdTarefaUseCaseTest {
 
         verify(tarefaRepository).findByIdAtivo(idTarefa);
         verify(authService).validateOwnerOrAdmin(10L);
-        verify(tagRepository).findByIdTarefa(idTarefa, pageable);
+        verify(tagRepository).findByIdTarefaAndAtivo(idTarefa, pageable);
         verify(mapper).toResponse(tag1);
         verify(mapper).toResponse(tag2);
     }
@@ -141,6 +141,6 @@ class ListarTagsPorIdTarefaUseCaseTest {
 
         verify(tarefaRepository).findByIdAtivo(idTarefa);
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
-        verify(tagRepository, never()).findByIdTarefa(any(), any());
+        verify(tagRepository, never()).findByIdTarefaAndAtivo(any(), any());
     }
 }

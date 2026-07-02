@@ -22,7 +22,7 @@ public class ListarTagsPorIdUsuarioUseCase {
     public Page<TagResponseDTO> execute(Long idUsuario, Pageable pageable) {
         authService.validateOwnerOrAdmin(idUsuario);
 
-        return tagRepository.findByIdUsuario(idUsuario, pageable)
+        return tagRepository.findByIdUsuarioAndAtivo(idUsuario, pageable)
                 .map(mapper::toResponse);
     }
 }

@@ -23,7 +23,18 @@ public interface SpringDataTagRepository extends JpaRepository<TagEntity, Long> 
        """)
     Page<TagEntity> buscarTagsPorIdTarefa(@Param("idTarefa") Long idTarefa, Pageable pageable);
 
+    @Query("""
+   SELECT t
+   FROM TarefaEntity ta
+   JOIN ta.tags t
+   WHERE ta.id = :idTarefa
+     AND t.ativo = true
+   """)
+    Page<TagEntity> buscarTagsPorIdTarefaAndAtivo(@Param("idTarefa") Long idTarefa, Pageable pageable);
+
     Page<TagEntity> findByIdUsuario(Long idUsuario, Pageable pageable);
+
+    Page<TagEntity> findByIdUsuarioAndAtivoTrue(Long idUsuario, Pageable pageable);
 
     boolean existsByNomeAndIdUsuario(String nome, Long idUsuario);
 

@@ -14,7 +14,11 @@ public interface TagRepository {
 
     Page<Tag> findByIdTarefa(Long idTarefa, Pageable pageable);
 
+    Page<Tag> findByIdTarefaAndAtivo(Long idTarefa, Pageable pageable);
+
     Page<Tag> findByIdUsuario(Long idUsuario, Pageable pageable);
+
+    Page<Tag> findByIdUsuarioAndAtivo(Long idUsuario, Pageable pageable);
 
     Optional<Tag> findById(Long id);
 

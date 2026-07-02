@@ -80,7 +80,7 @@ class ListarTagsPorIdUsuarioUseCaseTest {
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
 
-        when(tagRepository.findByIdUsuario(idUsuario, pageable))
+        when(tagRepository.findByIdUsuarioAndAtivo(idUsuario, pageable))
                 .thenReturn(pageEntity);
 
         when(mapper.toResponse(tag1))
@@ -98,7 +98,7 @@ class ListarTagsPorIdUsuarioUseCaseTest {
         assertEquals("Estudo", resultado.getContent().get(1).nome());
 
         verify(authService).validateOwnerOrAdmin(idUsuario);
-        verify(tagRepository).findByIdUsuario(idUsuario, pageable);
+        verify(tagRepository).findByIdUsuarioAndAtivo(idUsuario, pageable);
         verify(mapper).toResponse(tag1);
         verify(mapper).toResponse(tag2);
     }

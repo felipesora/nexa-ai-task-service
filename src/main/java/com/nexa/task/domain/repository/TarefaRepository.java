@@ -15,11 +15,17 @@ public interface TarefaRepository {
 
     Page<Tarefa> findByIdWorkspace(Long idWorkspace, Pageable pageable);
 
+    Page<Tarefa> findByIdWorkspaceAndAtivo(Long idWorkspace, Pageable pageable);
+
     List<Tarefa> findAllByWorkspace(Long idWorkspace);
 
     Page<Tarefa> findByIdUsuario(Long idUsuario, Pageable pageable);
 
+    Page<Tarefa> findByIdUsuarioAndAtivo(Long idUsuario, Pageable pageable);
+
     Page<Tarefa> findByIdUsuarioAndTitulo(Long idUsuario, String titulo, Pageable pageable);
+
+    Page<Tarefa> findByIdUsuarioAndTituloAndAtivo(Long idUsuario, String titulo, Pageable pageable);
 
     Optional<Tarefa> findById(Long id);
 

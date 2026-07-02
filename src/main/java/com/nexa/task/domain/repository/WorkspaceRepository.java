@@ -15,7 +15,11 @@ public interface WorkspaceRepository {
 
     Page<Workspace> findByIdUsuario(Long idUsuario, Pageable pageable);
 
+    Page<Workspace> findByIdUsuarioAndAtivo(Long idUsuario, Pageable pageable);
+
     Page<Workspace> findByIdUsuarioAndNome(Long idUsuario, String nome, Pageable pageable);
+
+    Page<Workspace> findByIdUsuarioAndNomeAndAtivo(Long idUsuario, String nome, Pageable pageable);
 
     List<Workspace> findAllByIdIconeWorkspace(Long idIconeWorkspace);
 

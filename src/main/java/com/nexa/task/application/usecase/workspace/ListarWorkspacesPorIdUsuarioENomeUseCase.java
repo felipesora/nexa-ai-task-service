@@ -22,7 +22,7 @@ public class ListarWorkspacesPorIdUsuarioENomeUseCase {
     public Page<WorkspaceResponseDTO> execute(Long idUsuario, String nome, Pageable pageable) {
         authService.validateOwnerOrAdmin(idUsuario);
 
-        return workspaceRepository.findByIdUsuarioAndNome(idUsuario, nome, pageable)
+        return workspaceRepository.findByIdUsuarioAndNomeAndAtivo(idUsuario, nome, pageable)
                 .map(mapper::toResponse);
     }
 }

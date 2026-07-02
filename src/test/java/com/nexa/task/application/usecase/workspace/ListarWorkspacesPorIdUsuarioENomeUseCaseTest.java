@@ -70,7 +70,7 @@ class ListarWorkspacesPorIdUsuarioENomeUseCaseTest {
 
         doNothing().when(authService).validateOwnerOrAdmin(idUsuario);
 
-        when(workspaceRepository.findByIdUsuarioAndNome(
+        when(workspaceRepository.findByIdUsuarioAndNomeAndAtivo(
                 idUsuario,
                 nome,
                 pageable))
@@ -96,7 +96,7 @@ class ListarWorkspacesPorIdUsuarioENomeUseCaseTest {
         assertEquals(nome, workspaceRetornado.nome());
 
         verify(authService).validateOwnerOrAdmin(idUsuario);
-        verify(workspaceRepository).findByIdUsuarioAndNome(idUsuario, nome, pageable);
+        verify(workspaceRepository).findByIdUsuarioAndNomeAndAtivo(idUsuario, nome, pageable);
         verify(mapper).toResponse(workspace);
     }
 }

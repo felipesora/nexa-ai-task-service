@@ -84,7 +84,7 @@ class ListarWorkspacesPorIdUsuarioUseCaseTest {
 
         doNothing().when(authService).validateOwnerOrAdmin(idUsuario);
 
-        when(workspaceRepository.findByIdUsuario(idUsuario, pageable))
+        when(workspaceRepository.findByIdUsuarioAndAtivo(idUsuario, pageable))
                 .thenReturn(pageEntity);
 
         when(mapper.toResponse(workspace1))
@@ -111,7 +111,7 @@ class ListarWorkspacesPorIdUsuarioUseCaseTest {
         );
 
         verify(authService).validateOwnerOrAdmin(idUsuario);
-        verify(workspaceRepository).findByIdUsuario(idUsuario, pageable);
+        verify(workspaceRepository).findByIdUsuarioAndAtivo(idUsuario, pageable);
         verify(mapper).toResponse(workspace1);
         verify(mapper).toResponse(workspace2);
     }
