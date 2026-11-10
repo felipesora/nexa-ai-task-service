@@ -58,7 +58,8 @@ class BuscarWorkspacePorIdUseCaseTest {
                 LocalDateTime.now(),
                 true,
                 null,
-                null
+                null,
+                0L
         );
 
         doNothing().when(authService).validateOwnerOrAdmin(workspace.getIdUsuario());

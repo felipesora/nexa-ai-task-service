@@ -30,4 +30,6 @@ public interface TarefaRepository {
     Optional<Tarefa> findById(Long id);
 
     Optional<Tarefa> findByIdAtivo(Long id);
+
+    long countAtivasByIdWorkspace(Long idWorkspace);
 }

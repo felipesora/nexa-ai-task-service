@@ -59,7 +59,8 @@ class ListarTodosWorkspacesUseCaseTest {
                 null,
                 true,
                 null,
-                null
+                null,
+                0L
         );
 
         WorkspaceResponseDTO response2 = new WorkspaceResponseDTO(
@@ -71,7 +72,8 @@ class ListarTodosWorkspacesUseCaseTest {
                 null,
                 true,
                 null,
-                null
+                null,
+                0L
         );
 
         when(workspaceRepository.findAll(pageable))

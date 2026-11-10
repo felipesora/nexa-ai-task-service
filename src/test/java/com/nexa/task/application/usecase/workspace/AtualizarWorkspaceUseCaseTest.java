@@ -75,7 +75,7 @@ class AtualizarWorkspaceUseCaseTest {
 
         doNothing().when(authService).validateOwnerOrAdmin(1L);
 
-        when(workspaceRepository.existsByNomeAndIdUsuarioAndIdNot(
+        when(workspaceRepository.existsAtivoByNomeAndIdUsuarioAndIdNot(
                 updateDTO.nome(),
                 workspace.getIdUsuario(),
                 workspace.getId()))
@@ -97,7 +97,7 @@ class AtualizarWorkspaceUseCaseTest {
 
         verify(workspaceRepository).findByIdAtivo(idWorkspace);
         verify(authService).validateOwnerOrAdmin(1L);
-        verify(workspaceRepository).existsByNomeAndIdUsuarioAndIdNot(
+        verify(workspaceRepository).existsAtivoByNomeAndIdUsuarioAndIdNot(
                 updateDTO.nome(),
                 workspace.getIdUsuario(),
                 workspace.getId());
@@ -160,7 +160,7 @@ class AtualizarWorkspaceUseCaseTest {
 
         doNothing().when(authService).validateOwnerOrAdmin(1L);
 
-        when(workspaceRepository.existsByNomeAndIdUsuarioAndIdNot(
+        when(workspaceRepository.existsAtivoByNomeAndIdUsuarioAndIdNot(
                 updateDTO.nome(),
                 workspace.getIdUsuario(),
                 workspace.getId()))
@@ -178,7 +178,7 @@ class AtualizarWorkspaceUseCaseTest {
 
         verify(workspaceRepository).findByIdAtivo(idWorkspace);
         verify(authService).validateOwnerOrAdmin(1L);
-        verify(workspaceRepository).existsByNomeAndIdUsuarioAndIdNot(
+        verify(workspaceRepository).existsAtivoByNomeAndIdUsuarioAndIdNot(
                 updateDTO.nome(),
                 workspace.getIdUsuario(),
                 workspace.getId());
@@ -210,7 +210,7 @@ class AtualizarWorkspaceUseCaseTest {
 
         doNothing().when(authService).validateOwnerOrAdmin(1L);
 
-        when(workspaceRepository.existsByNomeAndIdUsuarioAndIdNot(
+        when(workspaceRepository.existsAtivoByNomeAndIdUsuarioAndIdNot(
                 updateDTO.nome(),
                 workspace.getIdUsuario(),
                 workspace.getId()))
@@ -231,7 +231,7 @@ class AtualizarWorkspaceUseCaseTest {
 
         verify(workspaceRepository).findByIdAtivo(idWorkspace);
         verify(authService).validateOwnerOrAdmin(1L);
-        verify(workspaceRepository).existsByNomeAndIdUsuarioAndIdNot(
+        verify(workspaceRepository).existsAtivoByNomeAndIdUsuarioAndIdNot(
                 updateDTO.nome(),
                 workspace.getIdUsuario(),
                 workspace.getId());
@@ -267,7 +267,7 @@ class AtualizarWorkspaceUseCaseTest {
 
         doNothing().when(authService).validateOwnerOrAdmin(1L);
 
-        when(workspaceRepository.existsByNomeAndIdUsuarioAndIdNot(
+        when(workspaceRepository.existsAtivoByNomeAndIdUsuarioAndIdNot(
                 updateDTO.nome(),
                 workspace.getIdUsuario(),
                 workspace.getId()))
@@ -291,7 +291,7 @@ class AtualizarWorkspaceUseCaseTest {
 
         verify(workspaceRepository).findByIdAtivo(idWorkspace);
         verify(authService).validateOwnerOrAdmin(1L);
-        verify(workspaceRepository).existsByNomeAndIdUsuarioAndIdNot(
+        verify(workspaceRepository).existsAtivoByNomeAndIdUsuarioAndIdNot(
                 updateDTO.nome(),
                 workspace.getIdUsuario(),
                 workspace.getId());
@@ -333,7 +333,7 @@ class AtualizarWorkspaceUseCaseTest {
         verify(workspaceRepository).findByIdAtivo(idWorkspace);
         verify(authService).validateOwnerOrAdmin(1L);
 
-        verify(workspaceRepository, never()).existsByNomeAndIdUsuarioAndIdNot(any(), any(), any());
+        verify(workspaceRepository, never()).existsAtivoByNomeAndIdUsuarioAndIdNot(any(), any(), any());
         verify(workspaceRepository, never()).save(any());
 
         verifyNoInteractions(corWorkspaceRepository);

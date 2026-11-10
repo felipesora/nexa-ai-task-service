@@ -16,6 +16,8 @@ public interface SpringDataTarefaRepository extends JpaRepository<TarefaEntity, 
 
     Page<TarefaEntity> findByWorkspace_IdAndAtivoTrue(Long idWorkspace, Pageable pageable);
 
+    long countByWorkspace_IdAndAtivoTrue(Long idWorkspace);
+
     Page<TarefaEntity> findByIdUsuario(Long idUsuario, Pageable pageable);
 
     Page<TarefaEntity> findByIdUsuarioAndAtivoTrue(Long idUsuario, Pageable pageable);

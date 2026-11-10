@@ -110,7 +110,8 @@ class WorkspaceControllerTest {
                 LocalDateTime.now(),
                 true,
                 null,
-                null
+                null,
+                0L
         );
 
         tarefaResponse = new TarefaResponseDTO(
@@ -126,7 +127,8 @@ class WorkspaceControllerTest {
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 true,
-                1L
+                1L,
+                0L
         );
     }
 

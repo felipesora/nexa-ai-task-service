@@ -106,8 +106,8 @@ public class TarefaBeanConfig {
     }
 
     @Bean
-    TarefaControllerMapper tarefaControllerMapper() {
-        return new TarefaControllerMapper();
+    TarefaControllerMapper tarefaControllerMapper(SubtarefaRepository subtarefaRepository) {
+        return new TarefaControllerMapper(subtarefaRepository);
     }
 
     @Bean

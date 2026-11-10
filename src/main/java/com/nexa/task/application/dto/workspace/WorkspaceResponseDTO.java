@@ -7,7 +7,7 @@ import com.nexa.task.application.dto.iconeWorkspace.IconeWorkspaceResponseDTO;
 
 import java.time.LocalDateTime;
 
-@JsonPropertyOrder({ "id_workspace", "id_usuario", "nome", "descricao", "criado_em", "atualizado_em", "ativo", "cor_workspace", "icone_workspace" })
+@JsonPropertyOrder({ "id_workspace", "id_usuario", "nome", "descricao", "criado_em", "atualizado_em", "ativo", "cor_workspace", "icone_workspace", "quantidade_tarefas" })
 public record WorkspaceResponseDTO(
         @JsonProperty("id_workspace")
         Long id,
@@ -31,6 +31,9 @@ public record WorkspaceResponseDTO(
         CorWorkspaceResponseDTO corWorkspace,
 
         @JsonProperty("icone_workspace")
-        IconeWorkspaceResponseDTO iconeWorkspace
+        IconeWorkspaceResponseDTO iconeWorkspace,
+
+        @JsonProperty("quantidade_tarefas")
+        Long quantidadeTarefas
 ) {
 }

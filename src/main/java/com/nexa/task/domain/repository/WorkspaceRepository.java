@@ -29,9 +29,9 @@ public interface WorkspaceRepository {
 
     Optional<Workspace> findByIdAtivo(Long id);
 
-    boolean existsByNomeAndIdUsuario(String nome, Long idUsuario);
+    boolean existsAtivoByNomeAndIdUsuario(String nome, Long idUsuario);
 
-    boolean existsByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id);
+    boolean existsAtivoByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id);
 
     void removerIconeDosWorkspaces(Long idIcone);
 

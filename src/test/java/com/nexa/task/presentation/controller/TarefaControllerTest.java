@@ -134,7 +134,8 @@ class TarefaControllerTest {
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 true,
-                1L
+                1L,
+                0L
         );
 
         updateDto = new TarefaUpdateDTO(

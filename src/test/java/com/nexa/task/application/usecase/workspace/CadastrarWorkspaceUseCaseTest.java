@@ -85,11 +85,12 @@ class CadastrarWorkspaceUseCaseTest {
                 workspace.getAtualizadoEm(),
                 true,
                 null,
-                null
+                null,
+                0L
         );
 
         when(authService.getAuthenticatedUser()).thenReturn(user);
-        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), 1L)).thenReturn(false);
+        when(workspaceRepository.existsAtivoByNomeAndIdUsuario(request.nome(), 1L)).thenReturn(false);
         when(mapper.toDomain(request, null, null, 1L)).thenReturn(workspace);
         when(workspaceRepository.save(workspace)).thenReturn(workspace);
         when(mapper.toResponse(workspace)).thenReturn(response);
@@ -100,7 +101,7 @@ class CadastrarWorkspaceUseCaseTest {
         assertEquals(response, resultado);
 
         verify(authService).getAuthenticatedUser();
-        verify(workspaceRepository).existsByNomeAndIdUsuario(request.nome(), 1L);
+        verify(workspaceRepository).existsAtivoByNomeAndIdUsuario(request.nome(), 1L);
         verify(mapper).toDomain(request, null, null, 1L);
         verify(workspaceRepository).save(workspace);
         verify(mapper).toResponse(workspace);
@@ -142,11 +143,12 @@ class CadastrarWorkspaceUseCaseTest {
                 workspace.getAtualizadoEm(),
                 true,
                 null,
-                null
+                null,
+                0L
         );
 
         when(authService.getAuthenticatedUser()).thenReturn(user);
-        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), 1L)).thenReturn(false);
+        when(workspaceRepository.existsAtivoByNomeAndIdUsuario(request.nome(), 1L)).thenReturn(false);
         when(corWorkspaceRepository.findByIdAtivo(1L)).thenReturn(Optional.of(cor));
         when(iconeWorkspaceRepository.findByIdAtivo(1L)).thenReturn(Optional.of(icone));
         when(mapper.toDomain(request, cor, icone, 1L)).thenReturn(workspace);
@@ -159,7 +161,7 @@ class CadastrarWorkspaceUseCaseTest {
         assertEquals(response, resultado);
 
         verify(authService).getAuthenticatedUser();
-        verify(workspaceRepository).existsByNomeAndIdUsuario(request.nome(), 1L);
+        verify(workspaceRepository).existsAtivoByNomeAndIdUsuario(request.nome(), 1L);
         verify(corWorkspaceRepository).findByIdAtivo(1L);
         verify(iconeWorkspaceRepository).findByIdAtivo(1L);
         verify(mapper).toDomain(request, cor, icone, 1L);
@@ -178,7 +180,7 @@ class CadastrarWorkspaceUseCaseTest {
         );
 
         when(authService.getAuthenticatedUser()).thenReturn(user);
-        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), 1L))
+        when(workspaceRepository.existsAtivoByNomeAndIdUsuario(request.nome(), 1L))
                 .thenReturn(true);
 
         BadRequestException exception = assertThrows(
@@ -192,7 +194,7 @@ class CadastrarWorkspaceUseCaseTest {
         );
 
         verify(authService).getAuthenticatedUser();
-        verify(workspaceRepository).existsByNomeAndIdUsuario(request.nome(), 1L);
+        verify(workspaceRepository).existsAtivoByNomeAndIdUsuario(request.nome(), 1L);
         verify(corWorkspaceRepository, never()).findByIdAtivo(anyLong());
         verify(iconeWorkspaceRepository, never()).findByIdAtivo(anyLong());
         verify(workspaceRepository, never()).save(any());
@@ -211,7 +213,7 @@ class CadastrarWorkspaceUseCaseTest {
         );
 
         when(authService.getAuthenticatedUser()).thenReturn(user);
-        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), 1L))
+        when(workspaceRepository.existsAtivoByNomeAndIdUsuario(request.nome(), 1L))
                 .thenReturn(false);
         when(corWorkspaceRepository.findByIdAtivo(10L))
                 .thenReturn(Optional.empty());
@@ -227,7 +229,7 @@ class CadastrarWorkspaceUseCaseTest {
         );
 
         verify(authService).getAuthenticatedUser();
-        verify(workspaceRepository).existsByNomeAndIdUsuario(request.nome(), 1L);
+        verify(workspaceRepository).existsAtivoByNomeAndIdUsuario(request.nome(), 1L);
         verify(corWorkspaceRepository).findByIdAtivo(10L);
         verify(iconeWorkspaceRepository, never()).findByIdAtivo(anyLong());
         verify(workspaceRepository, never()).save(any());
@@ -245,7 +247,7 @@ class CadastrarWorkspaceUseCaseTest {
         );
 
         when(authService.getAuthenticatedUser()).thenReturn(user);
-        when(workspaceRepository.existsByNomeAndIdUsuario(request.nome(), 1L))
+        when(workspaceRepository.existsAtivoByNomeAndIdUsuario(request.nome(), 1L))
                 .thenReturn(false);
         when(iconeWorkspaceRepository.findByIdAtivo(20L))
                 .thenReturn(Optional.empty());
@@ -261,7 +263,7 @@ class CadastrarWorkspaceUseCaseTest {
         );
 
         verify(authService).getAuthenticatedUser();
-        verify(workspaceRepository).existsByNomeAndIdUsuario(request.nome(), 1L);
+        verify(workspaceRepository).existsAtivoByNomeAndIdUsuario(request.nome(), 1L);
         verify(corWorkspaceRepository, never()).findByIdAtivo(anyLong());
         verify(iconeWorkspaceRepository).findByIdAtivo(20L);
         verify(workspaceRepository, never()).save(any());

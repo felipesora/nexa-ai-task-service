@@ -83,7 +83,8 @@ class CadastrarTarefaUseCaseTest {
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 true,
-                1L
+                1L,
+                0L
         );
 
         when(workspaceRepository.findByIdAtivo(1L))

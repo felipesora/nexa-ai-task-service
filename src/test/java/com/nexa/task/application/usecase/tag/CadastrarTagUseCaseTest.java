@@ -76,7 +76,7 @@ class CadastrarTagUseCaseTest {
         );
 
         when(authService.getAuthenticatedUser()).thenReturn(user);
-        when(tagRepository.existsByNomeAndIdUsuario("Urgente", 1L)).thenReturn(false);
+        when(tagRepository.existsAtivoByNomeAndIdUsuario("Urgente", 1L)).thenReturn(false);
         when(mapper.toDomain(request, null, 1L)).thenReturn(tag);
         when(tagRepository.save(tag)).thenReturn(tag);
         when(mapper.toResponse(tag)).thenReturn(response);
@@ -87,7 +87,7 @@ class CadastrarTagUseCaseTest {
         assertEquals(response, resultado);
 
         verify(authService).getAuthenticatedUser();
-        verify(tagRepository).existsByNomeAndIdUsuario("Urgente", 1L);
+        verify(tagRepository).existsAtivoByNomeAndIdUsuario("Urgente", 1L);
         verify(mapper).toDomain(request, null, 1L);
         verify(tagRepository).save(tag);
         verify(mapper).toResponse(tag);
@@ -129,7 +129,7 @@ class CadastrarTagUseCaseTest {
         );
 
         when(authService.getAuthenticatedUser()).thenReturn(user);
-        when(tagRepository.existsByNomeAndIdUsuario("Estudo", 1L)).thenReturn(false);
+        when(tagRepository.existsAtivoByNomeAndIdUsuario("Estudo", 1L)).thenReturn(false);
         when(corTagRepository.findByIdAtivo(10L)).thenReturn(Optional.of(corTag));
         when(mapper.toDomain(request, corTag, 1L)).thenReturn(tag);
         when(tagRepository.save(tag)).thenReturn(tag);
@@ -141,7 +141,7 @@ class CadastrarTagUseCaseTest {
         assertEquals(response, resultado);
 
         verify(authService).getAuthenticatedUser();
-        verify(tagRepository).existsByNomeAndIdUsuario("Estudo", 1L);
+        verify(tagRepository).existsAtivoByNomeAndIdUsuario("Estudo", 1L);
         verify(corTagRepository).findByIdAtivo(10L);
         verify(mapper).toDomain(request, corTag, 1L);
         verify(tagRepository).save(tag);
@@ -164,7 +164,7 @@ class CadastrarTagUseCaseTest {
                 );
 
         when(authService.getAuthenticatedUser()).thenReturn(user);
-        when(tagRepository.existsByNomeAndIdUsuario("Importante", 1L)).thenReturn(false);
+        when(tagRepository.existsAtivoByNomeAndIdUsuario("Importante", 1L)).thenReturn(false);
         when(corTagRepository.findByIdAtivo(99L)).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
@@ -194,7 +194,7 @@ class CadastrarTagUseCaseTest {
                 );
 
         when(authService.getAuthenticatedUser()).thenReturn(user);
-        when(tagRepository.existsByNomeAndIdUsuario("Urgente", 1L))
+        when(tagRepository.existsAtivoByNomeAndIdUsuario("Urgente", 1L))
                 .thenReturn(true);
 
         BadRequestException exception = assertThrows(

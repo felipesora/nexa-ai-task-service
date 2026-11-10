@@ -5,10 +5,17 @@ import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.domain.entity.tarefa.StatusTarefa;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.entity.workspace.Workspace;
+import com.nexa.task.domain.repository.SubtarefaRepository;
 
 import java.time.LocalDateTime;
 
 public class TarefaControllerMapper {
+
+    private final SubtarefaRepository subtarefaRepository;
+
+    public TarefaControllerMapper(SubtarefaRepository subtarefaRepository) {
+        this.subtarefaRepository = subtarefaRepository;
+    }
 
     public Tarefa toDomain(TarefaCreateDTO request, Workspace workspace, Long idUsuario) {
 
@@ -44,7 +51,8 @@ public class TarefaControllerMapper {
                 tarefa.getCriadoEm(),
                 tarefa.getAtualizadoEm(),
                 tarefa.getAtivo(),
-                tarefa.getWorkspace().getId()
+                tarefa.getWorkspace().getId(),
+                subtarefaRepository.countAtivasByIdTarefa(tarefa.getId())
         );
     }
 }

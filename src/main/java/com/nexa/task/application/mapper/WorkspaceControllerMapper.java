@@ -5,6 +5,7 @@ import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
 import com.nexa.task.domain.entity.workspace.CorWorkspace;
 import com.nexa.task.domain.entity.workspace.IconeWorkspace;
 import com.nexa.task.domain.entity.workspace.Workspace;
+import com.nexa.task.domain.repository.TarefaRepository;
 
 import java.time.LocalDateTime;
 
@@ -12,10 +13,13 @@ public class WorkspaceControllerMapper {
 
     private final CorWorkspaceControllerMapper corWorkspaceMapper;
     private final IconeWorkspaceControllerMapper iconeWorkspaceMapper;
+    private final TarefaRepository tarefaRepository;
 
-    public WorkspaceControllerMapper(CorWorkspaceControllerMapper corWorkspaceMapper, IconeWorkspaceControllerMapper iconeWorkspaceMapper) {
+    public WorkspaceControllerMapper(CorWorkspaceControllerMapper corWorkspaceMapper, IconeWorkspaceControllerMapper iconeWorkspaceMapper,
+                                     TarefaRepository tarefaRepository) {
         this.corWorkspaceMapper = corWorkspaceMapper;
         this.iconeWorkspaceMapper = iconeWorkspaceMapper;
+        this.tarefaRepository = tarefaRepository;
     }
 
     public Workspace toDomain(WorkspaceRequestDTO request, CorWorkspace cor, IconeWorkspace icone, Long idUsuario) {
@@ -42,7 +46,8 @@ public class WorkspaceControllerMapper {
                 workspace.getAtualizadoEm(),
                 workspace.getAtivo(),
                 workspace.getCorWorkspace() != null ? corWorkspaceMapper.toResponse(workspace.getCorWorkspace()) : null,
-                workspace.getIconeWorkspace() != null ? iconeWorkspaceMapper.toResponse(workspace.getIconeWorkspace()) : null
+                workspace.getIconeWorkspace() != null ? iconeWorkspaceMapper.toResponse(workspace.getIconeWorkspace()) : null,
+                tarefaRepository.countAtivasByIdWorkspace(workspace.getId())
         );
     }
 }

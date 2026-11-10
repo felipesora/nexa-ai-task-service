@@ -69,8 +69,9 @@ public class WorkspaceBeanConfig {
     }
 
     @Bean
-    WorkspaceControllerMapper workspaceControllerMapper(CorWorkspaceControllerMapper corWorkspaceMapper, IconeWorkspaceControllerMapper iconeWorkspaceMapper) {
-        return new WorkspaceControllerMapper(corWorkspaceMapper, iconeWorkspaceMapper);
+    WorkspaceControllerMapper workspaceControllerMapper(CorWorkspaceControllerMapper corWorkspaceMapper, IconeWorkspaceControllerMapper iconeWorkspaceMapper,
+                                                        TarefaRepository tarefaRepository) {
+        return new WorkspaceControllerMapper(corWorkspaceMapper, iconeWorkspaceMapper, tarefaRepository);
     }
 
     @Bean
