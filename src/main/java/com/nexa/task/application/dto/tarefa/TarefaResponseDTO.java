@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @JsonPropertyOrder({ "id_tarefa", "id_usuario", "titulo", "descricao", "prioridade",
         "status", "dificuldade", "data_limite", "data_conclusao",
-        "criado_em", "atualizado_em", "ativo", "id_workspace", "quantidade_subtarefas" })
+        "criado_em", "atualizado_em", "ativo", "id_workspace", "quantidade_subtarefas", "quantidade_subtarefas_concluidas" })
 public record TarefaResponseDTO(
         @JsonProperty("id_tarefa")
         Long id,
@@ -46,6 +46,9 @@ public record TarefaResponseDTO(
         Long idWorkspace,
 
         @JsonProperty("quantidade_subtarefas")
-        Long quantidadeSubtarefas
+        Long quantidadeSubtarefas,
+
+        @JsonProperty("quantidade_subtarefas_concluidas")
+        Long quantidadeSubtarefasConcluidas
 ) {
 }

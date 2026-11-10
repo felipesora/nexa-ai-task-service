@@ -53,7 +53,8 @@ public class TarefaControllerMapper {
                 tarefa.getAtualizadoEm(),
                 tarefa.getAtivo(),
                 tarefa.getWorkspace().getId(),
-                subtarefaRepository.countAtivasByIdTarefa(tarefa.getId())
+                subtarefaRepository.countAtivasByIdTarefa(tarefa.getId()),
+                subtarefaRepository.countConcluidasAtivasByIdTarefa(tarefa.getId())
         );
     }
 

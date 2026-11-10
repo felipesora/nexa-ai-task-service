@@ -1,12 +1,14 @@
 package com.nexa.task.presentation.controller;
 
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
+import com.nexa.task.application.dto.workspace.ResumoWorkspaceResponseDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceUpdateDTO;
 import com.nexa.task.application.usecase.tarefa.ListarTarefasPorIdWorkspaceUseCase;
 import com.nexa.task.application.usecase.workspace.AtivarWorkspaceUseCase;
 import com.nexa.task.application.usecase.workspace.AtualizarWorkspaceUseCase;
+import com.nexa.task.application.usecase.workspace.BuscarResumoWorkspaceUseCase;
 import com.nexa.task.application.usecase.workspace.BuscarWorkspacePorIdUseCase;
 import com.nexa.task.application.usecase.workspace.CadastrarWorkspaceUseCase;
 import com.nexa.task.application.usecase.workspace.DesativarWorkspaceUseCase;
@@ -56,6 +58,7 @@ public class WorkspaceController {
     private final AtualizarWorkspaceUseCase atualizarWorkspaceUseCase;
     private final DesativarWorkspaceUseCase desativarWorkspaceUseCase;
     private final AtivarWorkspaceUseCase ativarWorkspaceUseCase;
+    private final BuscarResumoWorkspaceUseCase buscarResumoWorkspaceUseCase;
 
     public WorkspaceController(
             CadastrarWorkspaceUseCase cadastrarWorkspaceUseCase,
@@ -66,7 +69,8 @@ public class WorkspaceController {
             ListarTarefasPorIdWorkspaceUseCase listarTarefasPorIdWorkspaceUseCase,
             AtualizarWorkspaceUseCase atualizarWorkspaceUseCase,
             DesativarWorkspaceUseCase desativarWorkspaceUseCase,
-            AtivarWorkspaceUseCase ativarWorkspaceUseCase) {
+            AtivarWorkspaceUseCase ativarWorkspaceUseCase,
+            BuscarResumoWorkspaceUseCase buscarResumoWorkspaceUseCase) {
         this.cadastrarWorkspaceUseCase = cadastrarWorkspaceUseCase;
         this.listarTodosWorkspacesUseCase = listarTodosWorkspacesUseCase;
         this.buscarWorkspacePorIdUseCase = buscarWorkspacePorIdUseCase;
@@ -76,6 +80,7 @@ public class WorkspaceController {
         this.atualizarWorkspaceUseCase = atualizarWorkspaceUseCase;
         this.desativarWorkspaceUseCase = desativarWorkspaceUseCase;
         this.ativarWorkspaceUseCase = ativarWorkspaceUseCase;
+        this.buscarResumoWorkspaceUseCase = buscarResumoWorkspaceUseCase;
     }
 
     @Operation(
@@ -235,6 +240,35 @@ public class WorkspaceController {
             @PageableDefault(size = 10) Pageable pageable) {
         Page<TarefaResponseDTO> tarefas = listarTarefasPorIdWorkspaceUseCase.execute(idWorkspace, pageable);
         return ResponseEntity.ok(tarefas);
+    }
+
+    @Operation(
+            summary = "Resumo das tarefas do workspace",
+            description = """
+                Retorna o total de tarefas ativas do workspace e a quantidade por status.
+
+                Regras de negocio:
+                - O workspace deve existir e estar ativo.
+                - Apenas administradores ou o proprietario do workspace podem consultar o resumo.
+
+                Requer autenticacao JWT.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Resumo retornado com sucesso",
+                    content = @Content(schema = @Schema(implementation = ResumoWorkspaceResponseDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Usuario nao autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuario sem permissao",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Workspace nao encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{idWorkspace}/resumo")
+    public ResponseEntity<ResumoWorkspaceResponseDTO> buscarResumoWorkspace(
+            @Parameter(description = "Identificador do workspace") @PathVariable Long idWorkspace) {
+        return ResponseEntity.ok(buscarResumoWorkspaceUseCase.execute(idWorkspace));
     }
 
     @Operation(

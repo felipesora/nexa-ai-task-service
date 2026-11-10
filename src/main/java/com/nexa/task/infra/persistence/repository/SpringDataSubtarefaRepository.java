@@ -18,6 +18,8 @@ public interface SpringDataSubtarefaRepository extends JpaRepository<SubtarefaEn
 
     long countByTarefa_IdAndAtivoTrue(Long idTarefa);
 
+    long countByTarefa_IdAndConcluidaTrueAndAtivoTrue(Long idTarefa);
+
     List<SubtarefaEntity> findByTarefa_Id(Long idTarefa);
 
     Optional<SubtarefaEntity> findByIdAndAtivoTrue(Long id);

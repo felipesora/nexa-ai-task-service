@@ -42,6 +42,7 @@ class TarefaControllerMapperTest {
                 .build();
 
         when(subtarefaRepository.countAtivasByIdTarefa(1L)).thenReturn(3L);
+        when(subtarefaRepository.countConcluidasAtivasByIdTarefa(1L)).thenReturn(2L);
 
         TarefaResponseDTO response = mapper.toResponse(tarefa);
 
@@ -49,6 +50,7 @@ class TarefaControllerMapperTest {
         assertEquals("Minha tarefa", response.titulo());
         assertEquals(10L, response.idWorkspace());
         assertEquals(3L, response.quantidadeSubtarefas());
+        assertEquals(2L, response.quantidadeSubtarefasConcluidas());
         verify(subtarefaRepository).countAtivasByIdTarefa(1L);
     }
 
@@ -61,10 +63,12 @@ class TarefaControllerMapperTest {
                 .build();
 
         when(subtarefaRepository.countAtivasByIdTarefa(2L)).thenReturn(0L);
+        when(subtarefaRepository.countConcluidasAtivasByIdTarefa(2L)).thenReturn(0L);
 
         TarefaResponseDTO response = mapper.toResponse(tarefa);
 
         assertEquals(0L, response.quantidadeSubtarefas());
+        assertEquals(0L, response.quantidadeSubtarefasConcluidas());
     }
 
     @Test

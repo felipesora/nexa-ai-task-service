@@ -3,6 +3,7 @@ package com.nexa.task.presentation.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
+import com.nexa.task.application.dto.workspace.ResumoWorkspaceResponseDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceUpdateDTO;
 import com.nexa.task.application.exception.BadRequestException;
@@ -71,6 +72,9 @@ class WorkspaceControllerTest {
     private AtivarWorkspaceUseCase ativarWorkspaceUseCase;
 
     @MockitoBean
+    private BuscarResumoWorkspaceUseCase buscarResumoWorkspaceUseCase;
+
+    @MockitoBean
     private TokenProvider tokenProvider;
 
     @MockitoBean
@@ -128,6 +132,7 @@ class WorkspaceControllerTest {
                 LocalDateTime.now(),
                 true,
                 1L,
+                0L,
                 0L
         );
     }
@@ -505,5 +510,20 @@ class WorkspaceControllerTest {
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.message")
                         .value("Workspace com id: 999 não encontrado"));
+    }
+
+    @Test
+    void deveRetornarResumoDoWorkspace() throws Exception {
+
+        when(buscarResumoWorkspaceUseCase.execute(1L))
+                .thenReturn(new ResumoWorkspaceResponseDTO(12L, 4L, 3L, 4L, 1L));
+
+        mockMvc.perform(get("/v1/workspaces/1/resumo"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(12))
+                .andExpect(jsonPath("$.concluidas").value(4))
+                .andExpect(jsonPath("$.em_andamento").value(3))
+                .andExpect(jsonPath("$.pendentes").value(4))
+                .andExpect(jsonPath("$.atrasadas").value(1));
     }
 }

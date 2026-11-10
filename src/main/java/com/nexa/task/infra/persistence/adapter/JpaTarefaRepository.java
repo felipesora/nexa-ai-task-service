@@ -109,4 +109,9 @@ public class JpaTarefaRepository implements TarefaRepository {
                 .map(mapper::toDomain)
                 .toList();
     }
+
+    @Override
+    public long countAtivasByIdWorkspaceAndStatus(Long idWorkspace, StatusTarefa status) {
+        return repository.countByWorkspace_IdAndStatusAndAtivoTrue(idWorkspace, status);
+    }
 }

@@ -140,6 +140,7 @@ class TarefaControllerTest {
                 LocalDateTime.now(),
                 true,
                 1L,
+                0L,
                 0L
         );
 

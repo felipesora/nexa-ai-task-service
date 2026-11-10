@@ -59,6 +59,12 @@ public class WorkspaceBeanConfig {
     }
 
     @Bean
+    BuscarResumoWorkspaceUseCase buscarResumoWorkspaceUseCase(WorkspaceRepository workspaceRepository, TarefaRepository tarefaRepository,
+                                                              AuthenticationService authService) {
+        return new BuscarResumoWorkspaceUseCase(workspaceRepository, tarefaRepository, authService);
+    }
+
+    @Bean
     AtivarWorkspaceUseCase ativarWorkspaceUseCase(WorkspaceRepository workspaceRepository) {
         return new AtivarWorkspaceUseCase(workspaceRepository);
     }

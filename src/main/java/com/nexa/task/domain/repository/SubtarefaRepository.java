@@ -24,4 +24,6 @@ public interface SubtarefaRepository {
     Optional<Subtarefa> findByIdAtivo(Long id);
 
     long countAtivasByIdTarefa(Long idTarefa);
+
+    long countConcluidasAtivasByIdTarefa(Long idTarefa);
 }

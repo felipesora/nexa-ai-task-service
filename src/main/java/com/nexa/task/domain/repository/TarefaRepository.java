@@ -34,6 +34,8 @@ public interface TarefaRepository {
 
     long countAtivasByIdWorkspace(Long idWorkspace);
 
+    long countAtivasByIdWorkspaceAndStatus(Long idWorkspace, StatusTarefa status);
+
     long countAtivasByIdUsuarioAndStatus(Long idUsuario, StatusTarefa status);
 
     List<Tarefa> findPrioritariasByIdUsuario(Long idUsuario, int limite);

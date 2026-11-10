@@ -84,6 +84,7 @@ class CadastrarTarefaUseCaseTest {
                 LocalDateTime.now(),
                 true,
                 1L,
+                0L,
                 0L
         );
 
