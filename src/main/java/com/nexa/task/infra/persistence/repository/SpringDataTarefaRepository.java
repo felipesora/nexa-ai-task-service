@@ -1,5 +1,6 @@
 package com.nexa.task.infra.persistence.repository;
 
+import com.nexa.task.domain.entity.tarefa.PrioridadeTarefa;
 import com.nexa.task.domain.entity.tarefa.StatusTarefa;
 import com.nexa.task.infra.persistence.entity.tarefa.TarefaEntity;
 import org.springframework.data.domain.Page;
@@ -54,4 +55,23 @@ public interface SpringDataTarefaRepository extends JpaRepository<TarefaEntity, 
               t.dataLimite ASC
             """)
     List<TarefaEntity> buscarPrioritariasPorIdUsuario(@Param("idUsuario") Long idUsuario, Pageable pageable);
+
+    // Tarefas ativas do workspace; cada filtro só é aplicado quando informado (não nulo)
+    @Query("""
+            SELECT t FROM TarefaEntity t
+            WHERE t.workspace.id = :idWorkspace
+              AND t.ativo = true
+              AND (:titulo IS NULL OR LOWER(t.titulo) LIKE :titulo)
+              AND (:status IS NULL OR t.status = :status)
+              AND (:prioridade IS NULL OR t.prioridade = :prioridade)
+              AND (:idTag IS NULL OR EXISTS (
+                    SELECT 1 FROM TarefaEntity t2 JOIN t2.tags tg
+                    WHERE t2 = t AND tg.id = :idTag))
+            """)
+    Page<TarefaEntity> buscarAtivasPorWorkspaceComFiltros(@Param("idWorkspace") Long idWorkspace,
+                                                          @Param("titulo") String titulo,
+                                                          @Param("status") StatusTarefa status,
+                                                          @Param("prioridade") PrioridadeTarefa prioridade,
+                                                          @Param("idTag") Long idTag,
+                                                          Pageable pageable);
 }

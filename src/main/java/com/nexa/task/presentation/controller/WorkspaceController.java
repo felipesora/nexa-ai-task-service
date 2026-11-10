@@ -15,6 +15,9 @@ import com.nexa.task.application.usecase.workspace.DesativarWorkspaceUseCase;
 import com.nexa.task.application.usecase.workspace.ListarTodosWorkspacesUseCase;
 import com.nexa.task.application.usecase.workspace.ListarWorkspacesPorIdUsuarioENomeUseCase;
 import com.nexa.task.application.usecase.workspace.ListarWorkspacesPorIdUsuarioUseCase;
+import com.nexa.task.domain.entity.tarefa.FiltroTarefas;
+import com.nexa.task.domain.entity.tarefa.PrioridadeTarefa;
+import com.nexa.task.domain.entity.tarefa.StatusTarefa;
 import com.nexa.task.presentation.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -216,6 +219,12 @@ public class WorkspaceController {
             description = """
                 Retorna uma lista paginada de tarefas vinculadas a um workspace.
 
+                Filtros opcionais (podem ser combinados):
+                - `titulo`: parte do titulo, sem diferenciar maiusculas/minusculas.
+                - `status`: PENDENTE, EM_ANDAMENTO, CONCLUIDA ou ATRASADA.
+                - `prioridade`: BAIXA, MEDIA, ALTA ou URGENTE.
+                - `idTag`: apenas tarefas que possuem a tag.
+
                 Regras de negocio:
                 - O workspace deve existir.
                 - Apenas administradores ou o proprietario do workspace podem consultar suas tarefas.
@@ -237,8 +246,13 @@ public class WorkspaceController {
     @GetMapping("/{idWorkspace}/tarefas")
     public ResponseEntity<Page<TarefaResponseDTO>> listarTarefasPeloWorkspace(
             @Parameter(description = "Identificador do workspace") @PathVariable Long idWorkspace,
+            @Parameter(description = "Filtro opcional por parte do titulo") @RequestParam(required = false) String titulo,
+            @Parameter(description = "Filtro opcional por status") @RequestParam(required = false) StatusTarefa status,
+            @Parameter(description = "Filtro opcional por prioridade") @RequestParam(required = false) PrioridadeTarefa prioridade,
+            @Parameter(description = "Filtro opcional por tag") @RequestParam(required = false) Long idTag,
             @PageableDefault(size = 10) Pageable pageable) {
-        Page<TarefaResponseDTO> tarefas = listarTarefasPorIdWorkspaceUseCase.execute(idWorkspace, pageable);
+        FiltroTarefas filtro = new FiltroTarefas(titulo, status, prioridade, idTag);
+        Page<TarefaResponseDTO> tarefas = listarTarefasPorIdWorkspaceUseCase.execute(idWorkspace, filtro, pageable);
         return ResponseEntity.ok(tarefas);
     }
 

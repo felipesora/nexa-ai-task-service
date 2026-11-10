@@ -1,5 +1,6 @@
 package com.nexa.task.domain.repository;
 
+import com.nexa.task.domain.entity.tarefa.FiltroTarefas;
 import com.nexa.task.domain.entity.tarefa.StatusTarefa;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import org.springframework.data.domain.Page;
@@ -16,7 +17,7 @@ public interface TarefaRepository {
 
     Page<Tarefa> findByIdWorkspace(Long idWorkspace, Pageable pageable);
 
-    Page<Tarefa> findByIdWorkspaceAndAtivo(Long idWorkspace, Pageable pageable);
+    Page<Tarefa> findByIdWorkspaceAndAtivo(Long idWorkspace, FiltroTarefas filtro, Pageable pageable);
 
     List<Tarefa> findAllByWorkspace(Long idWorkspace);
 

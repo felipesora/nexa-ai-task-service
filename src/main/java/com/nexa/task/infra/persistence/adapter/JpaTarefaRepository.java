@@ -1,5 +1,6 @@
 package com.nexa.task.infra.persistence.adapter;
 
+import com.nexa.task.domain.entity.tarefa.FiltroTarefas;
 import com.nexa.task.domain.entity.tarefa.StatusTarefa;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.repository.TarefaRepository;
@@ -43,8 +44,12 @@ public class JpaTarefaRepository implements TarefaRepository {
     }
 
     @Override
-    public Page<Tarefa> findByIdWorkspaceAndAtivo(Long idWorkspace, Pageable pageable) {
-        return repository.findByWorkspace_IdAndAtivoTrue(idWorkspace, pageable)
+    public Page<Tarefa> findByIdWorkspaceAndAtivo(Long idWorkspace, FiltroTarefas filtro, Pageable pageable) {
+        FiltroTarefas f = filtro != null ? filtro : FiltroTarefas.vazio();
+        // O LIKE já recebe o padrão pronto, em minúsculas, para a busca ignorar maiúsculas/minúsculas
+        String titulo = f.titulo() != null ? "%" + f.titulo().toLowerCase() + "%" : null;
+
+        return repository.buscarAtivasPorWorkspaceComFiltros(idWorkspace, titulo, f.status(), f.prioridade(), f.idTag(), pageable)
                 .map(mapper::toDomain);
     }
 
