@@ -1,5 +1,6 @@
 package com.nexa.task.domain.repository;
 
+import com.nexa.task.domain.entity.tarefa.StatusTarefa;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,4 +33,8 @@ public interface TarefaRepository {
     Optional<Tarefa> findByIdAtivo(Long id);
 
     long countAtivasByIdWorkspace(Long idWorkspace);
+
+    long countAtivasByIdUsuarioAndStatus(Long idUsuario, StatusTarefa status);
+
+    List<Tarefa> findPrioritariasByIdUsuario(Long idUsuario, int limite);
 }

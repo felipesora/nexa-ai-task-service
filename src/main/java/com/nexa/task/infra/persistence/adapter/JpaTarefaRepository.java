@@ -1,11 +1,13 @@
 package com.nexa.task.infra.persistence.adapter;
 
+import com.nexa.task.domain.entity.tarefa.StatusTarefa;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.repository.TarefaRepository;
 import com.nexa.task.infra.persistence.entity.tarefa.TarefaEntity;
 import com.nexa.task.infra.persistence.mapper.TarefaPersistenceMapper;
 import com.nexa.task.infra.persistence.repository.SpringDataTarefaRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -93,5 +95,18 @@ public class JpaTarefaRepository implements TarefaRepository {
     @Override
     public long countAtivasByIdWorkspace(Long idWorkspace) {
         return repository.countByWorkspace_IdAndAtivoTrue(idWorkspace);
+    }
+
+    @Override
+    public long countAtivasByIdUsuarioAndStatus(Long idUsuario, StatusTarefa status) {
+        return repository.countByIdUsuarioAndStatusAndAtivoTrue(idUsuario, status);
+    }
+
+    @Override
+    public List<Tarefa> findPrioritariasByIdUsuario(Long idUsuario, int limite) {
+        return repository.buscarPrioritariasPorIdUsuario(idUsuario, PageRequest.of(0, limite))
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 }

@@ -106,6 +106,13 @@ public class TarefaBeanConfig {
     }
 
     @Bean
+    BuscarResumoTarefasPorIdUsuarioUseCase buscarResumoTarefasPorIdUsuarioUseCase(TarefaRepository tarefaRepository,
+                                                                                  TarefaControllerMapper mapper,
+                                                                                  AuthenticationService authService) {
+        return new BuscarResumoTarefasPorIdUsuarioUseCase(tarefaRepository, mapper, authService);
+    }
+
+    @Bean
     TarefaControllerMapper tarefaControllerMapper(SubtarefaRepository subtarefaRepository) {
         return new TarefaControllerMapper(subtarefaRepository);
     }

@@ -3,7 +3,9 @@ package com.nexa.task.presentation.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nexa.task.application.dto.subtarefa.SubtarefaResponseDTO;
 import com.nexa.task.application.dto.tag.TagResponseDTO;
+import com.nexa.task.application.dto.tarefa.ResumoTarefasResponseDTO;
 import com.nexa.task.application.dto.tarefa.TarefaCreateDTO;
+import com.nexa.task.application.dto.tarefa.TarefaPrioritariaResponseDTO;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.dto.tarefa.TarefaUpdateDTO;
 import com.nexa.task.application.exception.BadRequestException;
@@ -91,6 +93,9 @@ class TarefaControllerTest {
 
     @MockitoBean
     private RemoverTagDaTarefaUseCase removerTagDaTarefaUseCase;
+
+    @MockitoBean
+    private BuscarResumoTarefasPorIdUsuarioUseCase buscarResumoTarefasPorIdUsuarioUseCase;
 
     @MockitoBean
     private TokenProvider tokenProvider;
@@ -806,5 +811,38 @@ class TarefaControllerTest {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.message")
                         .value("A tag não está vinculada à tarefa."));
+    }
+
+    @Test
+    void deveRetornarResumoDasTarefasDoUsuario() throws Exception {
+
+        ResumoTarefasResponseDTO resumo = new ResumoTarefasResponseDTO(
+                18L,
+                7L,
+                5L,
+                2L,
+                java.util.List.of(new TarefaPrioritariaResponseDTO(
+                        1L,
+                        "Minha tarefa",
+                        PrioridadeTarefa.URGENTE,
+                        StatusTarefa.PENDENTE,
+                        null,
+                        10L,
+                        "Meu Workspace"
+                ))
+        );
+
+        when(buscarResumoTarefasPorIdUsuarioUseCase.execute(1L)).thenReturn(resumo);
+
+        mockMvc.perform(get("/v1/tarefas/usuario/1/resumo"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.concluidas").value(18))
+                .andExpect(jsonPath("$.em_andamento").value(7))
+                .andExpect(jsonPath("$.pendentes").value(5))
+                .andExpect(jsonPath("$.atrasadas").value(2))
+                .andExpect(jsonPath("$.tarefas_prioritarias[0].id_tarefa").value(1))
+                .andExpect(jsonPath("$.tarefas_prioritarias[0].titulo").value("Minha tarefa"))
+                .andExpect(jsonPath("$.tarefas_prioritarias[0].prioridade").value("URGENTE"))
+                .andExpect(jsonPath("$.tarefas_prioritarias[0].nome_workspace").value("Meu Workspace"));
     }
 }

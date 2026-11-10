@@ -1,6 +1,7 @@
 package com.nexa.task.application.mapper;
 
 import com.nexa.task.application.dto.tarefa.TarefaCreateDTO;
+import com.nexa.task.application.dto.tarefa.TarefaPrioritariaResponseDTO;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.domain.entity.tarefa.StatusTarefa;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
@@ -53,6 +54,18 @@ public class TarefaControllerMapper {
                 tarefa.getAtivo(),
                 tarefa.getWorkspace().getId(),
                 subtarefaRepository.countAtivasByIdTarefa(tarefa.getId())
+        );
+    }
+
+    public TarefaPrioritariaResponseDTO toPrioritariaResponse(Tarefa tarefa) {
+        return new TarefaPrioritariaResponseDTO(
+                tarefa.getId(),
+                tarefa.getTitulo(),
+                tarefa.getPrioridade(),
+                tarefa.getStatus(),
+                tarefa.getDataLimite(),
+                tarefa.getWorkspace().getId(),
+                tarefa.getWorkspace().getNome()
         );
     }
 }
