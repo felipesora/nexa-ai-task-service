@@ -53,7 +53,7 @@ class BuscarResumoWorkspaceUseCaseTest {
         when(tarefaRepository.countAtivasByIdWorkspaceAndStatus(1L, StatusTarefa.CONCLUIDA)).thenReturn(4L);
         when(tarefaRepository.countAtivasByIdWorkspaceAndStatus(1L, StatusTarefa.EM_ANDAMENTO)).thenReturn(3L);
         when(tarefaRepository.countAtivasByIdWorkspaceAndStatus(1L, StatusTarefa.PENDENTE)).thenReturn(4L);
-        when(tarefaRepository.countAtivasByIdWorkspaceAndStatus(1L, StatusTarefa.ATRASADA)).thenReturn(1L);
+        when(tarefaRepository.countAtrasadasByIdWorkspace(1L)).thenReturn(1L);
 
         ResumoWorkspaceResponseDTO resumo = useCase.execute(1L);
 

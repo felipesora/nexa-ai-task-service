@@ -61,8 +61,15 @@ public class TarefaControllerMapper {
                 tarefa.getTags().stream()
                         .filter(tag -> Boolean.TRUE.equals(tag.getAtivo()))
                         .map(tagMapper::toResponse)
-                        .toList()
+                        .toList(),
+                estaAtrasada(tarefa)
         );
+    }
+
+    private static boolean estaAtrasada(Tarefa tarefa) {
+        return tarefa.getDataLimite() != null
+                && tarefa.getStatus() != StatusTarefa.CONCLUIDA
+                && tarefa.getDataLimite().isBefore(LocalDateTime.now());
     }
 
     public TarefaPrioritariaResponseDTO toPrioritariaResponse(Tarefa tarefa) {

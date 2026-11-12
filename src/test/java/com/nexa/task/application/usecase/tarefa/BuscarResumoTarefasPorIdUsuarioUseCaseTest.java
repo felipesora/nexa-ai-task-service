@@ -59,7 +59,7 @@ class BuscarResumoTarefasPorIdUsuarioUseCaseTest {
         when(tarefaRepository.countAtivasByIdUsuarioAndStatus(1L, StatusTarefa.CONCLUIDA)).thenReturn(18L);
         when(tarefaRepository.countAtivasByIdUsuarioAndStatus(1L, StatusTarefa.EM_ANDAMENTO)).thenReturn(7L);
         when(tarefaRepository.countAtivasByIdUsuarioAndStatus(1L, StatusTarefa.PENDENTE)).thenReturn(5L);
-        when(tarefaRepository.countAtivasByIdUsuarioAndStatus(1L, StatusTarefa.ATRASADA)).thenReturn(2L);
+        when(tarefaRepository.countAtrasadasByIdUsuario(1L)).thenReturn(2L);
         when(tarefaRepository.findPrioritariasByIdUsuario(1L, 5)).thenReturn(List.of(tarefa));
         when(mapper.toPrioritariaResponse(tarefa)).thenReturn(prioritaria);
 

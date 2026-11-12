@@ -146,7 +146,8 @@ class TarefaControllerTest {
                 1L,
                 0L,
                 0L,
-                java.util.List.of()
+                java.util.List.of(),
+                false
         );
 
         updateDto = new TarefaUpdateDTO(

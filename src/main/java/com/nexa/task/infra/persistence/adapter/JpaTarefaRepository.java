@@ -50,8 +50,25 @@ public class JpaTarefaRepository implements TarefaRepository {
         // O LIKE já recebe o padrão pronto, em minúsculas, para a busca ignorar maiúsculas/minúsculas
         String titulo = f.titulo() != null ? "%" + f.titulo().toLowerCase() + "%" : null;
 
-        return repository.buscarAtivasPorWorkspaceComFiltros(idWorkspace, titulo, f.status(), f.prioridade(), f.idTag(), pageable)
+        // "Atrasada" não é um status gravado: o filtro vira a condição prazo vencido e não concluída
+        boolean filtrarAtrasadas = f.status() == StatusTarefa.ATRASADA;
+        StatusTarefa status = filtrarAtrasadas ? null : f.status();
+        LocalDateTime atrasadasAntesDe = filtrarAtrasadas ? LocalDateTime.now() : null;
+
+        return repository.buscarAtivasPorWorkspaceComFiltros(idWorkspace, titulo, status, atrasadasAntesDe, f.prioridade(), f.idTag(), pageable)
                 .map(mapper::toDomain);
+    }
+
+    @Override
+    public long countAtrasadasByIdUsuario(Long idUsuario) {
+        return repository.countByIdUsuarioAndAtivoTrueAndStatusNotAndDataLimiteBefore(
+                idUsuario, StatusTarefa.CONCLUIDA, LocalDateTime.now());
+    }
+
+    @Override
+    public long countAtrasadasByIdWorkspace(Long idWorkspace) {
+        return repository.countByWorkspace_IdAndAtivoTrueAndStatusNotAndDataLimiteBefore(
+                idWorkspace, StatusTarefa.CONCLUIDA, LocalDateTime.now());
     }
 
     @Override

@@ -31,7 +31,7 @@ public class BuscarResumoWorkspaceUseCase {
                 tarefaRepository.countAtivasByIdWorkspaceAndStatus(idWorkspace, StatusTarefa.CONCLUIDA),
                 tarefaRepository.countAtivasByIdWorkspaceAndStatus(idWorkspace, StatusTarefa.EM_ANDAMENTO),
                 tarefaRepository.countAtivasByIdWorkspaceAndStatus(idWorkspace, StatusTarefa.PENDENTE),
-                tarefaRepository.countAtivasByIdWorkspaceAndStatus(idWorkspace, StatusTarefa.ATRASADA)
+                tarefaRepository.countAtrasadasByIdWorkspace(idWorkspace)
         );
     }
 }

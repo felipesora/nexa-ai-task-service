@@ -43,6 +43,11 @@ public interface SpringDataTarefaRepository extends JpaRepository<TarefaEntity, 
 
     long countByIdUsuarioAndStatusAndAtivoTrue(Long idUsuario, StatusTarefa status);
 
+    // Atrasada = prazo vencido e ainda não concluída (calculado, não é um status gravado)
+    long countByIdUsuarioAndAtivoTrueAndStatusNotAndDataLimiteBefore(Long idUsuario, StatusTarefa status, LocalDateTime agora);
+
+    long countByWorkspace_IdAndAtivoTrueAndStatusNotAndDataLimiteBefore(Long idWorkspace, StatusTarefa status, LocalDateTime agora);
+
     // Tarefas em aberto da maior para a menor prioridade; no empate, prazo mais próximo primeiro (sem prazo por último)
     @Query("""
             SELECT t FROM TarefaEntity t
@@ -68,6 +73,8 @@ public interface SpringDataTarefaRepository extends JpaRepository<TarefaEntity, 
               AND t.ativo = true
               AND (:titulo IS NULL OR LOWER(t.titulo) LIKE :titulo)
               AND (:status IS NULL OR t.status = :status)
+              AND (:atrasadasAntesDe IS NULL OR (t.dataLimite < :atrasadasAntesDe
+                    AND t.status <> com.nexa.task.domain.entity.tarefa.StatusTarefa.CONCLUIDA))
               AND (:prioridade IS NULL OR t.prioridade = :prioridade)
               AND (:idTag IS NULL OR EXISTS (
                     SELECT 1 FROM TarefaEntity t2 JOIN t2.tags tg
@@ -76,6 +83,7 @@ public interface SpringDataTarefaRepository extends JpaRepository<TarefaEntity, 
     Page<TarefaEntity> buscarAtivasPorWorkspaceComFiltros(@Param("idWorkspace") Long idWorkspace,
                                                           @Param("titulo") String titulo,
                                                           @Param("status") StatusTarefa status,
+                                                          @Param("atrasadasAntesDe") LocalDateTime atrasadasAntesDe,
                                                           @Param("prioridade") PrioridadeTarefa prioridade,
                                                           @Param("idTag") Long idTag,
                                                           Pageable pageable);

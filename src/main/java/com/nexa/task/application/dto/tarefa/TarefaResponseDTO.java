@@ -13,7 +13,7 @@ import java.util.List;
 
 @JsonPropertyOrder({ "id_tarefa", "id_usuario", "titulo", "descricao", "prioridade",
         "status", "dificuldade", "data_limite", "data_conclusao",
-        "criado_em", "atualizado_em", "ativo", "id_workspace", "quantidade_subtarefas", "quantidade_subtarefas_concluidas", "tags" })
+        "criado_em", "atualizado_em", "ativo", "id_workspace", "quantidade_subtarefas", "quantidade_subtarefas_concluidas", "tags", "atrasada" })
 public record TarefaResponseDTO(
         @JsonProperty("id_tarefa")
         Long id,
@@ -54,6 +54,9 @@ public record TarefaResponseDTO(
         @JsonProperty("quantidade_subtarefas_concluidas")
         Long quantidadeSubtarefasConcluidas,
 
-        List<TagResponseDTO> tags
+        List<TagResponseDTO> tags,
+
+        // Calculado: prazo vencido e tarefa não concluída
+        Boolean atrasada
 ) {
 }

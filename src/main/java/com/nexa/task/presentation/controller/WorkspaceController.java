@@ -221,7 +221,7 @@ public class WorkspaceController {
 
                 Filtros opcionais (podem ser combinados):
                 - `titulo`: parte do titulo, sem diferenciar maiusculas/minusculas.
-                - `status`: PENDENTE, EM_ANDAMENTO, CONCLUIDA ou ATRASADA.
+                - `status`: PENDENTE, EM_ANDAMENTO, CONCLUIDA ou ATRASADA (ATRASADA = prazo vencido e nao concluida, em qualquer status).
                 - `prioridade`: BAIXA, MEDIA, ALTA ou URGENTE.
                 - `idTag`: apenas tarefas que possuem a tag.
 

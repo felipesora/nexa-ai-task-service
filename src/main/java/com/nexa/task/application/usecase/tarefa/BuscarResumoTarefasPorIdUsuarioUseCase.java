@@ -36,7 +36,7 @@ public class BuscarResumoTarefasPorIdUsuarioUseCase {
                 tarefaRepository.countAtivasByIdUsuarioAndStatus(idUsuario, StatusTarefa.CONCLUIDA),
                 tarefaRepository.countAtivasByIdUsuarioAndStatus(idUsuario, StatusTarefa.EM_ANDAMENTO),
                 tarefaRepository.countAtivasByIdUsuarioAndStatus(idUsuario, StatusTarefa.PENDENTE),
-                tarefaRepository.countAtivasByIdUsuarioAndStatus(idUsuario, StatusTarefa.ATRASADA),
+                tarefaRepository.countAtrasadasByIdUsuario(idUsuario),
                 prioritarias
         );
     }

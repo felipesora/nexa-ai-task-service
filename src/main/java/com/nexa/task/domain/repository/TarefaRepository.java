@@ -40,6 +40,10 @@ public interface TarefaRepository {
 
     long countAtivasByIdUsuarioAndStatus(Long idUsuario, StatusTarefa status);
 
+    long countAtrasadasByIdUsuario(Long idUsuario);
+
+    long countAtrasadasByIdWorkspace(Long idWorkspace);
+
     List<Tarefa> findPrioritariasByIdUsuario(Long idUsuario, int limite);
 
     List<Tarefa> findAtivasByIdUsuarioAndDataLimiteEntre(Long idUsuario, LocalDateTime inicio, LocalDateTime fim);
