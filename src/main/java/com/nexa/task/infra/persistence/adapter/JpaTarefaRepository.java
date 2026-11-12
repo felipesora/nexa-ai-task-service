@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,6 +111,14 @@ public class JpaTarefaRepository implements TarefaRepository {
     @Override
     public List<Tarefa> findPrioritariasByIdUsuario(Long idUsuario, int limite) {
         return repository.buscarPrioritariasPorIdUsuario(idUsuario, PageRequest.of(0, limite))
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Tarefa> findAtivasByIdUsuarioAndDataLimiteEntre(Long idUsuario, LocalDateTime inicio, LocalDateTime fim) {
+        return repository.findByIdUsuarioAndAtivoTrueAndDataLimiteBetweenOrderByDataLimiteAsc(idUsuario, inicio, fim)
                 .stream()
                 .map(mapper::toDomain)
                 .toList();

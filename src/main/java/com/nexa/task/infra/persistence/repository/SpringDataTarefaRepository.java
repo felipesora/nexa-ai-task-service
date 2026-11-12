@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +36,10 @@ public interface SpringDataTarefaRepository extends JpaRepository<TarefaEntity, 
     List<TarefaEntity> findAllByWorkspace_Id(Long idWorkspace);
 
     Optional<TarefaEntity> findByIdAndAtivoTrue(Long id);
+
+    List<TarefaEntity> findByIdUsuarioAndAtivoTrueAndDataLimiteBetweenOrderByDataLimiteAsc(Long idUsuario,
+                                                                                           LocalDateTime inicio,
+                                                                                           LocalDateTime fim);
 
     long countByIdUsuarioAndStatusAndAtivoTrue(Long idUsuario, StatusTarefa status);
 

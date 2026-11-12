@@ -55,6 +55,13 @@ public class TarefaBeanConfig {
     }
 
     @Bean
+    ListarTarefasAgendaUseCase listarTarefasAgendaUseCase(TarefaRepository tarefaRepository,
+                                                          TarefaControllerMapper mapper,
+                                                          AuthenticationService authService) {
+        return new ListarTarefasAgendaUseCase(tarefaRepository, mapper, authService);
+    }
+
+    @Bean
     ListarTarefasPorIdUsuarioETituloUseCase listarTarefasPorIdUsuarioETituloUseCase(TarefaRepository tarefaRepository,
                                                                                      TarefaControllerMapper mapper,
                                                                                     AuthenticationService authService) {

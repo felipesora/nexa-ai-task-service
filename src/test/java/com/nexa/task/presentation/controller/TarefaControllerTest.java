@@ -56,6 +56,9 @@ class TarefaControllerTest {
     private ListarTodasTarefasUseCase listarTodasTarefasUseCase;
 
     @MockitoBean
+    private ListarTarefasAgendaUseCase listarTarefasAgendaUseCase;
+
+    @MockitoBean
     private BuscarTarefaPorIdUseCase buscarTarefaPorIdUseCase;
 
     @MockitoBean
