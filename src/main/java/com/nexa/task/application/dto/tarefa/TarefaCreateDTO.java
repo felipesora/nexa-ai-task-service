@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record TarefaCreateDTO(
         @NotBlank(message = "Título da tarefa é obrigatório")
@@ -29,6 +30,10 @@ public record TarefaCreateDTO(
 
         @NotNull(message = "ID do workspace é obrigatório")
         @JsonProperty("id_workspace")
-        Long idWorkspace
+        Long idWorkspace,
+
+        // Opcional: tags do usuário já vinculadas no cadastro
+        @JsonProperty("id_tags")
+        List<Long> idTags
 ) {
 }

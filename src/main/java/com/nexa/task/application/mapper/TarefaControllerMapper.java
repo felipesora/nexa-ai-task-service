@@ -13,9 +13,11 @@ import java.time.LocalDateTime;
 public class TarefaControllerMapper {
 
     private final SubtarefaRepository subtarefaRepository;
+    private final TagControllerMapper tagMapper;
 
-    public TarefaControllerMapper(SubtarefaRepository subtarefaRepository) {
+    public TarefaControllerMapper(SubtarefaRepository subtarefaRepository, TagControllerMapper tagMapper) {
         this.subtarefaRepository = subtarefaRepository;
+        this.tagMapper = tagMapper;
     }
 
     public Tarefa toDomain(TarefaCreateDTO request, Workspace workspace, Long idUsuario) {
@@ -54,7 +56,12 @@ public class TarefaControllerMapper {
                 tarefa.getAtivo(),
                 tarefa.getWorkspace().getId(),
                 subtarefaRepository.countAtivasByIdTarefa(tarefa.getId()),
-                subtarefaRepository.countConcluidasAtivasByIdTarefa(tarefa.getId())
+                subtarefaRepository.countConcluidasAtivasByIdTarefa(tarefa.getId()),
+                // Tags desativadas continuam no vínculo do banco, mas não são exibidas
+                tarefa.getTags().stream()
+                        .filter(tag -> Boolean.TRUE.equals(tag.getAtivo()))
+                        .map(tagMapper::toResponse)
+                        .toList()
         );
     }
 

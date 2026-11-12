@@ -29,7 +29,7 @@ class TarefaControllerMapperTest {
 
     @BeforeEach
     void setUp() {
-        mapper = new TarefaControllerMapper(subtarefaRepository);
+        mapper = new TarefaControllerMapper(subtarefaRepository, new TagControllerMapper(new CorTagControllerMapper()));
     }
 
     @Test

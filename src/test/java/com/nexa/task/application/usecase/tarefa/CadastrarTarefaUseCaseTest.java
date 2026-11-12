@@ -42,6 +42,9 @@ class CadastrarTarefaUseCaseTest {
     @Mock
     private AuthenticationService authService;
 
+    @Mock
+    private com.nexa.task.domain.repository.TagRepository tagRepository;
+
     @InjectMocks
     private CadastrarTarefaUseCase useCase;
 
@@ -54,7 +57,8 @@ class CadastrarTarefaUseCaseTest {
                 PrioridadeTarefa.ALTA,
                 DificuldadeTarefa.MEDIA,
                 LocalDateTime.now().plusDays(1),
-                1L
+                1L,
+                null
         );
 
         Workspace workspace = new WorkspaceBuilder()
@@ -85,7 +89,8 @@ class CadastrarTarefaUseCaseTest {
                 true,
                 1L,
                 0L,
-                0L
+                0L,
+                java.util.List.of()
         );
 
         when(workspaceRepository.findByIdAtivo(1L))
@@ -124,7 +129,8 @@ class CadastrarTarefaUseCaseTest {
                 PrioridadeTarefa.ALTA,
                 DificuldadeTarefa.MEDIA,
                 LocalDateTime.now().plusDays(1),
-                999L
+                999L,
+                null
         );
 
         when(workspaceRepository.findByIdAtivo(999L))

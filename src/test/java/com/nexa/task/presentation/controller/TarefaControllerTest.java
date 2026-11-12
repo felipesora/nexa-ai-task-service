@@ -126,7 +126,8 @@ class TarefaControllerTest {
                 PrioridadeTarefa.ALTA,
                 DificuldadeTarefa.MEDIA,
                 dataLimite,
-                1L
+                1L,
+                null
         );
 
         response = new TarefaResponseDTO(
@@ -144,7 +145,8 @@ class TarefaControllerTest {
                 true,
                 1L,
                 0L,
-                0L
+                0L,
+                java.util.List.of()
         );
 
         updateDto = new TarefaUpdateDTO(
@@ -225,6 +227,7 @@ class TarefaControllerTest {
         TarefaCreateDTO requestInvalido = new TarefaCreateDTO(
                 "",
                 "",
+                null,
                 null,
                 null,
                 null,

@@ -134,7 +134,8 @@ class WorkspaceControllerTest {
                 true,
                 1L,
                 0L,
-                0L
+                0L,
+                java.util.List.of()
         );
     }
 
