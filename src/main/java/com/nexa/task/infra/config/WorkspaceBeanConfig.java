@@ -59,6 +59,12 @@ public class WorkspaceBeanConfig {
     }
 
     @Bean
+    BuscarResumoWorkspaceUseCase buscarResumoWorkspaceUseCase(WorkspaceRepository workspaceRepository, TarefaRepository tarefaRepository,
+                                                              AuthenticationService authService) {
+        return new BuscarResumoWorkspaceUseCase(workspaceRepository, tarefaRepository, authService);
+    }
+
+    @Bean
     AtivarWorkspaceUseCase ativarWorkspaceUseCase(WorkspaceRepository workspaceRepository) {
         return new AtivarWorkspaceUseCase(workspaceRepository);
     }
@@ -69,8 +75,9 @@ public class WorkspaceBeanConfig {
     }
 
     @Bean
-    WorkspaceControllerMapper workspaceControllerMapper(CorWorkspaceControllerMapper corWorkspaceMapper, IconeWorkspaceControllerMapper iconeWorkspaceMapper) {
-        return new WorkspaceControllerMapper(corWorkspaceMapper, iconeWorkspaceMapper);
+    WorkspaceControllerMapper workspaceControllerMapper(CorWorkspaceControllerMapper corWorkspaceMapper, IconeWorkspaceControllerMapper iconeWorkspaceMapper,
+                                                        TarefaRepository tarefaRepository) {
+        return new WorkspaceControllerMapper(corWorkspaceMapper, iconeWorkspaceMapper, tarefaRepository);
     }
 
     @Bean

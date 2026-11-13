@@ -3,6 +3,7 @@ package com.nexa.task.presentation.controller;
 import com.nexa.task.application.dto.subtarefa.SubtarefaResponseDTO;
 import com.nexa.task.application.dto.tag.TagResponseDTO;
 import com.nexa.task.application.dto.tarefa.TarefaCreateDTO;
+import com.nexa.task.application.dto.tarefa.ResumoTarefasResponseDTO;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.dto.tarefa.TarefaUpdateDTO;
 import com.nexa.task.application.usecase.subtarefa.ListarSubtarefasPorIdTarefaUseCase;
@@ -15,6 +16,8 @@ import com.nexa.task.application.usecase.tarefa.CadastrarTarefaUseCase;
 import com.nexa.task.application.usecase.tarefa.ConcluirTarefaUseCase;
 import com.nexa.task.application.usecase.tarefa.DesativarTarefaUseCase;
 import com.nexa.task.application.usecase.tarefa.IniciarTarefaUseCase;
+import com.nexa.task.application.usecase.tarefa.BuscarResumoTarefasPorIdUsuarioUseCase;
+import com.nexa.task.application.usecase.tarefa.ListarTarefasAgendaUseCase;
 import com.nexa.task.application.usecase.tarefa.ListarTarefasPorIdUsuarioETituloUseCase;
 import com.nexa.task.application.usecase.tarefa.ListarTarefasPorIdUsuarioUseCase;
 import com.nexa.task.application.usecase.tarefa.ListarTodasTarefasUseCase;
@@ -33,6 +36,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,6 +52,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/tarefas")
@@ -70,6 +76,8 @@ public class TarefaController {
     private final AtivarTarefaUseCase ativarTarefaUseCase;
     private final AdicionarTagNaTarefaUseCase adicionarTagNaTarefaUseCase;
     private final RemoverTagDaTarefaUseCase removerTagDaTarefaUseCase;
+    private final BuscarResumoTarefasPorIdUsuarioUseCase buscarResumoTarefasPorIdUsuarioUseCase;
+    private final ListarTarefasAgendaUseCase listarTarefasAgendaUseCase;
 
     public TarefaController(
             CadastrarTarefaUseCase cadastrarTarefaUseCase,
@@ -86,7 +94,9 @@ public class TarefaController {
             DesativarTarefaUseCase desativarTarefaUseCase,
             AtivarTarefaUseCase ativarTarefaUseCase,
             AdicionarTagNaTarefaUseCase adicionarTagNaTarefaUseCase,
-            RemoverTagDaTarefaUseCase removerTagDaTarefaUseCase) {
+            RemoverTagDaTarefaUseCase removerTagDaTarefaUseCase,
+            BuscarResumoTarefasPorIdUsuarioUseCase buscarResumoTarefasPorIdUsuarioUseCase,
+            ListarTarefasAgendaUseCase listarTarefasAgendaUseCase) {
         this.cadastrarTarefaUseCase = cadastrarTarefaUseCase;
         this.listarTodasTarefasUseCase = listarTodasTarefasUseCase;
         this.listarTarefasPorIdUsuarioUseCase = listarTarefasPorIdUsuarioUseCase;
@@ -102,6 +112,8 @@ public class TarefaController {
         this.ativarTarefaUseCase = ativarTarefaUseCase;
         this.adicionarTagNaTarefaUseCase = adicionarTagNaTarefaUseCase;
         this.removerTagDaTarefaUseCase = removerTagDaTarefaUseCase;
+        this.buscarResumoTarefasPorIdUsuarioUseCase = buscarResumoTarefasPorIdUsuarioUseCase;
+        this.listarTarefasAgendaUseCase = listarTarefasAgendaUseCase;
     }
 
     @Operation(
@@ -362,6 +374,69 @@ public class TarefaController {
             tarefas = listarTarefasPorIdUsuarioUseCase.execute(idUsuario, pageable);
         }
         return ResponseEntity.ok(tarefas);
+    }
+
+    @Operation(
+            summary = "Resumo das tarefas do usuario",
+            description = """
+                Retorna os dados da dashboard: quantidade de tarefas por status e as 5 tarefas em aberto
+                de maior prioridade (empate decidido pelo prazo mais proximo).
+
+                Regras de negocio:
+                - Considera apenas tarefas ativas.
+                - Apenas administradores ou o proprio usuario podem consultar o resumo.
+
+                Requer autenticacao JWT.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Resumo retornado com sucesso",
+                    content = @Content(schema = @Schema(implementation = ResumoTarefasResponseDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Usuario nao autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuario sem permissao",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/usuario/{idUsuario}/resumo")
+    public ResponseEntity<ResumoTarefasResponseDTO> buscarResumoTarefasPorIdUsuario(
+            @Parameter(description = "Identificador do usuario proprietario das tarefas") @PathVariable Long idUsuario) {
+        return ResponseEntity.ok(buscarResumoTarefasPorIdUsuarioUseCase.execute(idUsuario));
+    }
+
+    @Operation(
+            summary = "Listar tarefas da agenda",
+            description = """
+                Retorna, sem paginacao, as tarefas ativas do usuario cujo prazo esta no periodo informado,
+                ordenadas pela data limite. Usado pelo calendario da agenda.
+
+                Regras de negocio:
+                - Apenas administradores ou o proprio usuario podem consultar.
+                - `inicio` e inclusivo e `fim` e exclusivo (formato yyyy-MM-dd).
+                - `fim` deve ser posterior a `inicio` e o periodo nao pode passar de 62 dias.
+                - Tarefas sem data limite nao sao retornadas.
+
+                Requer autenticacao JWT.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Tarefas retornadas com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Periodo invalido",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Usuario nao autenticado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Usuario sem permissao",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/usuario/{idUsuario}/agenda")
+    public ResponseEntity<List<TarefaResponseDTO>> listarTarefasAgenda(
+            @Parameter(description = "Identificador do usuario proprietario das tarefas") @PathVariable Long idUsuario,
+            @Parameter(description = "Inicio do periodo (inclusivo), yyyy-MM-dd")
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @Parameter(description = "Fim do periodo (exclusivo), yyyy-MM-dd")
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
+        return ResponseEntity.ok(listarTarefasAgendaUseCase.execute(idUsuario, inicio, fim));
     }
 
     @Operation(

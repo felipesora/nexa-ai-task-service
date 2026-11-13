@@ -67,7 +67,8 @@ class ListarWorkspacesPorIdUsuarioUseCaseTest {
                 LocalDateTime.now(),
                 true,
                 null,
-                null
+                null,
+                0L
         );
 
         WorkspaceResponseDTO response2 = new WorkspaceResponseDTO(
@@ -79,7 +80,8 @@ class ListarWorkspacesPorIdUsuarioUseCaseTest {
                 LocalDateTime.now(),
                 true,
                 null,
-                null
+                null,
+                0L
         );
 
         doNothing().when(authService).validateOwnerOrAdmin(idUsuario);

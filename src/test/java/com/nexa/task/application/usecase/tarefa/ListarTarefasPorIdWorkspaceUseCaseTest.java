@@ -4,6 +4,9 @@ import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.mapper.TarefaControllerMapper;
 import com.nexa.task.domain.builder.tarefa.TarefaBuilder;
+import com.nexa.task.domain.entity.tarefa.FiltroTarefas;
+import com.nexa.task.domain.entity.tarefa.PrioridadeTarefa;
+import com.nexa.task.domain.entity.tarefa.StatusTarefa;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import com.nexa.task.domain.entity.workspace.Workspace;
 import com.nexa.task.domain.repository.TarefaRepository;
@@ -43,6 +46,8 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
     @InjectMocks
     private ListarTarefasPorIdWorkspaceUseCase useCase;
 
+    private final FiltroTarefas filtro = FiltroTarefas.vazio();
+
     @Mock
     private Workspace workspace;
 
@@ -71,20 +76,20 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
         when(workspace.getIdUsuario()).thenReturn(1L);
         doNothing().when(authService).validateOwnerOrAdmin(1L);
 
-        when(tarefaRepository.findByIdWorkspaceAndAtivo(1L, pageable))
+        when(tarefaRepository.findByIdWorkspaceAndAtivo(1L, filtro, pageable))
                 .thenReturn(page);
 
         when(mapper.toResponse(tarefa))
                 .thenReturn(response);
 
         Page<TarefaResponseDTO> resultado =
-                useCase.execute(1L, pageable);
+                useCase.execute(1L, filtro, pageable);
 
         assertEquals(1, resultado.getTotalElements());
 
         verify(workspaceRepository).findByIdAtivo(1L);
         verify(authService).validateOwnerOrAdmin(1L);
-        verify(tarefaRepository).findByIdWorkspaceAndAtivo(1L, pageable);
+        verify(tarefaRepository).findByIdWorkspaceAndAtivo(1L, filtro, pageable);
         verify(mapper).toResponse(tarefa);
     }
 
@@ -97,7 +102,7 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
         EntityNotFoundException exception =
                 assertThrows(
                         EntityNotFoundException.class,
-                        () -> useCase.execute(999L, pageable)
+                        () -> useCase.execute(999L, filtro, pageable)
                 );
 
         assertEquals(
@@ -106,7 +111,7 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
         );
 
         verify(authService, never()).validateOwnerOrAdmin(anyLong());
-        verify(tarefaRepository, never()).findByIdWorkspaceAndAtivo(anyLong(), any());
+        verify(tarefaRepository, never()).findByIdWorkspaceAndAtivo(anyLong(), any(), any());
     }
 
     @Test
@@ -123,13 +128,41 @@ class ListarTarefasPorIdWorkspaceUseCaseTest {
 
         assertThrows(
                 ForbiddenException.class,
-                () -> useCase.execute(1L, pageable)
+                () -> useCase.execute(1L, filtro, pageable)
         );
 
         verify(tarefaRepository, never())
-                .findByIdWorkspaceAndAtivo(anyLong(), any());
+                .findByIdWorkspaceAndAtivo(anyLong(), any(), any());
 
         verify(mapper, never())
                 .toResponse(any());
+    }
+
+    @Test
+    void deveRepassarOsFiltrosParaORepositorio() {
+
+        Pageable pageable = PageRequest.of(0, 10);
+        FiltroTarefas filtroCompleto = new FiltroTarefas("relatorio", StatusTarefa.PENDENTE, PrioridadeTarefa.ALTA, 3L);
+        Workspace workspaceDoUsuario = new com.nexa.task.domain.builder.workspace.WorkspaceBuilder()
+                .comId(1L)
+                .comIdUsuario(10L)
+                .build();
+
+        when(workspaceRepository.findByIdAtivo(1L)).thenReturn(Optional.of(workspaceDoUsuario));
+        when(tarefaRepository.findByIdWorkspaceAndAtivo(1L, filtroCompleto, pageable))
+                .thenReturn(new PageImpl<>(List.of(), pageable, 0));
+
+        Page<TarefaResponseDTO> resultado = useCase.execute(1L, filtroCompleto, pageable);
+
+        assertEquals(0, resultado.getTotalElements());
+        verify(tarefaRepository).findByIdWorkspaceAndAtivo(1L, filtroCompleto, pageable);
+    }
+
+    @Test
+    void deveTratarTituloEmBrancoComoSemFiltro() {
+
+        FiltroTarefas filtroComTituloEmBranco = new FiltroTarefas("   ", null, null, null);
+
+        assertEquals(FiltroTarefas.vazio(), filtroComTituloEmBranco);
     }
 }

@@ -36,9 +36,9 @@ public interface SpringDataTagRepository extends JpaRepository<TagEntity, Long> 
 
     Page<TagEntity> findByIdUsuarioAndAtivoTrue(Long idUsuario, Pageable pageable);
 
-    boolean existsByNomeAndIdUsuario(String nome, Long idUsuario);
+    boolean existsByNomeAndIdUsuarioAndAtivoTrue(String nome, Long idUsuario);
 
-    boolean existsByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id);
+    boolean existsByNomeAndIdUsuarioAndAtivoTrueAndIdNot(String nome, Long idUsuario, Long id);
 
     @Modifying
     @Transactional

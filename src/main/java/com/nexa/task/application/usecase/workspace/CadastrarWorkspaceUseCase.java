@@ -58,7 +58,7 @@ public class CadastrarWorkspaceUseCase {
     }
 
     private void validarNomeUnicoDeWorkspace(String nome, Long idUsuario) {
-        if (workspaceRepository.existsByNomeAndIdUsuario(nome, idUsuario)) {
+        if (workspaceRepository.existsAtivoByNomeAndIdUsuario(nome, idUsuario)) {
             throw new BadRequestException("Já existe um workspace com esse nome para este usuário");
         }
     }

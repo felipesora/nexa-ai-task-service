@@ -1,9 +1,12 @@
 package com.nexa.task.domain.repository;
 
+import com.nexa.task.domain.entity.tarefa.FiltroTarefas;
+import com.nexa.task.domain.entity.tarefa.StatusTarefa;
 import com.nexa.task.domain.entity.tarefa.Tarefa;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +18,7 @@ public interface TarefaRepository {
 
     Page<Tarefa> findByIdWorkspace(Long idWorkspace, Pageable pageable);
 
-    Page<Tarefa> findByIdWorkspaceAndAtivo(Long idWorkspace, Pageable pageable);
+    Page<Tarefa> findByIdWorkspaceAndAtivo(Long idWorkspace, FiltroTarefas filtro, Pageable pageable);
 
     List<Tarefa> findAllByWorkspace(Long idWorkspace);
 
@@ -30,4 +33,18 @@ public interface TarefaRepository {
     Optional<Tarefa> findById(Long id);
 
     Optional<Tarefa> findByIdAtivo(Long id);
+
+    long countAtivasByIdWorkspace(Long idWorkspace);
+
+    long countAtivasByIdWorkspaceAndStatus(Long idWorkspace, StatusTarefa status);
+
+    long countAtivasByIdUsuarioAndStatus(Long idUsuario, StatusTarefa status);
+
+    long countAtrasadasByIdUsuario(Long idUsuario);
+
+    long countAtrasadasByIdWorkspace(Long idWorkspace);
+
+    List<Tarefa> findPrioritariasByIdUsuario(Long idUsuario, int limite);
+
+    List<Tarefa> findAtivasByIdUsuarioAndDataLimiteEntre(Long idUsuario, LocalDateTime inicio, LocalDateTime fim);
 }

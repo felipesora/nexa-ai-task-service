@@ -56,7 +56,7 @@ class AtualizarTagUseCaseTest {
                 .build();
 
         when(tagRepository.findByIdAtivo(idTag)).thenReturn(Optional.of(tag));
-        when(tagRepository.existsByNomeAndIdUsuarioAndIdNot(
+        when(tagRepository.existsAtivoByNomeAndIdUsuarioAndIdNot(
                 "Tag Atualizada",
                 1L,
                 idTag
@@ -95,7 +95,7 @@ class AtualizarTagUseCaseTest {
                 .build();
 
         when(tagRepository.findByIdAtivo(idTag)).thenReturn(Optional.of(tag));
-        when(tagRepository.existsByNomeAndIdUsuarioAndIdNot(
+        when(tagRepository.existsAtivoByNomeAndIdUsuarioAndIdNot(
                 "Tag Atualizada",
                 1L,
                 idTag
@@ -150,7 +150,7 @@ class AtualizarTagUseCaseTest {
                 .build();
 
         when(tagRepository.findByIdAtivo(idTag)).thenReturn(Optional.of(tag));
-        when(tagRepository.existsByNomeAndIdUsuarioAndIdNot(
+        when(tagRepository.existsAtivoByNomeAndIdUsuarioAndIdNot(
                 "Tag Atualizada",
                 1L,
                 idTag
@@ -189,7 +189,7 @@ class AtualizarTagUseCaseTest {
 
         doNothing().when(authService).validateOwnerOrAdmin(anyLong());
 
-        when(tagRepository.existsByNomeAndIdUsuarioAndIdNot(
+        when(tagRepository.existsAtivoByNomeAndIdUsuarioAndIdNot(
                 "Tag Atualizada",
                 1L,
                 idTag

@@ -3,6 +3,7 @@ package com.nexa.task.application.usecase.tarefa;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.mapper.TarefaControllerMapper;
+import com.nexa.task.domain.entity.tarefa.FiltroTarefas;
 import com.nexa.task.domain.entity.workspace.Workspace;
 import com.nexa.task.domain.repository.TarefaRepository;
 import com.nexa.task.domain.repository.WorkspaceRepository;
@@ -24,13 +25,13 @@ public class ListarTarefasPorIdWorkspaceUseCase {
         this.authService = authService;
     }
 
-    public Page<TarefaResponseDTO> execute(Long idWorkspace, Pageable pageable) {
+    public Page<TarefaResponseDTO> execute(Long idWorkspace, FiltroTarefas filtro, Pageable pageable) {
         Workspace workspace = workspaceRepository.findByIdAtivo(idWorkspace)
                 .orElseThrow(() -> new EntityNotFoundException("Workspace com id: " + idWorkspace + " não encontrado."));
 
         authService.validateOwnerOrAdmin(workspace.getIdUsuario());
 
-        return tarefaRepository.findByIdWorkspaceAndAtivo(idWorkspace, pageable)
+        return tarefaRepository.findByIdWorkspaceAndAtivo(idWorkspace, filtro, pageable)
                 .map(mapper::toResponse);
     }
 }

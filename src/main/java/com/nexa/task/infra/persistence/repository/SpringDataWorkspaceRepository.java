@@ -15,9 +15,9 @@ import java.util.Optional;
 @Repository
 public interface SpringDataWorkspaceRepository extends JpaRepository<WorkspaceEntity, Long> {
 
-    boolean existsByNomeAndIdUsuario(String nome, Long idUsuario);
+    boolean existsByNomeAndIdUsuarioAndAtivoTrue(String nome, Long idUsuario);
 
-    boolean existsByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id);
+    boolean existsByNomeAndIdUsuarioAndAtivoTrueAndIdNot(String nome, Long idUsuario, Long id);
 
     Page<WorkspaceEntity> findByIdUsuario(Long idUsuario, Pageable pageable);
 

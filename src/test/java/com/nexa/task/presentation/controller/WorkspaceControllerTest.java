@@ -3,6 +3,7 @@ package com.nexa.task.presentation.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nexa.task.application.dto.tarefa.TarefaResponseDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceRequestDTO;
+import com.nexa.task.application.dto.workspace.ResumoWorkspaceResponseDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceResponseDTO;
 import com.nexa.task.application.dto.workspace.WorkspaceUpdateDTO;
 import com.nexa.task.application.exception.BadRequestException;
@@ -10,6 +11,7 @@ import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.application.usecase.tarefa.ListarTarefasPorIdWorkspaceUseCase;
 import com.nexa.task.application.usecase.workspace.*;
 import com.nexa.task.domain.entity.tarefa.DificuldadeTarefa;
+import com.nexa.task.domain.entity.tarefa.FiltroTarefas;
 import com.nexa.task.domain.entity.tarefa.PrioridadeTarefa;
 import com.nexa.task.domain.entity.tarefa.StatusTarefa;
 import com.nexa.task.infra.security.JwtAuthenticationFilter;
@@ -71,6 +73,9 @@ class WorkspaceControllerTest {
     private AtivarWorkspaceUseCase ativarWorkspaceUseCase;
 
     @MockitoBean
+    private BuscarResumoWorkspaceUseCase buscarResumoWorkspaceUseCase;
+
+    @MockitoBean
     private TokenProvider tokenProvider;
 
     @MockitoBean
@@ -110,7 +115,8 @@ class WorkspaceControllerTest {
                 LocalDateTime.now(),
                 true,
                 null,
-                null
+                null,
+                0L
         );
 
         tarefaResponse = new TarefaResponseDTO(
@@ -126,7 +132,11 @@ class WorkspaceControllerTest {
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 true,
-                1L
+                1L,
+                0L,
+                0L,
+                java.util.List.of(),
+                false
         );
     }
 
@@ -307,7 +317,7 @@ class WorkspaceControllerTest {
                 new PageImpl<>(List.of(tarefaResponse));
 
         when(listarTarefasPorIdWorkspaceUseCase
-                .execute(eq(1L), any(Pageable.class)))
+                .execute(eq(1L), any(), any(Pageable.class)))
                 .thenReturn(page);
 
         mockMvc.perform(get("/v1/workspaces/1/tarefas"))
@@ -336,7 +346,7 @@ class WorkspaceControllerTest {
             throws Exception {
 
         when(listarTarefasPorIdWorkspaceUseCase
-                .execute(eq(999L), any(Pageable.class)))
+                .execute(eq(999L), any(), any(Pageable.class)))
                 .thenThrow(
                         new EntityNotFoundException(
                                 "Workspace com id: 999 não encontrado."
@@ -503,5 +513,47 @@ class WorkspaceControllerTest {
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.message")
                         .value("Workspace com id: 999 não encontrado"));
+    }
+
+    @Test
+    void deveRetornarResumoDoWorkspace() throws Exception {
+
+        when(buscarResumoWorkspaceUseCase.execute(1L))
+                .thenReturn(new ResumoWorkspaceResponseDTO(12L, 4L, 3L, 4L, 1L));
+
+        mockMvc.perform(get("/v1/workspaces/1/resumo"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(12))
+                .andExpect(jsonPath("$.concluidas").value(4))
+                .andExpect(jsonPath("$.em_andamento").value(3))
+                .andExpect(jsonPath("$.pendentes").value(4))
+                .andExpect(jsonPath("$.atrasadas").value(1));
+    }
+
+    @Test
+    void deveRepassarFiltrosDaUrlParaOUseCase() throws Exception {
+
+        when(listarTarefasPorIdWorkspaceUseCase.execute(eq(1L), any(), any(Pageable.class)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.List.of()));
+
+        mockMvc.perform(get("/v1/workspaces/1/tarefas")
+                        .param("titulo", "relatorio")
+                        .param("status", "ATRASADA")
+                        .param("prioridade", "URGENTE")
+                        .param("idTag", "3"))
+                .andExpect(status().isOk());
+
+        verify(listarTarefasPorIdWorkspaceUseCase).execute(
+                eq(1L),
+                eq(new FiltroTarefas("relatorio", StatusTarefa.ATRASADA, PrioridadeTarefa.URGENTE, 3L)),
+                any(Pageable.class));
+    }
+
+    @Test
+    void deveRetornar400QuandoStatusDoFiltroForInvalido() throws Exception {
+
+        mockMvc.perform(get("/v1/workspaces/1/tarefas").param("status", "QUALQUER"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
     }
 }

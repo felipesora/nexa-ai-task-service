@@ -47,7 +47,7 @@ public class CadastrarTagUseCase {
     }
 
     private void validarNomeUnicoDeTag(String nome, Long idUsuario) {
-        if (tagRepository.existsByNomeAndIdUsuario(nome, idUsuario)) {
+        if (tagRepository.existsAtivoByNomeAndIdUsuario(nome, idUsuario)) {
             throw new BadRequestException("Já existe uma tag com esse nome para este usuário");
         }
     }

@@ -70,13 +70,13 @@ public class JpaTagRepository implements TagRepository {
     }
 
     @Override
-    public boolean existsByNomeAndIdUsuario(String nome, Long idUsuario) {
-        return repository.existsByNomeAndIdUsuario(nome, idUsuario);
+    public boolean existsAtivoByNomeAndIdUsuario(String nome, Long idUsuario) {
+        return repository.existsByNomeAndIdUsuarioAndAtivoTrue(nome, idUsuario);
     }
 
     @Override
-    public boolean existsByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id) {
-        return repository.existsByNomeAndIdUsuarioAndIdNot(nome, idUsuario, id);
+    public boolean existsAtivoByNomeAndIdUsuarioAndIdNot(String nome, Long idUsuario, Long id) {
+        return repository.existsByNomeAndIdUsuarioAndAtivoTrueAndIdNot(nome, idUsuario, id);
     }
 
     @Override

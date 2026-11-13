@@ -60,7 +60,7 @@ public class AtualizarWorkspaceUseCase {
     }
 
     private void validarNomeUnicoDeWorkspace(Workspace workspace, WorkspaceUpdateDTO updateDTO) {
-        if (workspaceRepository.existsByNomeAndIdUsuarioAndIdNot(updateDTO.nome(), workspace.getIdUsuario(), workspace.getId())) {
+        if (workspaceRepository.existsAtivoByNomeAndIdUsuarioAndIdNot(updateDTO.nome(), workspace.getIdUsuario(), workspace.getId())) {
             throw new BadRequestException("Já existe um workspace com esse nome para este usuário");
         }
     }

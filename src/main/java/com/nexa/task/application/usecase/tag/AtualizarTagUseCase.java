@@ -44,7 +44,7 @@ public class AtualizarTagUseCase {
     }
 
     private void validarNomeUnicoDeTag(Tag tag, String nome) {
-        if (tagRepository.existsByNomeAndIdUsuarioAndIdNot(nome, tag.getIdUsuario(), tag.getId())) {
+        if (tagRepository.existsAtivoByNomeAndIdUsuarioAndIdNot(nome, tag.getIdUsuario(), tag.getId())) {
             throw new BadRequestException("Já existe uma tag com esse nome para este usuário");
         }
     }

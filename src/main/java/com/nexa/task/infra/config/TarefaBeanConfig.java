@@ -1,5 +1,6 @@
 package com.nexa.task.infra.config;
 
+import com.nexa.task.application.mapper.TagControllerMapper;
 import com.nexa.task.application.mapper.TarefaControllerMapper;
 import com.nexa.task.application.usecase.tarefa.*;
 import com.nexa.task.domain.repository.SubtarefaRepository;
@@ -21,9 +22,10 @@ public class TarefaBeanConfig {
     @Bean
     CadastrarTarefaUseCase cadastrarTarefaUseCase(TarefaRepository tarefaRepository,
                                                   WorkspaceRepository workspaceRepository,
+                                                  TagRepository tagRepository,
                                                   TarefaControllerMapper mapper,
                                                   AuthenticationService authService) {
-        return new CadastrarTarefaUseCase(tarefaRepository, workspaceRepository, mapper, authService);
+        return new CadastrarTarefaUseCase(tarefaRepository, workspaceRepository, tagRepository, mapper, authService);
     }
 
     @Bean
@@ -52,6 +54,13 @@ public class TarefaBeanConfig {
                                                                       TarefaControllerMapper mapper,
                                                                       AuthenticationService authService) {
         return new ListarTarefasPorIdUsuarioUseCase(tarefaRepository, mapper, authService);
+    }
+
+    @Bean
+    ListarTarefasAgendaUseCase listarTarefasAgendaUseCase(TarefaRepository tarefaRepository,
+                                                          TarefaControllerMapper mapper,
+                                                          AuthenticationService authService) {
+        return new ListarTarefasAgendaUseCase(tarefaRepository, mapper, authService);
     }
 
     @Bean
@@ -106,8 +115,16 @@ public class TarefaBeanConfig {
     }
 
     @Bean
-    TarefaControllerMapper tarefaControllerMapper() {
-        return new TarefaControllerMapper();
+    BuscarResumoTarefasPorIdUsuarioUseCase buscarResumoTarefasPorIdUsuarioUseCase(TarefaRepository tarefaRepository,
+                                                                                  TarefaControllerMapper mapper,
+                                                                                  AuthenticationService authService) {
+        return new BuscarResumoTarefasPorIdUsuarioUseCase(tarefaRepository, mapper, authService);
+    }
+
+    @Bean
+    TarefaControllerMapper tarefaControllerMapper(SubtarefaRepository subtarefaRepository,
+                                                  TagControllerMapper tagControllerMapper) {
+        return new TarefaControllerMapper(subtarefaRepository, tagControllerMapper);
     }
 
     @Bean

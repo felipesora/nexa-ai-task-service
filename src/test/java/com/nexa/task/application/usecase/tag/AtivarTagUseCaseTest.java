@@ -1,5 +1,6 @@
 package com.nexa.task.application.usecase.tag;
 
+import com.nexa.task.application.exception.BadRequestException;
 import com.nexa.task.application.exception.EntityNotFoundException;
 import com.nexa.task.domain.builder.tag.TagBuilder;
 import com.nexa.task.domain.entity.tag.Tag;
@@ -13,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
@@ -34,19 +36,51 @@ class AtivarTagUseCaseTest {
 
         Tag tag = new TagBuilder()
                 .comId(1L)
+                .comIdUsuario(10L)
                 .comNome("Tag Teste")
                 .comAtivo(false)
                 .build();
 
         when(tagRepository.findById(1L))
                 .thenReturn(Optional.of(tag));
+        when(tagRepository.existsAtivoByNomeAndIdUsuarioAndIdNot("Tag Teste", 10L, 1L))
+                .thenReturn(false);
 
         useCase.execute(1L);
 
         assertTrue(tag.getAtivo());
 
         verify(tagRepository).findById(1L);
+        verify(tagRepository).existsAtivoByNomeAndIdUsuarioAndIdNot("Tag Teste", 10L, 1L);
         verify(tagRepository).save(tag);
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoJaExisteTagAtivaComMesmoNome() {
+
+        Tag tag = new TagBuilder()
+                .comId(1L)
+                .comIdUsuario(10L)
+                .comNome("Tag Teste")
+                .comAtivo(false)
+                .build();
+
+        when(tagRepository.findById(1L))
+                .thenReturn(Optional.of(tag));
+        when(tagRepository.existsAtivoByNomeAndIdUsuarioAndIdNot("Tag Teste", 10L, 1L))
+                .thenReturn(true);
+
+        BadRequestException exception =
+                assertThrows(BadRequestException.class,
+                        () -> useCase.execute(1L));
+
+        assertEquals(
+                "Já existe uma tag ativa com esse nome para este usuário",
+                exception.getMessage()
+        );
+
+        assertFalse(tag.getAtivo());
+        verify(tagRepository, never()).save(any());
     }
 
     @Test
